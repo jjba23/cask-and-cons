@@ -31,21 +31,17 @@
   '("d12frosted/emacs-plus"))
 
 (define brew-formulae
-  '(;; from README
-    "jq" "fzf" "tree" "coreutils" "marksman" "gpg" "yaml-language-server"
+  '("jq" "fzf" "tree" "coreutils" "marksman" "gpg" "yaml-language-server"
     "apm" "azure-cli" "gh" "Azure/kubelogin/kubelogin" "k9s" "krew"
     "kubectx" "7zip" "guile"
-    ;; extra useful macOS tools
     "kubectl" "ripgrep" "fd" "bat" "eza" "htop" "wget" "watch" "git-delta"
     "yq" "tmux" "mas" "gnu-sed" "gawk" "shellcheck" "direnv" "zoxide"
     "jless" "tldr"))
 
 (define brew-casks
-  '(;; from README
-    "iterm2" "the-unarchiver" "bruno" "claude" "claude-code" "omniwm"
+  '("iterm2" "the-unarchiver" "bruno" "claude" "claude-code" "omniwm"
     "emacs-plus-app@master"
-    ;; extra useful macOS apps
-    "rectangle" "stats" "keepassxc" "raycast" "podman-desktop"))
+    "rectangle" "stats" "keepassxc" "raycast"))
 
 (define (brew-output . args)
   "Run brew with @var{args}; return its stdout lines as a list."
@@ -84,6 +80,6 @@
                   (log-info "Tapping ~a" t)
                   (system* "brew" "tap" t)))
               brew-taps)
-    (brew-install! '() (missing brew-formulae formulae))
-    (brew-install! '("--cask") (missing brew-casks casks)))
+    (brew-install! '("-y") (missing brew-formulae formulae))
+    (brew-install! '("-y" "--cask") (missing brew-casks casks)))
   (log-success "Homebrew packages are installed"))
