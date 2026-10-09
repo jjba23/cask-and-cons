@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# cask-and-cons CLI entrypoint.
+#
+# Usage:
+#   ./caco <task> [args...]
+#   ./caco compile
+#   ./caco install-git
+#   ./caco list
+#   ./caco --list   (special-cased alias for 'list'; no other task
+#                    accepts a leading "--")
+#
+# This is a plain bash launcher: it re-execs through Guile (adding ./src
+# to the load path) and hands off to the Scheme entrypoint defined in
+# src/cask-and-cons/main.scm.
+set -euo pipefail
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+exec guile --no-auto-compile \
+     -L "$DIR/src" \
+     -e '(@ (cask-and-cons main) main)' \
+     -s "$DIR/src/cask-and-cons/main.scm" \
+     "$@"

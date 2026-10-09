@@ -1,0 +1,302 @@
+#+title: cask-and-cons
+
+*My work macOS dotfiles.*
+
+cask-and-cons provides a convenience CLI tool (~caco~). Naming stems from a pun on Homebrew casks of macOS and the cons cells of Lisp.
+
+
+------------------
+
+** Reproducibility and why declarative dotfiles matter
+
+Every piece of configuration this tool manages (Git config, gitignore
+globals, and others) is expressed as plain Scheme source code and data, alists and other simple constructs,
+describing the desired end state, rather than as a series of imperative shell commands that mutate files in place.
+
+This is a deliberate choice, as it offers:
+
+- *Reproducibility* — Given the same source (this repo) and the same   inputs (=user-settings.scm= and any local overrides), running =./caco install-git= always produces byte-identical output. There is no implicit dependency on whatever state the file happened to be in before, so *re-provisioning a machine (or recovering a wiped one) is just "clone the repo and run the tasks"*.
+- *Idempotency* — Install tasks overwrite the target file wholesale instead of patching/appending to it, so running them twice, or after manually editing the config, converges back to the declared state
+  instead of accumulating drift or duplicate entries.
+- *Auditability* — The desired configuration lives as data in version control, so changes show up as regular, reviewable diffs instead of being buried in shell history or one-off commands you may forget you ran.
+- *Separation of data and mechanism* — The "what" (e.g. =gitconfig=,  =gitconfig-personal=) is decoupled from the "how" (the serialization  helpers in =prelude.scm=), so adding a new dotfile module mostly means writing a new data definition, not new file-mutation logic.
+- *Portability of machine-specific tweaks* — =load-local-overrides= lets a given machine layer small, local changes on top of the shared declarative base, without forking the repo's own definitions.
+
+------------------
+
+** Keyboard modifications
+
+I like to customize modifier keys and in all keyboards map:
+- Caps Lock to Control
+
+Then I remove many superfluous or unnecessary keyboard shortcuts (some also conflict with Emacs)
+An important one to remove is "Next Input source" which is mapped to ~C-SPC~.
+
+--------
+
+** Install Homebrew
+
+Go to https://brew.sh and install it
+
+--------
+
+** Install iTerm2
+
+#+begin_src shell
+brew install --cask iterm2
+#+end_src
+
+I like to use Emacs Bindings for navigating the terminal. The iTerm2 default for the Control key works just fine, but the Meta key puts junk in the terminal. To fix this, iTerm2 needs to know that “Left Option” needs to be treated as a Meta key.
+
+Open Settings
+Click on Profile
+Click on Keys
+In the bottom right corner, You’ll see Left Option. Change that to Esc+
+
+I set it to 100k lines scrollback
+
+Then I set the window to have some transparency and blur.
+
+I also add some basic Emacs motions and bindings to iTerm profile, e.g. ~C-v~ for page down, etc.
+
+--------
+
+** Install Guile Scheme
+
+#+begin_src shell
+brew install guile
+#+end_src
+
+Guile libraries can now be installed here:
+    Source files: /opt/homebrew/share/guile/site/3.0
+  Compiled files: /opt/homebrew/lib/guile/3.0/site-ccache
+      Extensions: /opt/homebrew/lib/guile/3.0/extensions
+
+
+----------
+
+** The =cask-and-cons= CLI
+
+This repo ships its own executable entrypoint, =./caco=, a plain bash script that executes =guile=, with =./src= added to the
+load path, and hands off to the Scheme entrypoint defined in =src/cask-and-cons/main.scm=, which dispatches to a sub-task based on the CLI arguments.
+
+#+begin_src shell
+./caco <task> [args...]
+#+end_src
+
+=./caco --list= is a special-cased alias for =./caco list=;
+
+Available tasks:
+
+- =list= — print all available tasks
+- =compile= — byte-compile every =.scm= file under =src/= with =guild compile -W3=
+- =install-brew= — ensure the Homebrew taps, formulae and casks declared in =src/cask-and-cons/brew.scm= are installed (skips what is already present)
+- =install-git= — install the Git configuration
+- =install-omniwm= — install the OmniWM configuration
+- =install-zsh= — install the ZSH configuration (=~/.zshrc=)
+
+Install targets are just plain tasks named =install-<target>=; there is no separate =install= sub-command or target argument to parse.
+
+#+begin_src shell
+./caco list
+./caco --list
+./caco compile
+./caco install-git
+#+end_src
+
+*** Composing tasks
+
+Tasks that take no arguments can be chained in a single invocation by joining their names with commas (no spaces):
+
+#+begin_src shell
+./caco compile,install-git
+#+end_src
+
+This runs each task in order. Tasks that require their own arguments are not supported inside a chain and must be run on their own.
+
+All tasks log their progress with colored, timestamped output via =log-info=, =log-warning=, =log-error= and =log-success=, exported from
+=(cask-and-cons prelude)=.
+
+*** Adding a new install target
+
+All tasks, including install targets, live in the single =%tasks= alist inside =src/cask-and-cons/main.scm=, mapping a task name to a thunk:
+
+#+begin_src scheme
+(define %tasks
+  `(("compile"     . ,(lambda (args) (compile)))
+    ("install-git" . ,(lambda (args) (install-git-config)))
+    ("list"        . ,(lambda (args) ...))))
+#+end_src
+
+To wire up a new module (e.g. a =waybar= module):
+
+- Implement an =install-waybar-config= function in a new  =src/cask-and-cons/waybar.scm= module, following the pattern in  =src/cask-and-cons/git.scm=.
+- =use-module= it at the top of =src/cask-and-cons/main.scm=.
+- Add =("install-waybar" . ,(lambda (args) (install-waybar-config)))=
+   to =%tasks=.
+
+No changes to the dispatch logic itself are needed.
+
+----------
+
+** Install Emacs
+
+Installing Emacs is an important step in my setup.
+#+begin_src shell
+brew tap d12frosted/emacs-plus
+brew install --cask emacs-plus-app@master    # nightly from master
+# brew install --cask emacs-plus-app         # latest stable
+# brew install --cask emacs-plus-app@next    # nightly from release branch (next stable)
+#+end_src
+
+---------
+
+** Install Heks Emacs configuration
+
+Heks Emacs is fully compatible with macOS and GNU/Linux systems
+
+https://codeberg.org/jjba23/heks-emacs
+
+
+#+begin_src shell
+rm -rfv ~/.emacs.d && mkdir ~/.emacs.d
+cp -rfv src/* ~/.emacs.d
+#+end_src
+
+You can also configure it with  a =~/.emacs.d/heks-linux-bridge.el=
+#+begin_src emacs-lisp
+;; heks-linux-bridge.el --- Bridge to Heks Emacs  -*- lexical-binding: t -*-
+(setopt heks-emacs-font-mono "Intel One Mono"
+        heks-emacs-font-sans "Lucida Sans"
+        heks-emacs-font-serif "Baskerville"
+        heks-emacs-theme 'ayu-dark
+        heks-emacs-clone-dir "~/Hacking/heks-emacs"
+        heks-emacs-notes-roam-dir "~/Hacking/private-notes"
+        heks-emacs-ews-music-directory "~/Music")
+#+end_src
+
+
+---------
+
+** Install Jetbrains Toolbox
+
+JetBrains Toolbox is useful for managing your IntelliJ IDEA and other programs from Jetbrains.
+
+See https://www.jetbrains.com/toolbox-app/
+
+---------
+
+** Install useful packages
+
+All of the packages and casks below (plus some extras) are declared in =src/cask-and-cons/brew.scm= and installed with =./caco install-brew=.
+
+#+begin_src shell
+brew install jq fzf tree coreutils marksman gpg yaml-language-server apm azure-cli gh kubectl Azure/kubelogin/kubelogin rg k9s krew kubectx 7zip
+#+end_src
+
+ #+begin_src shell
+ brew install --cask the-unarchiver
+ brew install --cask bruno
+ brew install --cask claude
+  brew install --cask claude-code
+ #+end_src
+
+--------
+
+** Install Nix package manager
+
+#+begin_src shell
+curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh
+#+end_src
+
+------
+
+** Setup SSH config
+
+#+begin_src
+Host github.com
+     Hostname ssh.github.com
+     Port 443
+     IdentityFile ~/.ssh/gitlab_prive
+
+Host codeberg.org
+     Hostname codeberg.org
+     IdentityFile ~/.ssh/gitlab_prive
+#+end_src
+
+-------
+
+** Java, Kotlin - Setup SDKMAN and JVM things
+
+#+begin_src shell
+curl -s "https://get.sdkman.io" | bash
+sdk install java 25-tem
+sdk install maven
+#+end_src
+
+-------
+
+** Node.js, NPM - Setup NVM
+
+#+begin_src shell
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
+#+end_src
+
+---------
+
+** Containers - Setup Podman
+
+Get [[https://podman-desktop.io/][Podman Desktop]]
+
+-------
+
+** OmniWM - scrolling window manager
+
+#+begin_src shell
+brew install --cask omniwm
+#+end_src
+
+First-launch setup
+In System Settings > Desktop & Dock > Mission Control, turn ON Displays have separate Spaces.
+Log out of macOS and log back in for that change to take effect, unless you had it on already.
+Launch OmniWM and grant Accessibility and Input Monitoring when prompted. Both are required at launch.
+Optionally grant Screen Recording for capture-derived visuals: Overview thumbnails, rendered wallpaper previews, drag previews, and captured Hidden Bar glyphs.
+Return to OmniWM’s permissions window and click Start OmniWM or Continue Without Screen Recording. If a required permission still appears missing, click Check Again.
+
+First hotkeys to try
+Shortcut	What it does
+Option + 1-9	Switch to workspace 1-9
+Option + Arrow Keys	Focus the window to the left / right / up / down
+Option + Shift + Arrow Keys	Move the focused window
+Option + `	Toggle the Quake Terminal
+Control + Option + Space	Toggle the Command Palette
+Option + Shift + O	Toggle Overview
+Every shortcut is customizable in Settings > Hotkeys; the complete list lives in Keyboard Shortcuts.
+
+----------
+
+** ZSH configuration
+
+Install ZSH autosuggestion
+
+#+begin_src shell
+git clone https://github.com/jumbojett/zsh-autosuggestions-plugin.git ~/.zsh/zsh-autosuggestions
+#+end_src
+
+My ZSH config is managed by the =cask-and-cons= CLI rather than being inlined here. Its source of truth lives in =src/cask-and-cons/zsh.scm=: =setopt= flags and aliases are plain Scheme alists (=zsh-completion-setopts=, =zsh-shell-setopts=, =zsh-history-setopts=, =zsh-aliases=) that get serialized into the final =~/.zshrc= contents, and everything else follows the same install pattern as the Git configuration.
+
+#+begin_src shell
+./caco install-zsh
+#+end_src
+
+This writes =~/.zshrc=. As with the other install targets, a machine-specific override can be dropped at =$XDG_CONFIG_HOME/cask-and-cons/zsh-settings.scm= (defaulting to =~/.config/cask-and-cons/zsh-settings.scm=) to tweak the alists above before the file is rendered.
+
+---------
+
+** Install the Emacs bridge
+
+Writes =~/.emacs.d/cask-and-cons-bridge.el= (settings consumed by Heks Emacs). The ELisp is declared as quoted data in =src/cask-and-cons/emacs.scm=.
+
+#+begin_src shell
+./caco install-emacs-bridge
+#+end_src
