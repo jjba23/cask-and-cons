@@ -6,6 +6,8 @@
 
 ~cask-and-cons~ provides a convenience CLI tool (~caco~). Naming stems from a pun on Homebrew casks of macOS and the cons cells of Lisp.
 
+[[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/license-gpl3+.svg]]  [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]]
+
 
 ------------------
 
