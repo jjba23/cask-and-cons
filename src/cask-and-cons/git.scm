@@ -80,7 +80,8 @@
 
 (define (install-git-config)
   (log-info "Installing Git configuration ecosystem")
-  (load-local-overrides '(cask-and-cons git) 'git-settings)
+  (load-local-overrides '(cask-and-cons git)
+                        'git-settings)
   (install-config-file! #:name (gitconfig-filename)
                         #:dir (git-config-dir)
                         #:contents (mk-rec-kv-conf-lines gitconfig

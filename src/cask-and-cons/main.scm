@@ -32,12 +32,13 @@
 (define (find-scm-files dir)
   "Recursively collect all @file{.scm} files under @var{dir}."
   (let ((acc '()))
-    (ftw dir (lambda (filename statinfo flag)
-               (when (and (eq? flag 'regular)
-                          (string-suffix? ".scm" filename))
-                 (set! acc (cons filename acc)))
-               #t))
-    acc))
+    (ftw dir
+         (lambda (filename statinfo flag)
+           (when (and (eq? flag
+                           'regular)
+                      (string-suffix? ".scm" filename))
+             (set! acc
+                   (cons filename acc))) #t)) acc))
 
 (define (compile)
   "Compile all project source code."
@@ -45,37 +46,58 @@
   (let ((files (find-scm-files "src")))
     (for-each (lambda (file)
                 (log-info "Compiling ~a" file)
-                (let ((status (system* "guild" "compile" "-L" "src" "-W3" file)))
+                (let ((status (system* "guild"
+                                       "compile"
+                                       "-L"
+                                       "src"
+                                       "-W3"
+                                       file)))
                   (unless (zero? status)
                     (log-error "Failed to compile ~a" file)
-                    (exit 1))))
-              files))
+                    (exit 1)))) files))
   (log-success "Compiled project sources"))
 
 ;; name -> thunk taking the remaining task args.  Install targets are plain
 ;; tasks named "install-<target>" (e.g. "install-git"), so adding a new
 ;; dotfile module just means adding one more entry here.
 (define %tasks
-  `((compile     unquote (lambda (args) (compile)))
-    (install-git unquote (lambda (args) (install-git-config)))
-    (install-brew unquote (lambda (args) (install-brew-packages)))
-    (install-omniwm unquote (lambda(args) (install-omniwm-config)))
-    (install-emacs-bridge unquote (lambda (args) (install-emacs-bridge)))
-    (install-zsh unquote (lambda (args) (install-zsh-config)))
-    (list        unquote (lambda (args)
-                    (log-info "Available tasks: ~a" (map car %tasks))))))
+  `((compile unquote
+             (lambda (args)
+               (compile)))
+    (install-git unquote
+                 (lambda (args)
+                   (install-git-config)))
+    (install-brew unquote
+                  (lambda (args)
+                    (install-brew-packages)))
+    (install-omniwm unquote
+                    (lambda (args)
+                      (install-omniwm-config)))
+    (install-emacs-bridge unquote
+                          (lambda (args)
+                            (install-emacs-bridge)))
+    (install-zsh unquote
+                 (lambda (args)
+                   (install-zsh-config)))
+    (list unquote
+          (lambda (args)
+            (log-info "Available tasks: ~a"
+                      (map car %tasks))))))
 
 (define (dispatch task-name task-args)
-  (let* ((task-name (string->symbol (if (string=? task-name "--list") "list" task-name)))
+  (let* ((task-name (string->symbol (if (string=? task-name "--list") "list"
+                                        task-name)))
          (entry (assq task-name %tasks)))
     (if entry
         (begin
           (log-info "Running task ~a ~a" task-name task-args)
-          ((cdr entry) task-args)
+          ((cdr entry)
+           task-args)
           (log-success "Task ~a finished" task-name))
         (begin
           (log-error "Unknown task: ~a" task-name)
-          (log-info "Available tasks: ~a" (map car %tasks))
+          (log-info "Available tasks: ~a"
+                    (map car %tasks))
           (exit 1)))))
 
 (define (run-chain task-names rest)
@@ -85,19 +107,22 @@ must be run on their own."
   (unless (null? rest)
     (log-warning
      "Ignoring extra arguments ~a when running a chained task list" rest))
-  (for-each (lambda (task-name) (dispatch task-name '())) task-names))
+  (for-each (lambda (task-name)
+              (dispatch task-name
+                        '())) task-names))
 
 (define (main args)
-  (match (cdr args) ; drop argv[0] (script path)
-    ((task-arg . rest)
-     (let ((task-names (string-split task-arg #\,)))
-       (if (> (length task-names) 1)
-           (run-chain task-names rest)
-           (dispatch task-arg rest))))
-    (()
-     (log-error "No task given.")
-     (log-info "Usage: ~a <task> [args...]" (car args))
+  (match (cdr args)
+     ;drop argv[0] (script path)
+    ((task-arg . rest) (let ((task-names (string-split task-arg #\,)))
+                         (if (> (length task-names) 1)
+                             (run-chain task-names rest)
+                             (dispatch task-arg rest))))
+    (() (log-error "No task given.")
+     (log-info "Usage: ~a <task> [args...]"
+               (car args))
      (log-info "Usage: ~a <task1>,<task2>,... (chain tasks with no args)"
                (car args))
-     (log-info "Available tasks: ~a" (map car %tasks))
+     (log-info "Available tasks: ~a"
+               (map car %tasks))
      (exit 1))))
