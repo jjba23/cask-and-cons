@@ -18,7 +18,9 @@ Every piece of configuration this tool manages (Git config, gitignore
 globals, and others) is expressed as Lisp ( Scheme ) source code and data, alists and other simple constructs,
 describing the desired end state, rather than as a series of imperative shell commands that mutate files in place.
 
-[[https://jointhefreeworld.org/static-assets/cask-and-cons/finder-icon.png]]
+#+BEGIN_EXPORT html
+<img src="https://jointhefreeworld.org/static-assets/cask-and-cons/finder-icon.png" alt="Finder logo" style="max-width: 250px; width: 100%; height: auto;" />
+#+END_EXPORT
 
 This is a deliberate choice, as it offers:
 
