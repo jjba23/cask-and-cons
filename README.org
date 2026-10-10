@@ -18,7 +18,7 @@ Every piece of configuration this tool manages (Git config, gitignore
 globals, and others) is expressed as Lisp ( Scheme ) source code and data, alists and other simple constructs,
 describing the desired end state, rather than as a series of imperative shell commands that mutate files in place.
 
-[[https://jointhefreeworld.org/static-assets/cask-and-cons/Finder_icon_macOS_Yosemite.png]]
+[[https://jointhefreeworld.org/static-assets/cask-and-cons/finder-icon.png]]
 
 This is a deliberate choice, as it offers:
 
