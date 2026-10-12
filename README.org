@@ -274,11 +274,12 @@ Return to OmniWM’s permissions window and click Start OmniWM or Continue Witho
 First hotkeys to try
 Shortcut	What it does
 Option + 1-9	Switch to workspace 1-9
-Option + Arrow Keys	Focus the window to the left / right / up / down
+Command + Arrow Keys	Focus the window to the left / right / up / down
 Option + Shift + Arrow Keys	Move the focused window
 Option + `	Toggle the Quake Terminal
 Control + Option + Space	Toggle the Command Palette
 Option + Shift + O	Toggle Overview
+Focus uses Command instead of Option (set in =src/cask-and-cons/omniwm-settings.toml=, installed with =./caco install-omniwm=). OmniWM rejects incomplete settings files, so that file is a full OmniWM-generated snapshot with my tweaks; regenerate it if OmniWM bumps =schemaVersion=.
 Every shortcut is customizable in Settings > Hotkeys; the complete list lives in Keyboard Shortcuts.
 
 ----------
