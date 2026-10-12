@@ -64,7 +64,11 @@
     "direnv"
     "zoxide"
     "jless"
-    "tldr"))
+    "tldr"
+    "avro-tools"
+    "kcat"
+    "fx"
+    "gron"))
 
 (define brew-casks
   '("iterm2" "the-unarchiver"
