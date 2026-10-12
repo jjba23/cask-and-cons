@@ -19,12 +19,8 @@
   #:declarative? #t
   #:use-module (cask-and-cons prelude)
   #:use-module (cask-and-cons user-settings)
-  #:export (omniwm-config
-                             install-omniwm-config
-                             omniwm-config-dir
-                             omniwm-filename))
-
-
+  #:export (omniwm-config install-omniwm-config omniwm-config-dir
+                          omniwm-filename))
 
 (define omniwm-config
   "
@@ -44,7 +40,8 @@ color = { red = 0.1846, green = 1.0, blue = 0.8793, alpha = 0.7 }
 
 (define (install-omniwm-config)
   (log-info "Installing OmniWM configuration")
-  (load-local-overrides '(cask-and-cons omniwm) 'omniwm-settings)
+  (load-local-overrides '(cask-and-cons omniwm)
+                        'omniwm-settings)
   (install-config-file! #:name (omniwm-filename)
                         #:dir (omniwm-config-dir)
                         #:contents omniwm-config)

@@ -1,6 +1,7 @@
 #+title: Cask & Cons
 #+author: Josep Bigorra
 #+email: jjbigorra@gmail.com
+#+options: toc:nil
 
 *My work macOS dotfiles.*
 
@@ -11,11 +12,15 @@
 
 ------------------
 
-* Reproducibility and why declarative dotfiles matter
+* My declarative dotfiles in Lisp
 
 Every piece of configuration this tool manages (Git config, gitignore
-globals, and others) is expressed as plain Scheme source code and data, alists and other simple constructs,
+globals, and others) is expressed as Lisp ( Scheme ) source code and data, alists and other simple constructs,
 describing the desired end state, rather than as a series of imperative shell commands that mutate files in place.
+
+#+BEGIN_EXPORT html
+<img src="https://jointhefreeworld.org/static-assets/cask-and-cons/finder-icon.png" alt="Finder logo" width="250px" style="max-width: 250px; height: auto;" />
+#+END_EXPORT
 
 This is a deliberate choice, as it offers:
 

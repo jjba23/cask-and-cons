@@ -270,8 +270,7 @@ preventing unbound variable errors.
     (if config-dir
         (let ((local-file (format #f "~a/cask-and-cons/~a.scm" config-dir
                                   profile-name)))
-          (log-info
-                    "load-local-overrides: Checking for override file at: ~a"
+          (log-info "load-local-overrides: Checking for override file at: ~a"
                     local-file)
           (if (file-exists? local-file)
               (begin
@@ -300,17 +299,21 @@ preventing unbound variable errors.
 
 (define (log--emit port color label fmt args)
   (let ((msg (apply format #f fmt args)))
-    (format port "\x1b[~am[~a] ~a: ~a\x1b[0m~%"
-            color (log--timestamp) label msg)))
+    (format port
+            "\x1b[~am[~a] ~a: ~a\x1b[0m~%"
+            color
+            (log--timestamp)
+            label
+            msg)))
 
 (define (log-error fmt . args)
   (log--emit (current-error-port) 31 "ERROR" fmt args))
 
 (define (log-warning fmt . args)
-  (log--emit (current-error-port) 33 "WARN"  fmt args))
+  (log--emit (current-error-port) 33 "WARN" fmt args))
 
 (define (log-info fmt . args)
-  (log--emit (current-output-port) 36 "INFO"  fmt args))
+  (log--emit (current-output-port) 36 "INFO" fmt args))
 
 (define (log-success fmt . args)
-  (log--emit (current-output-port) 32 "OK"    fmt args))
+  (log--emit (current-output-port) 32 "OK" fmt args))

@@ -31,37 +31,76 @@
   '("d12frosted/emacs-plus"))
 
 (define brew-formulae
-  '("jq" "fzf" "tree" "coreutils" "marksman" "gpg" "yaml-language-server"
-    "apm" "azure-cli" "gh" "Azure/kubelogin/kubelogin" "k9s" "krew"
-    "kubectx" "7zip" "guile"
-    "kubectl" "ripgrep" "fd" "bat" "eza" "htop" "wget" "watch" "git-delta"
-    "yq" "tmux" "mas" "gnu-sed" "gawk" "shellcheck" "direnv" "zoxide"
-    "jless" "tldr" "avro-tools" "kcat" "fx" "gron"))
+  '("jq" "fzf"
+    "tree"
+    "coreutils"
+    "marksman"
+    "gpg"
+    "yaml-language-server"
+    "apm"
+    "azure-cli"
+    "gh"
+    "Azure/kubelogin/kubelogin"
+    "k9s"
+    "krew"
+    "kubectx"
+    "7zip"
+    "guile"
+    "kubectl"
+    "ripgrep"
+    "fd"
+    "bat"
+    "eza"
+    "htop"
+    "wget"
+    "watch"
+    "git-delta"
+    "yq"
+    "tmux"
+    "mas"
+    "gnu-sed"
+    "gawk"
+    "shellcheck"
+    "direnv"
+    "zoxide"
+    "jless"
+    "tldr"))
 
 (define brew-casks
-  '("iterm2" "the-unarchiver" "bruno" "claude" "claude-code" "omniwm"
+  '("iterm2" "the-unarchiver"
+    "bruno"
+    "claude"
+    "claude-code"
+    "omniwm"
     "emacs-plus-app@master"
-    "rectangle" "stats" "keepassxc" "raycast"))
+    "rectangle"
+    "stats"
+    "keepassxc"
+    "raycast"))
 
 (define (brew-output . args)
   "Run brew with @var{args}; return its stdout lines as a list."
   (let* ((port (apply open-pipe* OPEN_READ "brew" args))
-         (lines (let loop ((acc '()))
+         (lines (let loop
+                  ((acc '()))
                   (let ((l (read-line port)))
-                    (if (eof-object? l) (reverse acc) (loop (cons l acc)))))))
-    (close-pipe port)
-    lines))
+                    (if (eof-object? l)
+                        (reverse acc)
+                        (loop (cons l acc)))))))
+    (close-pipe port) lines))
 
 (define (short-name name)
   (last (string-split name #\/)))
 
 (define (missing items installed)
-  (filter (lambda (i) (not (member (short-name i) installed))) items))
+  (filter (lambda (i)
+            (not (member (short-name i) installed))) items))
 
 (define (brew-install! flags items)
   (unless (null? items)
     (log-info "Installing ~a" items)
-    (let ((status (apply system* "brew" "install" (append flags items))))
+    (let ((status (apply system* "brew" "install"
+                         (append flags items))))
       (unless (zero? status)
         (log-error "brew install failed for ~a" items)
         (exit 1)))))
@@ -71,15 +110,17 @@
   (unless (zero? (system* "brew" "--version"))
     (log-error "Homebrew not found, see https://brew.sh")
     (exit 1))
-  (load-local-overrides '(cask-and-cons brew) 'brew-settings)
+  (load-local-overrides '(cask-and-cons brew)
+                        'brew-settings)
   (let ((tapped (brew-output "tap"))
         (formulae (brew-output "list" "--formula" "-1"))
         (casks (brew-output "list" "--cask" "-1")))
     (for-each (lambda (t)
                 (unless (member t tapped)
                   (log-info "Tapping ~a" t)
-                  (system* "brew" "tap" t)))
-              brew-taps)
-    (brew-install! '("-y") (missing brew-formulae formulae))
-    (brew-install! '("-y" "--cask") (missing brew-casks casks)))
+                  (system* "brew" "tap" t))) brew-taps)
+    (brew-install! '("-y")
+                   (missing brew-formulae formulae))
+    (brew-install! '("-y" "--cask")
+                   (missing brew-casks casks)))
   (log-success "Homebrew packages are installed"))
