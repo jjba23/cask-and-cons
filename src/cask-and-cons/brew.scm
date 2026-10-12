@@ -36,7 +36,7 @@
     "kubectx" "7zip" "guile"
     "kubectl" "ripgrep" "fd" "bat" "eza" "htop" "wget" "watch" "git-delta"
     "yq" "tmux" "mas" "gnu-sed" "gawk" "shellcheck" "direnv" "zoxide"
-    "jless" "tldr"))
+    "jless" "tldr" "avro-tools" "kcat" "fx" "gron"))
 
 (define brew-casks
   '("iterm2" "the-unarchiver" "bruno" "claude" "claude-code" "omniwm"
