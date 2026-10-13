@@ -28,7 +28,8 @@
   #:export (brew-taps brew-formulae brew-casks install-brew-packages))
 
 (define brew-taps
-  '("d12frosted/emacs-plus"))
+  '("d12frosted/emacs-plus"
+    "hashicorp/tap"))
 
 (define brew-formulae
   '("jq" "fzf"
@@ -68,7 +69,13 @@
     "avro-tools"
     "kcat"
     "fx"
-    "gron"))
+    "gron"
+    "hashicorp/tap/terraform"
+    "terraform-linters/tap/tflint"
+    "terraform-docs"
+    "terragrunt"
+    "trivy"
+    "infracost"))
 
 (define brew-casks
   '("iterm2" "the-unarchiver"
