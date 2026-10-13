@@ -75,6 +75,7 @@
     "bruno"
     "claude"
     "claude-code"
+    "signal"
     "omniwm"
     "emacs-plus-app@master"
     "rectangle"
