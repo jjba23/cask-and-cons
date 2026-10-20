@@ -292,7 +292,34 @@ Install ZSH autosuggestion
 git clone https://github.com/jumbojett/zsh-autosuggestions-plugin.git ~/.zsh/zsh-autosuggestions
 #+end_src
 
-My ZSH config is managed by the =cask-and-cons= CLI rather than being inlined here. Its source of truth lives in =src/cask-and-cons/zsh.scm=: =setopt= flags and aliases are plain Scheme alists (=zsh-completion-setopts=, =zsh-shell-setopts=, =zsh-history-setopts=, =zsh-aliases=) that get serialized into the final =~/.zshrc= contents, and everything else follows the same install pattern as the Git configuration.
+My ZSH config is managed by the =cask-and-cons= CLI rather than being inlined here. Its source of truth lives in =src/cask-and-cons/zsh.scm=: the machine identity (=zsh-identity=), =setopt= flags and aliases are plain Scheme alists (=zsh-completion-setopts=, =zsh-shell-setopts=, =zsh-history-setopts=, =zsh-aliases=) that get serialized into the final =~/.zshrc= contents, and everything else follows the same install pattern as the Git configuration.
+
+The procedural half of the shell (prompt engine, git segment, helper
+functions, greeting pool) lives in =src/cask-and-cons/shell-lib.zsh= and is
+spliced verbatim into =~/.zshrc=. It is the zsh twin of
+=heks-bash/src/heks-bash/shell-lib.bash= and of the shared block in
+=wolk-jjba/home/bash/bashrc.sh=: same two-line prompt, same colours, same
+helpers, so all my machines feel like one shell.
+
+#+begin_src shell
+╭─ joe@macbook ⌘ macos …/Hacking/cask-and-cons
+╰─ main ✚2 ↑1↓3 ⚑1 ⌘
+#+end_src
+
+The only differences between machines are the five =CC_*= variables in
+=zsh-identity= — flavour name, at-a-glance badge (=macos= here, =guix/linux=
+on the desktop, =guix/server= on the server), prompt sigil (=⌘=, =λ=, =ω=),
+256-colour accent, and the rc file =reload= re-sources. The prompt shows the
+branch (or =@sha= when detached), changed files (=✚n=), conflicts (=✖n=),
+clean state (=✓=), =↑n=/=↓n= against the upstream and =⚑n= stashes, from a
+single =git status --porcelain=v2 --branch= per prompt.
+
+Handy additions on top of the usual aliases: =about= (machine identity and
+prompt legend), =hist-top=, =rc-time=, =mkcd=, =up=, =extract=, =serve=,
+=psg=, =kport=, =ports=, =notify= (native macOS notification), =bak=,
+=calc=, =json=, =paths=, =ff=, =cdroot=, =reload=, the git shortcuts
+(=gst=, =gd=, =gds=, =glog=, =gco=, =gsw=, =gbr=, =gcm=, =gpl=, =gpu=,
+=gfetch=), plus =brewu=, =flushdns=, =showfiles= and =hidefiles= for macOS.
 
 #+begin_src shell
 ./caco install-zsh

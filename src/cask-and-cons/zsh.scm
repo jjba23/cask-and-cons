@@ -18,9 +18,13 @@
 (define-module (cask-and-cons zsh)
   #:declarative? #t
   #:use-module (ice-9 format)
+  #:use-module (ice-9 textual-ports)
   #:use-module (cask-and-cons prelude)
   #:use-module (cask-and-cons user-settings)
-  #:export (zsh-completion-setopts zsh-shell-setopts
+  #:export (zsh-identity zsh-shell-lib-filename
+                         zsh-read-shell-lib
+                         serialize-zsh-assignment
+                         zsh-completion-setopts zsh-shell-setopts
                                    zsh-history-setopts
                                    zsh-color-exports
                                    zsh-path-exports
@@ -40,12 +44,18 @@
 
 (define zsh-completion-setopts
   '(LIST_AMBIGUOUS ;like show-all-if-ambiguous
-                   MARK_DIRS))
+                   MARK_DIRS ;mark symlinked/completed dirs with /
+                   COMPLETE_IN_WORD))
  ;; mark symlinked/completed dirs with /
 
 (define zsh-shell-setopts
   '(AUTO_CD CORRECT ;like dirspell/cdspell (spelling correction for commands)
-            CORRECT_ALL))
+            CORRECT_ALL
+            AUTO_PUSHD ;cd pushes the old directory, like a builtin dirs -v
+            PUSHD_IGNORE_DUPS
+            PUSHD_SILENT
+            INTERACTIVE_COMMENTS ;allow # comments in an interactive shell
+            NO_BEEP))
  ;; extends correction to all arguments (optional, close to dirspell)
 
 (define zsh-history-setopts
@@ -69,7 +79,9 @@
     ("BOLD_TEXT" . "$(tput bold)")))
 
 (define zsh-path-exports
-  '(("CDPATH" . ".:$HOME/Hacking:$HOME/Work")))
+  '(("CDPATH" . ".:$HOME/Hacking:$HOME/Work")
+    ("PAGER" . "less")
+    ("MANPAGER" . "less")))
 
 (define zsh-history-exports
   '(("HISTSIZE" . "500000") ("SAVEHIST" . "100000") ;replaces HISTFILESIZE
@@ -89,22 +101,13 @@
 ;; Alist of alias name -> command, rendered as `alias name="command"`.
 
 (define zsh-aliases
-  '((".." . "cd ..;pwd") ("..." . "cd ../..;pwd")
-    ("...." . "cd ../../..;pwd")
-    ("c" . "clear")
-    ("h" . "history")
-    ("tree" . "tree --dirsfirst -F")
-    ("mkdir" . "mkdir -p -v")
-    ("ll" . "gls -lAh --group-directories-first")
+  ;; Only what is truly machine specific: the shared alias set (navigation,
+  ;; emacs, podman, fetch, ...) lives in (shell-lib.zsh).
+  '(("ll" . "gls -lAh --group-directories-first")
     ("l" . "gls -lAh --group-directories-first")
-    ("e" . "emacsclient -t")
-    ("k" . "pkill")
-    ("fetch" . "fastfetch")
-    ("vanilla-emacs" . "emacs -Q")
-    ("restart-emacs" . "pkill Emacs && emacs --daemon")
-    ("docker" . "podman")
-    ("docker-compose" . "podman compose")
-    ("find-largest-files" . "du -h -x -s -- * | sort -r -h | head -20")))
+    ("la" . "gls -lAh --group-directories-first")
+    ("du" . "gdu -h")
+    ("df" . "gdf -h")))
 
 (define (mk-setopt-lines setopts)
   "Serialize a list of @var{setopts} names into one `setopt NAME` line per
@@ -132,66 +135,151 @@ setopt CORRECT
   (mk-kv-conf-lines exports
                     #:template "export ~a=\"~a\"\n"))
 
+(define zsh-identity
+  ;; Machine identity read by the shared shell library. These five knobs are
+  ;; all it takes to make the prompt say "macOS laptop" instead of "server".
+  '(("CC_FLAVOR" . "cask-and-cons")
+    ("CC_HOST_KIND" . "macos")
+    ("CC_SIGIL" . "⌘")
+    ("CC_ACCENT" . "175")
+    ("CC_RC_FILE" . "$HOME/.zshrc")))
+
+(define zsh-shell-lib-filename
+  (make-parameter "shell-lib.zsh"))
+
+(define (serialize-zsh-assignment a)
+  "Serialize a single @var{a} (@code{NAME . VALUE}) as a plain shell assignment.
+Nothing is exported: the @code{CC_*} variables are only read by the shared
+shell library."
+  (format #f "~a=\"~a\"\n"
+          (car a)
+          (cdr a)))
+
+(define (zsh-read-shell-lib)
+  "Return the contents of the shared zsh library as a string.
+The library sits next to this module, so look there first and fall back to the
+repository-relative path for setups that load compiled code."
+  (let* ((here (and (current-filename)
+                    (dirname (current-filename))))
+         (name (zsh-shell-lib-filename)))
+    (let loop
+        ((paths (list (and here
+                           (format #f "~a/~a" here name))
+                      (format #f "src/cask-and-cons/~a" name))))
+      (cond ((null? paths)
+             (error "cask-and-cons: cannot find the shared zsh library"
+                    name))
+            ((and (car paths)
+                  (file-exists? (car paths)))
+             (call-with-input-file (car paths)
+               get-string-all))
+            (else (loop (cdr paths)))))))
+
 (define zshrc-config
   (string-append
-   "# cask-and-cons --- ZSH configuration
-
-include() { [[ -f \"$1\" ]] && . \"$1\"; }
-
-include /etc/zshrc
-
-[[ -o interactive ]] && include ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-bindkey '^I' expand-or-complete   # restore Tab for completion (autosuggestions hijacks it)
-
-# Completion-related options
-autoload -Uz compinit && compinit
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'   # case-insensitive completion
-zstyle ':completion:*' completer _complete _match
-"
+   "# cask-and-cons --- ZSH configuration\n"
+   "# auto-generated file! Regenerate with `./caco install-zsh`.\n"
+   "# Sources of truth: src/cask-and-cons/zsh.scm (machine data) and\n"
+   "# src/cask-and-cons/shell-lib.zsh (shared prompt + helpers).\n"
+   "\n"
+   (mk-kv-conf-lines zsh-identity
+                     #:template equal-conf-quote-value-pair)
+   "\n"
+   "include() { [[ -f \"$1\" ]] && . \"$1\"; }\n"
+   "\n"
+   "include /etc/zshrc\n"
+   "\n"
+   "# ---- line editor -----------------------------------------------------------\n"
+   "[[ -o interactive ]] && include ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh\n"
+   "bindkey '^I' expand-or-complete   # restore Tab for completion\n"
+   "bindkey '^[[A' up-line-or-search\n"
+   "bindkey '^[[B' down-line-or-search\n"
+   "\n"
+   "# ---- completion ------------------------------------------------------------\n"
+   "autoload -Uz compinit\n"
+   "zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'\n"
+   "zstyle ':completion:*' completer _complete _match _approximate\n"
+   "zstyle ':completion:*' menu select\n"
+   "zstyle ':completion:*' use-cache on\n"
+   "zstyle ':completion:*' cache-path \"${XDG_CACHE_HOME:-$HOME/.cache}/zcompcache\"\n"
+   "zstyle ':completion:*' group-name ''\n"
+   "zstyle ':completion:*' list-colors \"${(s.:.)LS_COLORS}\"\n"
+   "zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'\n"
+   "compinit -C -d \"${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump\"\n"
+   "_comp_options+=(globdots)\n"
+   "\n\n# ---- shell options ----\n"
    (mk-setopt-lines zsh-completion-setopts)
    "\n"
    (mk-setopt-lines zsh-shell-setopts)
-   "\n"
+   "\n# ---- environment ----\n"
    (mk-export-lines zsh-color-exports)
    "\n"
    (mk-export-lines zsh-path-exports)
-   "\n# --- History config ---\n"
+   "\n# ---- history ----\n"
    (mk-export-lines zsh-history-exports)
    "\n"
    (mk-setopt-lines zsh-history-setopts)
-   "
-# HISTIGNORE equivalent: pattern-based, via a zshaddhistory hook
-zshaddhistory() {
-    local line=${1%%$'\\n'}
-    [[ \"$line\" =~ ^(\\ |exit|ls|ll|bg|fg|history|clear)([[:space:]]|$) ]] && return 1
-    return 0
-}
-
-"
+   "\n\n"
+   "# HISTIGNORE equivalent: pattern-based, via a zshaddhistory hook\n"
+   "zshaddhistory() {\n"
+   "    local line=${1%%$'\\n'}\n"
+   "    [[ \"$line\" =~ ^( |cd|pwd|exit|ls|ll|l|bg|fg|history|clear)([[:space:]]|$) ]] && return 1\n"
+   "    return 0\n"
+   "}\n"
+   "\n# ---- GUILE (Homebrew) ----\n"
    (mk-export-lines zsh-guile-exports)
-   "
-setopt PROMPT_SUBST
-
-PROMPT='%B%n@%m%b: %2~${GUIX_ENVIRONMENT:+ [env]}
-%Bλ%b '
-
-path+=(\"$HOME/.bin\")
-path+=(\"$HOME/Downloads/kotlin-server-latest/bin\")
-export PATH
-
-"
+   "\n"
+   ;; the shared prompt engine, git segment, helpers and greeting pool
+   (zsh-read-shell-lib)
+   "\n"
+   "# ---- macOS specifics -------------------------------------------------------\n"
+   "brewu () {\n"
+   "    brew update && brew upgrade && brew cleanup\n"
+   "}\n"
+   "\n"
+   "flushdns () {\n"
+   "    sudo dscacheutil -flushcache\n"
+   "    sudo killall -HUP mDNSResponder\n"
+   "}\n"
+   "\n"
+   "showfiles () {\n"
+   "    defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder\n"
+   "}\n"
+   "\n"
+   "hidefiles () {\n"
+   "    defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder\n"
+   "}\n"
+   "\n"
+   "# Native notifications; overrides the portable helper from the shared library.\n"
+   "notify () {\n"
+   "    osascript -e \"display notification \\\"$1\\\" with title \\\"${2:-$(hostname -s)}\\\"\" 2>/dev/null \\\n"
+   "        || printf '\\a%s: %s\\n' \"${2:-$(hostname -s)}\" \"$1\"\n"
+   "}\n"
+   "\n"
+   "# macOS has no ss(8): a readable listener list via lsof.\n"
+   "ports () {\n"
+   "    lsof -iTCP -sTCP:LISTEN -P -n\n"
+   "}\n"
+   "\n# ---- aliases ----\n"
+   (mk-alias-lines zsh-aliases)
+   "\n# ---- PATH ----\n"
+   "path+=(\"$HOME/.bin\")\n"
+   "path+=(\"$HOME/.local/bin\")\n"
+   "path+=(\"$HOME/Downloads/kotlin-server-latest/bin\")\n"
+   "export PATH\n"
+   "\n"
    (mk-export-lines zsh-sdkman-exports)
-   "
+   """
 [[ -s \"$HOME/.sdkman/bin/sdkman-init.sh\" ]] && source \"$HOME/.sdkman/bin/sdkman-init.sh\"
-
-"
+"""
    (mk-export-lines zsh-nvm-exports)
-   "
+   """
 [ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\"  # This loads nvm
 [ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\"  # This loads nvm bash_completion
 
-"
-   (mk-alias-lines zsh-aliases)))
+# ---- boot: colours, prompt hook, greeting ---------------------------------
+cc_boot
+"""))
 
 (define zsh-config-dir
   (make-parameter (format #f "~a"
