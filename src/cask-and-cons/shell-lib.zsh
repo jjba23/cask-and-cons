@@ -42,8 +42,9 @@ SAVEHIST=${SAVEHIST:-100000}
 export PAGER=${PAGER:-less}
 export MANPAGER=${MANPAGER:-less}
 export LESS="-F -I -M -R"
+# less looks for that file on its own, so nothing needs to be exported; older
+# less versions (< 582) simply ignore it and keep their default keys.
 CC_LESSKEY=${XDG_CONFIG_HOME:-$HOME/.config}/lesskey
-[[ -r $CC_LESSKEY ]] && export LESSKEYIN=$CC_LESSKEY
 export CC_LESSKEY
 
 # ---- palette ----------------------------------------------------------------

@@ -321,11 +321,41 @@ prompt legend), =hist-top=, =rc-time=, =mkcd=, =up=, =extract=, =serve=,
 (=gst=, =gd=, =gds=, =glog=, =gco=, =gsw=, =gbr=, =gcm=, =gpl=, =gpu=,
 =gfetch=), plus =brewu=, =flushdns=, =showfiles= and =hidefiles= for macOS.
 
+*** The pager
+
+=less= is the pager, with Emacs key bindings, exactly as on the Guix
+desktop and the Guix server: =src/cask-and-cons/lesskey= (byte-identical
+with =heks-bash/src/heks-bash/lesskey= and =wolk-jjba/home/bash/lesskey=)
+is installed as =$XDG_CONFIG_HOME/lesskey=, the first place =less= 582 and
+later look, so =man=, =git=, =journalctl= and every other pager user share
+one set of keys. =PAGER= and =MANPAGER= are =less=, =LESS= is
+=-F -I -M -R=.
+
+| Key          | What it does                                   |
+|--------------+------------------------------------------------|
+| =C-n= =C-p=  | one line down / up                             |
+| =C-f= =C-b=  | one screen down / up                           |
+| =C-v= =M-v=  | one screen down / up                           |
+| =C-d= =C-u=  | half a screen down / up                        |
+| =C-a= =C-e=  | top / bottom of the file                       |
+| =M-<= =M->=  | top / bottom of the file                       |
+| =C-s= =C-r=  | search forward / backward                      |
+| =M-g=        | go to line                                     |
+| =M-u=        | clear the search highlighting                  |
+| =C-l=        | redraw the screen                              |
+
+Inside the =less= prompts the keys are Emacs keys too (=C-a= / =C-e=,
+=C-b= / =C-f=, =M-b= / =M-f=, =C-w= / =M-d=, =C-k= / =C-u=, =C-g=), and
+nothing was taken away: =space=, =b=, =j=, =k=, =g=, =G=, =/=, =?=, =n=,
+=N=, =m=, ='=, =!=, =|= and =q= keep their less meaning. =pager-keys=
+prints the map anywhere. =cc_boot= also runs =stty -ixon=, so =C-s= is
+forward-search in zle instead of a frozen terminal.
+
 #+begin_src shell
 ./caco install-zsh
 #+end_src
 
-This writes =~/.zshrc=. As with the other install targets, a machine-specific override can be dropped at =$XDG_CONFIG_HOME/cask-and-cons/zsh-settings.scm= (defaulting to =~/.config/cask-and-cons/zsh-settings.scm=) to tweak the alists above before the file is rendered.
+This writes =~/.zshrc= and =$XDG_CONFIG_HOME/lesskey=. As with the other install targets, a machine-specific override can be dropped at =$XDG_CONFIG_HOME/cask-and-cons/zsh-settings.scm= (defaulting to =~/.config/cask-and-cons/zsh-settings.scm=) to tweak the alists above before the file is rendered.
 
 ---------
 
