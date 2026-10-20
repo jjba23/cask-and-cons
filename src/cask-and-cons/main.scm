@@ -27,6 +27,7 @@
   #:use-module (cask-and-cons omniwm)
   #:use-module (cask-and-cons emacs)
   #:use-module (cask-and-cons zsh)
+  #:use-module (cask-and-cons wezterm)
   #:export (main))
 
 (define (find-scm-files dir)
@@ -79,6 +80,9 @@
     (install-zsh unquote
                  (lambda (args)
                    (install-zsh-config)))
+    (install-wezterm unquote
+                     (lambda (args)
+                       (install-wezterm-config)))
     (list unquote
           (lambda (args)
             (log-info "Available tasks: ~a"

@@ -88,7 +88,8 @@
     "rectangle"
     "stats"
     "keepassxc"
-    "raycast"))
+    "raycast"
+    "wezterm"))
 
 (define (brew-output . args)
   "Run brew with @var{args}; return its stdout lines as a list."

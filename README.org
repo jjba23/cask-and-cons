@@ -70,6 +70,55 @@ I also add some basic Emacs motions and bindings to iTerm profile, e.g. ~C-v~ fo
 
 --------
 
+* WezTerm
+
+WezTerm is declared in =src/cask-and-cons/brew.scm= (=./caco install-brew= installs
+it), and unlike iTerm2 it is configured from Lisp rather than by hand:
+
+#+begin_src shell
+./caco install-wezterm
+#+end_src
+
+writes =~/.config/wezterm/wezterm.lua=, generated from
+=src/cask-and-cons/wezterm.scm=. Everything the iTerm2 setup above asks you to
+click through - the Meta key, 100k lines of scrollback, the transparency and the
+blur - is a value in that module (=wezterm-font-family=, =wezterm-scrollback-lines=,
+=wezterm-window-opacity=, =wezterm-window-blur=), and the font and the colours are
+the ones the Emacs bridge gives Heks Emacs (=Intel One Mono=, =ayu-dark=).
+
+The key bindings are the Emacs ones, and they are *guarded*: WezTerm asks each
+pane which process is in front of it, and while the answer is one of
+=wezterm-yield-apps= - Emacs above all, but also =less=, the editors, the
+full-screen TUIs, the multiplexers and the REPLs - the chord is handed straight
+back to that application. Inside Emacs =C-x= is Emacs's =C-x=; at a shell prompt it
+is the prefix of the terminal's window commands. =C-v= and =M-v= are never bound at
+all, because they belong to the pager (see [[*The pager][The pager]]) and to Emacs's own
+scrolling, and =C-c= is never bound because it is the interrupt signal.
+
+| Chord                     | WezTerm does                       | Emacs equivalent                |
+|---------------------------+------------------------------------+---------------------------------|
+| =C-x 2=                   | split the pane below               | =C-x 2= split-window-below      |
+| =C-x 3=                   | split the pane to the right        | =C-x 3= split-window-right      |
+| =C-x 1=                   | zoom the pane in place             | =C-x 1= delete-other-windows    |
+| =C-x 0=                   | close the pane                     | =C-x 0= delete-window           |
+| =C-x o=                   | move to the next pane              | =C-x o= other-window            |
+| =C-x b=                   | pick a pane by name                | =C-x b= switch-to-buffer        |
+| =C-x <left> / <right>=    | previous / next tab                | =C-x <left>= previous-buffer    |
+| =C-x g=                   | leave the prefix                   | =C-g= keyboard-quit             |
+| =S-<arrow>=               | move to the pane in that direction | =S-<arrow>= windmove            |
+| =C-y= / =M-w=             | paste / copy                       | =C-y= yank, =M-w= kill-ring-save |
+| =C-=, =C--, =C-0=        | grow / shrink / reset the font     | =C-=, =C--= text-scale          |
+| =M-s=                     | search the scrollback              | =M-s= search prefix             |
+| =S-PageUp= / =S-PageDown= | page the scrollback                | =S-PageUp= scroll-other-window  |
+| =S-Home= / =S-End=        | top / bottom of the scrollback     |                                 |
+
+As with the other install targets, a machine-specific override can be dropped at
+=$XDG_CONFIG_HOME/cask-and-cons/wezterm-settings.scm= (defaulting to
+=~/.config/cask-and-cons/wezterm-settings.scm=) to tweak the parameters before the
+file is rendered. WezTerm reloads the generated file on its own.
+
+--------
+
 * Install Guile Scheme
 
 #+begin_src shell
@@ -102,7 +151,9 @@ Available tasks:
 - =install-brew= — ensure the Homebrew taps, formulae and casks declared in =src/cask-and-cons/brew.scm= are installed (skips what is already present)
 - =install-git= — install the Git configuration
 - =install-omniwm= — install the OmniWM configuration
-- =install-zsh= — install the ZSH configuration (=~/.zshrc=)
+- =install-emacs-bridge= — install the settings Heks Emacs reads (=~/.emacs.d/cask-and-cons-bridge.el=)
+- =install-zsh= — install the ZSH configuration (=~/.zshrc= and the pager keymap)
+- =install-wezterm= — install the WezTerm configuration (=~/.config/wezterm/wezterm.lua=)
 
 Install targets are just plain tasks named =install-<target>=; there is no separate =install= sub-command or target argument to parse.
 
