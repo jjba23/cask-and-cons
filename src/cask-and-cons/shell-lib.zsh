@@ -15,7 +15,9 @@
 #   CC_PATH_DEPTH path components kept in the prompt (default 3)
 #
 # No prompt framework, no plugins: one `git status --porcelain=v2 --branch' is
-# the only fork behind each prompt.
+# the only fork behind each prompt. The pager is plain less with the Emacs
+# keymap from the sibling `lesskey' file, installed by the same installer that
+# writes this rc.
 # =============================================================================
 
 CC_PATH_DEPTH=${CC_PATH_DEPTH:-3}
@@ -31,6 +33,18 @@ CC_ACCENT=${CC_ACCENT:-99}
 HISTFILE=${HISTFILE:-$HOME/.zsh_history}
 HISTSIZE=${HISTSIZE:-500000}
 SAVEHIST=${SAVEHIST:-100000}
+
+# ---- pager ------------------------------------------------------------------
+# One pager everywhere (less), with Emacs key bindings: the keymap is the
+# shared lesskey source file installed as $XDG_CONFIG_HOME/lesskey — less 582
+# and later read it directly, so there is no compiled file to keep in sync.
+# -F quit-if-one-screen, -I case-insensitive search, -M long prompt, -R colour.
+export PAGER=${PAGER:-less}
+export MANPAGER=${MANPAGER:-less}
+export LESS="-F -I -M -R"
+CC_LESSKEY=${XDG_CONFIG_HOME:-$HOME/.config}/lesskey
+[[ -r $CC_LESSKEY ]] && export LESSKEYIN=$CC_LESSKEY
+export CC_LESSKEY
 
 # ---- palette ----------------------------------------------------------------
 # 256-colour ANSI, wrapped in %{...%} so zsh does not count them as width.
@@ -287,7 +301,9 @@ about () {
     printf '  %sprompt%s  accent %s · sigil %s · depth %s · %s\n' \
         "$CC_DIM_OUT" "$CC_RESET_OUT" "$CC_ACCENT" "$CC_SIGIL" "$CC_PATH_DEPTH" \
         "$([[ ${CC_PLAIN:-0} != 0 || -n ${NO_COLOR:-} ]] && echo plain || echo colour)"
-    printf '  %shelpers%s about · hist-top · paths · extract · mkcd · up · serve · bak · calc · json · notify\n' \
+    printf '  %spager%s   less · Emacs keys · %s\n' \
+        "$CC_DIM_OUT" "$CC_RESET_OUT" "$CC_LESSKEY"
+    printf '  %shelpers%s about · pager-keys · hist-top · paths · extract · mkcd · up · serve · bak · calc · json · notify\n' \
         "$CC_DIM_OUT" "$CC_RESET_OUT"
 }
 
@@ -450,6 +466,33 @@ paths () {
     done
 }
 
+# The pager keymap (installed as $XDG_CONFIG_HOME/lesskey) in one screen.
+pager-keys () {
+    local b=${CC_BOLD_OUT:-} d=${CC_DIM_OUT:-} r=${CC_RESET_OUT:-}
+    local a=${CC_ACCENT_OUT:-}
+    printf '%s%spager%s less · Emacs keys · %s\n\n' \
+        "$b" "$a" "$r$d" "$CC_LESSKEY"
+    printf '  %s%-11s%s %s\n' "$b" 'C-n  C-p' "$r" 'one line down / up'
+    printf '  %s%-11s%s %s\n' "$b" 'C-f  C-b' "$r" 'one screen down / up'
+    printf '  %s%-11s%s %s\n' "$b" 'C-v  M-v' "$r" 'one screen down / up'
+    printf '  %s%-11s%s %s\n' "$b" 'C-d  C-u' "$r" 'half a screen down / up'
+    printf '  %s%-11s%s %s\n' "$b" 'C-a  C-e' "$r" 'top / bottom of the file'
+    printf '  %s%-11s%s %s\n' "$b" 'M-<  M->' "$r" 'top / bottom of the file'
+    printf '  %s%-11s%s %s\n' "$b" 'C-s  C-r' "$r" 'search forward / backward'
+    printf '  %s%-11s%s %s\n' "$b" 'M-g' "$r" 'go to line'
+    printf '  %s%-11s%s %s\n' "$b" 'M-u' "$r" 'clear the search highlighting'
+    printf '  %s%-11s%s %s\n' "$b" 'C-l' "$r" 'redraw the screen'
+    printf '\n  %sin prompts (:e, /, ?, ...)%s\n' "$d" "$r"
+    printf '  %s%-11s%s %s\n' "$b" 'C-a  C-e' "$r" 'beginning / end of the line'
+    printf '  %s%-11s%s %s\n' "$b" 'C-b  C-f' "$r" 'one character left / right'
+    printf '  %s%-11s%s %s\n' "$b" 'M-b  M-f' "$r" 'one word left / right'
+    printf '  %s%-11s%s %s\n' "$b" 'C-w  M-d' "$r" 'kill the word before / after the cursor'
+    printf '  %s%-11s%s %s\n' "$b" 'C-k  C-u' "$r" 'kill the whole line'
+    printf '  %s%-11s%s %s\n' "$b" 'C-g' "$r" 'cancel the prompt'
+    printf '\n  %sstill plain less%s: space b · g G · / ? · n N · m '\'' · ! · | · q%s\n' \
+        "$d" "$r" "$r"
+}
+
 reload () {
     printf 'reloading %s\n' "$CC_RC_FILE"
     CC_RELOAD=1 . "$CC_RC_FILE"
@@ -568,6 +611,9 @@ alias find-largest-files='du -h -x -s -- * 2>/dev/null | sort -r -h | head -20'
 # -----------------------------------------------------------------------------
 cc_boot () {
     __cc_palette
+    # No XOFF/XON: C-s is forward-search in zle and in the pager, not a frozen
+    # terminal. Set per TTY, and only when there is one.
+    [[ -t 0 ]] && stty -ixon 2> /dev/null
     autoload -Uz add-zsh-hook
     (( ${precmd_functions[(I)__cc_prompt]} )) \
         || add-zsh-hook precmd __cc_prompt

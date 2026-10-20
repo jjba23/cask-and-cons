@@ -21,7 +21,8 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (cask-and-cons prelude)
   #:use-module (cask-and-cons user-settings)
-  #:export (zsh-identity zsh-shell-lib-filename
+  #:export (zsh-identity zsh-shell-lib-filename zsh-lesskey-filename
+                         zsh-read-source-file lesskey-config-dir
                          zsh-read-shell-lib
                          serialize-zsh-assignment
                          zsh-completion-setopts zsh-shell-setopts
@@ -79,9 +80,7 @@
     ("BOLD_TEXT" . "$(tput bold)")))
 
 (define zsh-path-exports
-  '(("CDPATH" . ".:$HOME/Hacking:$HOME/Work")
-    ("PAGER" . "less")
-    ("MANPAGER" . "less")))
+  '(("CDPATH" . ".:$HOME/Hacking:$HOME/Work")))
 
 (define zsh-history-exports
   '(("HISTSIZE" . "500000") ("SAVEHIST" . "100000") ;replaces HISTFILESIZE
@@ -147,6 +146,11 @@ setopt CORRECT
 (define zsh-shell-lib-filename
   (make-parameter "shell-lib.zsh"))
 
+;; The pager keymap: a plain data file next to this module, shared verbatim
+;; with heks-bash and wolk-jjba, installed as $XDG_CONFIG_HOME/lesskey.
+(define zsh-lesskey-filename
+  (make-parameter "lesskey"))
+
 (define (serialize-zsh-assignment a)
   "Serialize a single @var{a} (@code{NAME . VALUE}) as a plain shell assignment.
 Nothing is exported: the @code{CC_*} variables are only read by the shared
@@ -155,25 +159,36 @@ shell library."
           (car a)
           (cdr a)))
 
-(define (zsh-read-shell-lib)
-  "Return the contents of the shared zsh library as a string.
-The library sits next to this module, so look there first and fall back to the
+(define (zsh-read-source-file name)
+  "Return the contents of the repository file @var{name} as a string.
+The file sits next to this module, so look there first and fall back to the
 repository-relative path for setups that load compiled code."
   (let* ((here (and (current-filename)
-                    (dirname (current-filename))))
-         (name (zsh-shell-lib-filename)))
+                    (dirname (current-filename)))))
     (let loop
         ((paths (list (and here
                            (format #f "~a/~a" here name))
                       (format #f "src/cask-and-cons/~a" name))))
       (cond ((null? paths)
-             (error "cask-and-cons: cannot find the shared zsh library"
-                    name))
+             (error "cask-and-cons: cannot find the shared file" name))
             ((and (car paths)
                   (file-exists? (car paths)))
              (call-with-input-file (car paths)
                get-string-all))
             (else (loop (cdr paths)))))))
+
+(define (zsh-read-shell-lib)
+  "Return the contents of the shared zsh library as a string."
+  (zsh-read-source-file (zsh-shell-lib-filename)))
+
+(define (lesskey-config-dir)
+  "Directory less(1) searches first for its keymap: @env{XDG_CONFIG_HOME},
+else @file{~/.config}."
+  (let* ((home (or (getenv "HOME") "/tmp"))
+         (xdg (getenv "XDG_CONFIG_HOME")))
+    (if (and xdg (not (string-null? xdg)))
+        xdg
+        (format #f "~a/.config" home))))
 
 (define zshrc-config
   (string-append
@@ -295,5 +310,13 @@ cc_boot
   (install-config-file! #:name (zshrc-filename)
                         #:dir (zsh-config-dir)
                         #:contents zshrc-config)
+  ;; The pager keymap lives outside the rc so less can read it directly.
+  (let ((dir (lesskey-config-dir)))
+    (unless (file-exists? dir)
+      (system* "mkdir" "-p" dir))
+    (install-config-file! #:name (zsh-lesskey-filename)
+                          #:dir dir
+                          #:contents (zsh-read-source-file
+                                      (zsh-lesskey-filename))))
 
   (log-success "Installed ZSH configuration"))
