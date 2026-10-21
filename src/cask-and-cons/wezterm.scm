@@ -52,11 +52,12 @@
 ;; chord silently dropped - and it is why the scrollback also stays on S-PageUp
 ;; and S-PageDown.
 ;;
-;; No title bar is drawn.  `window_decorations' asks for the resize border and
-;; nothing else, so the window is a plain rectangle of terminal with no title
-;; strip and no traffic lights; moving and closing it is left to the window
-;; manager's keybindings.  The tab bar is WezTerm's own and stays hidden while
-;; there is a single tab.
+;; The window asks for a title bar and a resize border: `window_decorations' is
+;; `TITLE | RESIZE' on both platforms.  macOS draws the native title bar and the
+;; traffic lights.  On Wayland the same value is the default, so WezTerm asks the
+;; compositor to follow the server's decorations instead of painting its own;
+;; Niri has none to offer, so nothing is drawn there - and no blank band either.
+;; The tab bar is WezTerm's own and stays hidden while there is a single tab.
 ;;
 ;; The prefix table maps Emacs's window commands onto panes and its buffer
 ;; commands onto tabs: C-x 2 splits below, C-x 3 splits right, C-x 0 closes,
@@ -496,11 +497,18 @@ single number they all take."
 (define* (wezterm-window-decorations)
   "Return WezTerm's @code{window_decorations} value.
 
-Only the resize border is asked for, so macOS draws no title bar and no traffic
-lights: the window is a plain rectangle of terminal whose edges still resize it.
-Moving and closing it is the window manager's business, and the tab bar stays
-hidden while there is a single tab."
-  "RESIZE")
+The window asks for a title bar and a resize border.  macOS draws the native
+title bar with its traffic lights, so closing, moving and resizing stay where
+they always were; the tab bar stays hidden while there is a single tab.
+
+@code{TITLE | RESIZE} is also what the Linux twin asks for, and both platforms
+can share the value because WezTerm draws neither the title nor the border: the
+platform does.  It is also @code{WindowDecorations}'s default, which is what
+makes it the right choice on Wayland: the default asks the compositor to follow
+the server's decorations, while any non-default value makes WezTerm paint a
+client-side frame of its own - a 33 pixel band of flat dark with no title and no
+buttons in it on the Wayland side of this pair."
+  "TITLE | RESIZE")
 
 (define* (wezterm-settings)
   "Return the settings WezTerm receives, as an association list.

@@ -95,11 +95,17 @@ as ESC. =enable_kitty_keyboard= lets a program that asks for the kitty keyboard
 protocol (Emacs does) tell chords apart that the legacy encoding cannot, such as
 =C-i= against =TAB=.
 
-There is no title bar: the generated file asks for
-=window_decorations = 'RESIZE'=, so the window is a plain rectangle of terminal
-with no title strip and no traffic lights, whose edges still resize it. Moving
-and closing it is the window manager's business. Tabs still exist, but the tab
-bar stays hidden while there is only one tab.
+The window keeps its title bar and its resize border: the generated file asks for
+=window_decorations = 'TITLE | RESIZE'=, so macOS draws the native title bar with
+its traffic lights and moving, closing and resizing all work the way they always
+did. Tabs still exist, but the tab bar stays hidden while there is only one tab.
+
+The value is shared with the Linux twin, and it is also the default value of
+=WindowDecorations=, which is what makes it the right one on Wayland: the default
+asks the compositor to follow the server's decorations, while any non-default
+value (=RESIZE=, =TITLE= alone, anything with =INTEGRATED_BUTTONS=) makes WezTerm
+paint a client-side frame of its own -- on the Linux side of this pair that frame
+is a 33 pixel band of flat dark with no title and no buttons in it.
 
 The key bindings are the Emacs ones, and they are *guarded*: WezTerm asks each
 pane which process is in front of it, and while the answer is one of
