@@ -86,14 +86,36 @@ blur - is a value in that module (=wezterm-font-family=, =wezterm-scrollback-lin
 =wezterm-window-opacity=, =wezterm-window-blur=), and the font and the colours are
 the ones the Emacs bridge gives Heks Emacs (=Intel One Mono=, =ayu-dark=).
 
+Two keyboard settings replace the iTerm2 clicking outright. Option is not Meta on
+macOS by default - it composes characters, so =M-v= types a mathematical symbol
+instead of paging - so the generated file turns
+off =send_composed_key_when_left_alt_is_pressed= and
+=send_composed_key_when_right_alt_is_pressed=, and Option reaches the application
+as ESC. =enable_kitty_keyboard= lets a program that asks for the kitty keyboard
+protocol (Emacs does) tell chords apart that the legacy encoding cannot, such as
+=C-i= against =TAB=.
+
+There is no title bar: the generated file asks for
+=window_decorations = 'RESIZE'=, so the window is a plain rectangle of terminal
+with no title strip and no traffic lights, whose edges still resize it. Moving
+and closing it is the window manager's business. Tabs still exist, but the tab
+bar stays hidden while there is only one tab.
+
 The key bindings are the Emacs ones, and they are *guarded*: WezTerm asks each
 pane which process is in front of it, and while the answer is one of
 =wezterm-yield-apps= - Emacs above all, but also =less=, the editors, the
 full-screen TUIs, the multiplexers and the REPLs - the chord is handed straight
 back to that application. Inside Emacs =C-x= is Emacs's =C-x=; at a shell prompt it
-is the prefix of the terminal's window commands. =C-v= and =M-v= are never bound at
-all, because they belong to the pager (see [[*The pager][The pager]]) and to Emacs's own
-scrolling, and =C-c= is never bound because it is the interrupt signal.
+is the prefix of the terminal's window commands. =C-c= is never bound, because it
+is the interrupt signal.
+
+The guard is what lets the terminal claim the page keys at all: =C-v= pages the
+scrollback forward and =M-v= pages it back, and inside Emacs or the pager those
+same chords are handed over untouched, so the pager keeps its =forw-screen= and
+=back-screen= (see [[*The pager][The pager]]) and Emacs keeps its =scroll-up-command=.
+WezTerm's own bare-modifier defaults are re-registered through the same guard -
+=C-Tab=, =C-S-Tab=, =C-PageUp=, =C-PageDown=, =M-Enter= and =C-Insert= - so a
+full-screen program receives them instead of the terminal.
 
 | Chord                     | WezTerm does                       | Emacs equivalent                |
 |---------------------------+------------------------------------+---------------------------------|
@@ -109,8 +131,16 @@ scrolling, and =C-c= is never bound because it is the interrupt signal.
 | =C-y= / =M-w=             | paste / copy                       | =C-y= yank, =M-w= kill-ring-save |
 | =C-=, =C--, =C-0=        | grow / shrink / reset the font     | =C-=, =C--= text-scale          |
 | =M-s=                     | search the scrollback              | =M-s= search prefix             |
+| =C-v= / =M-v=             | page the scrollback down / up      | =C-v= / =M-v= scroll-up-command |
 | =S-PageUp= / =S-PageDown= | page the scrollback                | =S-PageUp= scroll-other-window  |
 | =S-Home= / =S-End=        | top / bottom of the scrollback     |                                 |
+
+That list is what the terminal does when no application owns the keyboard; while
+Emacs, =less= or any other entry of =wezterm-yield-apps= is in front, every one of
+these chords goes to it instead. The guard needs
+=pane:get_foreground_process_name()=, which only answers for local panes, so over
+=ssh= or inside the WezTerm multiplexer the terminal keeps its own binding - and
+that is why the scrollback also stays on =S-PageUp= and =S-PageDown=.
 
 As with the other install targets, a machine-specific override can be dropped at
 =$XDG_CONFIG_HOME/cask-and-cons/wezterm-settings.scm= (defaulting to
