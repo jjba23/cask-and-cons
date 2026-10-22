@@ -80,6 +80,7 @@
 (define brew-casks
   '("iterm2" "the-unarchiver"
     "bruno"
+    "dbgate"
     "claude"
     "claude-code"
     "signal"

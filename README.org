@@ -190,6 +190,7 @@ Available tasks:
 - =install-emacs-bridge= — install the settings Heks Emacs reads (=~/.emacs.d/cask-and-cons-bridge.el=)
 - =install-zsh= — install the ZSH configuration (=~/.zshrc= and the pager keymap)
 - =install-wezterm= — install the WezTerm configuration (=~/.config/wezterm/wezterm.lua=)
+- =install-macos= — converge macOS system preferences (Dock, Finder, trackpad, clock, ...) declared in =src/cask-and-cons/macos.scm=; only changed keys are written and only affected processes (Dock, Finder) restart. Override with =~/.config/cask-and-cons/macos-settings.scm=, e.g. =(macos-settings (append (macos-settings) '(("com.apple.dock" (tilesize . 36)))))=
 
 Install targets are just plain tasks named =install-<target>=; there is no separate =install= sub-command or target argument to parse.
 
@@ -292,6 +293,7 @@ brew install jq fzf tree coreutils marksman gpg yaml-language-server apm azure-c
  #+begin_src shell
  brew install --cask the-unarchiver
  brew install --cask bruno
+ brew install --cask dbgate
  brew install --cask claude
  brew install --cask claude-code
  #+end_src

@@ -28,6 +28,7 @@
   #:use-module (cask-and-cons emacs)
   #:use-module (cask-and-cons zsh)
   #:use-module (cask-and-cons wezterm)
+  #:use-module (cask-and-cons macos)
   #:export (main))
 
 (define (find-scm-files dir)
@@ -83,6 +84,9 @@
     (install-wezterm unquote
                      (lambda (args)
                        (install-wezterm-config)))
+    (install-macos unquote
+                    (lambda (args)
+                      (install-macos-settings)))
     (list unquote
           (lambda (args)
             (log-info "Available tasks: ~a"
