@@ -88,6 +88,7 @@
     "claude-code"
     "signal"
     "omniwm"
+    "mongodb-compass"
     "emacs-plus-app@master"
     "rectangle"
     "stats"
