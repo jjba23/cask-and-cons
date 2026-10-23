@@ -24,7 +24,7 @@ describing the desired end state, rather than as a series of imperative shell co
 
 This is a deliberate choice, as it offers:
 
-- *Reproducibility* — Given the same source (this repo) and the same   inputs (=user-settings.scm= and any local overrides), running =./caco install-git= always produces byte-identical output. There is no implicit dependency on whatever state the file happened to be in before, so *re-provisioning a machine (or recovering a wiped one) is just "clone the repo and run the tasks"*.
+- *Reproducibility* — Given the same source (this repo) and the same   inputs (=user-settings.scm= and any local overrides), running =caco install-git= always produces byte-identical output. There is no implicit dependency on whatever state the file happened to be in before, so *re-provisioning a machine (or recovering a wiped one) is just "clone the repo and run the tasks"*.
 - *Idempotency* — Install tasks overwrite the target file wholesale instead of patching/appending to it, so running them twice, or after manually editing the config, converges back to the declared state
   instead of accumulating drift or duplicate entries.
 - *Auditability* — The desired configuration lives as data in version control, so changes show up as regular, reviewable diffs instead of being buried in shell history or one-off commands you may forget you ran.
@@ -72,11 +72,11 @@ I also add some basic Emacs motions and bindings to iTerm profile, e.g. ~C-v~ fo
 
 * WezTerm
 
-WezTerm is declared in =src/cask-and-cons/brew.scm= (=./caco install-brew= installs
+WezTerm is declared in =src/cask-and-cons/brew.scm= (=caco install-brew= installs
 it), and unlike iTerm2 it is configured from Lisp rather than by hand:
 
 #+begin_src shell
-./caco install-wezterm
+caco install-wezterm
 #+end_src
 
 writes =~/.config/wezterm/wezterm.lua=, generated from
@@ -171,14 +171,16 @@ Guile libraries can now be installed here:
 
 * The =cask-and-cons= CLI
 
-This repo ships its own executable entrypoint, =./caco=, a plain bash script that executes =guile=, with =./src= added to the
+This repo ships its own executable entrypoint, =caco=, a plain bash script that executes =guile=, with =./src= added to the
 load path, and hands off to the Scheme entrypoint defined in =src/cask-and-cons/main.scm=, which dispatches to a sub-task based on the CLI arguments.
 
 #+begin_src shell
-./caco <task> [args...]
+caco <task> [args...]
 #+end_src
 
-=./caco --list= is a special-cased alias for =./caco list=;
+=caco --list= is a special-cased alias for =caco list=;
+
+Once the zsh configuration is installed (=./caco install-zsh=), =caco= is also available as a shell function in every directory. It automatically does a =cd ~/Hacking/cask-and-cons= and then runs =./caco "$@"=, so you never need to navigate to the repo or prefix the command with =./= yourself. Note that this leaves your shell in the repo directory afterwards.
 
 Available tasks:
 
@@ -195,10 +197,10 @@ Available tasks:
 Install targets are just plain tasks named =install-<target>=; there is no separate =install= sub-command or target argument to parse.
 
 #+begin_src shell
-./caco list
-./caco --list
-./caco compile
-./caco install-git
+caco list
+caco --list
+caco compile
+caco install-git
 #+end_src
 
 *** Composing tasks
@@ -206,7 +208,7 @@ Install targets are just plain tasks named =install-<target>=; there is no separ
 Tasks that take no arguments can be chained in a single invocation by joining their names with commas (no spaces):
 
 #+begin_src shell
-./caco compile,install-git
+caco compile,install-git
 #+end_src
 
 This runs each task in order. Tasks that require their own arguments are not supported inside a chain and must be run on their own.
@@ -284,7 +286,7 @@ See https://www.jetbrains.com/toolbox-app/
 
 * Install useful packages
 
-All of the packages and casks below (plus some extras) are declared in =src/cask-and-cons/brew.scm= and installed with =./caco install-brew=.
+All of the packages and casks below (plus some extras) are declared in =src/cask-and-cons/brew.scm= and installed with =caco install-brew=.
 
 #+begin_src shell
 brew install jq fzf tree coreutils marksman gpg yaml-language-server apm azure-cli gh kubectl Azure/kubelogin/kubelogin rg k9s krew kubectx 7zip
@@ -368,7 +370,7 @@ Option + Shift + Arrow Keys	Move the focused window
 Option + `	Toggle the Quake Terminal
 Control + Option + Space	Toggle the Command Palette
 Option + Shift + O	Toggle Overview
-Focus uses Command instead of Option (set in =src/cask-and-cons/omniwm-settings.toml=, installed with =./caco install-omniwm=). OmniWM rejects incomplete settings files, so that file is a full OmniWM-generated snapshot with my tweaks; regenerate it if OmniWM bumps =schemaVersion=.
+Focus uses Command instead of Option (set in =src/cask-and-cons/omniwm-settings.toml=, installed with =caco install-omniwm=). OmniWM rejects incomplete settings files, so that file is a full OmniWM-generated snapshot with my tweaks; regenerate it if OmniWM bumps =schemaVersion=.
 Every shortcut is customizable in Settings > Hotkeys; the complete list lives in Keyboard Shortcuts.
 
 ----------
@@ -441,7 +443,7 @@ prints the map anywhere. =cc_boot= also runs =stty -ixon=, so =C-s= is
 forward-search in zle instead of a frozen terminal.
 
 #+begin_src shell
-./caco install-zsh
+caco install-zsh
 #+end_src
 
 This writes =~/.zshrc= and =$XDG_CONFIG_HOME/lesskey=.
@@ -466,14 +468,14 @@ How it is wired:
 - The notes directory is defined once, as =notes-directory= in =user-settings.scm=; the Emacs bridge takes =heks/notes-dir= from the same value.
 - The index pages it writes are byte-identical to the ones Emacs writes.
 
-Everything -- every command, how the pickers behave, the file formats the two sides share, recipes, how to test changes on a copy of your notes, limits and troubleshooting -- is in *[[file:docs/notes-from-the-terminal.org][docs/notes-from-the-terminal.org]]*. Moving a note is deliberately left to Emacs, because it has to repair the links that point at it. Run =./caco install-zsh= and open a new shell to get it.
+Everything -- every command, how the pickers behave, the file formats the two sides share, recipes, how to test changes on a copy of your notes, limits and troubleshooting -- is in *[[file:docs/notes-from-the-terminal.org][docs/notes-from-the-terminal.org]]*. Moving a note is deliberately left to Emacs, because it has to repair the links that point at it. Run =caco install-zsh= and open a new shell to get it.
 
 * Install the Emacs bridge
 
 Writes =~/.emacs.d/cask-and-cons-bridge.el= (settings consumed by Heks Emacs). The ELisp is declared as quoted data in =src/cask-and-cons/emacs.scm=.
 
 #+begin_src shell
-./caco install-emacs-bridge
+caco install-emacs-bridge
 #+end_src
 
 ----------
