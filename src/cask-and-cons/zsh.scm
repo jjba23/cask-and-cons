@@ -100,9 +100,119 @@
 
 ;; Alist of alias name -> command, rendered as `alias name="command"`.
 
+(define zsh-shared-aliases
+  ;; Navigation, emacs, podman, fetch, ...: the set every machine shares.
+  '((".." . "cd ..;pwd")
+    ("..." . "cd ../..;pwd")
+    ("...." . "cd ../../..;pwd")
+    ("c" . "clear")
+    ("h" . "history")
+    ("hg" . "hgrep")
+    ("tree" . "tree --dirsfirst -F")
+    ("mkdir" . "mkdir -p -v")
+    ("df" . "df -h")
+    ("e" . "emacsclient -t")
+    ("k" . "pkill")
+    ("fetch" . "fastfetch")
+    ("vanilla-emacs" . "emacs -Q")
+    ("restart-emacs" . "pkill emacs || true; pkill Emacs || true; emacs --daemon")
+    ("docker" . "podman")
+    ("docker-compose" . "podman compose")
+    ("find-largest-files" . "du -h -x -s -- * 2>/dev/null | sort -r -h | head -20")))
+
+;; One-line git shortcuts, as data: (NAME . BODY).  glog is multi-line and
+;; stays in shell-lib.zsh.
+(define zsh-git-shortcuts
+  '(("gst" . "git status --short --branch \"$@\"")
+    ("gd" . "git diff \"$@\"")
+    ("gds" . "git diff --stat \"$@\"")
+    ("gco" . "git checkout \"$@\"")
+    ("gsw" . "git switch \"$@\"")
+    ("gbr" . "git branch -vv \"$@\"")
+    ("gcm" . "git commit -m \"$*\"")
+    ("gpl" . "git pull --ff-only \"$@\"")
+    ("gpu" . "git push \"$@\"")
+    ("gfetch" . "git fetch --all --prune \"$@\"")
+    ("groot" . "cdroot")))
+
+;; The greeting pool: nerd-style sayings about free software, RMS, GNU, Emacs
+;; and Linux/Unix.  Plain data; extend freely.  Keep in step with heks-bash.
+(define zsh-greetings
+  '(;; emacs
+    "Vi Vi Vi is the number of the beast. Emacs is salvation."
+    "M-x doctor. Tell me about your childhood."
+    "Evaluating buffer... Enlightenment achieved."
+    "C-x C-c. Are you sure you want to exit your entire reality?"
+    "Your .emacs file has more lines of code than most corporate startups."
+    "Emacs: The extensible, customizable, self-documenting, real-time display environment."
+    "Emacs is a magnificent operating system, it just lacks a good text editor."
+    "M-x butterfly"
+    "Escape Meta Alt Control Shift. Your pinky finger is strong."
+    "C-x C-s. Your progress is saved. Your soul is secure."
+    "Welcome to the Church of Emacs. Emacs is my editor, and GNU is its operating system."
+    "Living in the buffers since inception."
+    "C-h t. Everyone starts as a beginner."
+    "Everything is a buffer, until it's a window."
+    "M-x emacs-uptime. Reboot? Never heard of it."
+    "In Emacs, nobody can hear you C-g."
+    "Lisp: the programmable programming language."
+    "(lambda (x) x) -- the identity of a hacker."
+    ;; gnu / rms / free software
+    "GNU's Not Unix! Welcome to the recursive revolution."
+    "Free software is a matter of liberty, not price. Think free speech, not free beer."
+    "You are entering a 100% libre user space."
+    "Guile, Guix, and Glory. Welcome to the GNU system."
+    "Join us now and share the software; You'll be free, hackers, you'll be free."
+    "Happy Hacking!"
+    "There is no system but GNU, and Linux is one of its kernels."
+    "If we do not control our software, our software controls us."
+    "Proprietary software is a social problem. Keep your system clean."
+    "With digital technology, sharing is easy. Sharing is good."
+    "I'd just like to interject for a moment: what you're referring to as Linux is GNU/Linux."
+    "The four freedoms: run, study, share, improve. Number zero is the best one."
+    "Copyleft: all rights reversed."
+    "Use free software. Your freedom is not a feature request."
+    "Software wants to be free, and so do you."
+    "Treat your source like a library book: share it."
+    ;; unix / linux lore
+    "Unix is user-friendly. It's just very selective about who its friends are."
+    "In the beginning was the command line."
+    "Everything is a file, until it's a process."
+    "May the source be with you."
+    "RTFM: Read The Fine Manual."
+    "Pipe it, grep it, sed it, love it."
+    "sudo make me a sandwich."
+    "There's no place like 127.0.0.1."
+    "rm -rf: the sharpest tool in the shed."
+    "Keep calm and `man man`."
+    "Linux: because a computer should do what you tell it to."
+    "It's not a bug, it's an undocumented feature of the kernel."
+    "chmod +x your life."
+    "Talk is cheap. Show me the code."))
+
+(define (shell-double-quote s)
+  "Return @var{s} escaped for use inside a double-quoted shell string."
+  (string-concatenate
+   (map (lambda (c)
+          (if (memv c '(#\\ #\" #\$ #\`))
+              (string #\\ c)
+              (string c)))
+        (string->list s))))
+
+(define (serialize-zsh-greetings)
+  (string-append
+   "CC_GREETINGS=(\n"
+   (string-join (map (lambda (g)
+                       (format #f "\t\"~a\"" (shell-double-quote g)))
+                     zsh-greetings)
+                "\n")
+   "\n)\n"))
+
+(define (serialize-zsh-function f)
+  (format #f "~a () { ~a; }\n" (car f) (cdr f)))
+
 (define zsh-aliases
-  ;; Only what is truly machine specific: the shared alias set (navigation,
-  ;; emacs, podman, fetch, ...) lives in (shell-lib.zsh).
+  ;; Only what is truly machine specific.
   '(("ll" . "gls -lAh --group-directories-first")
     ("l" . "gls -lAh --group-directories-first")
     ("la" . "gls -lAh --group-directories-first")
@@ -261,6 +371,8 @@ else @file{~/.config}."
    "\n"
    ;; the shared prompt engine, git segment, helpers and greeting pool
    (zsh-read-shell-lib)
+   (serialize-zsh-greetings)
+   (string-concatenate (map serialize-zsh-function zsh-git-shortcuts))
    "\n"
    ;; the notes: where they are, and the `n' command that works on them
    "# ---- notes (the `n' command) ----\n"
@@ -296,6 +408,7 @@ else @file{~/.config}."
    "    lsof -iTCP -sTCP:LISTEN -P -n\n"
    "}\n"
    "\n# ---- aliases ----\n"
+   (mk-alias-lines zsh-shared-aliases)
    (mk-alias-lines zsh-aliases)
    "\n# ---- PATH ----\n"
    "path+=(\"$HOME/.bin\")\n"

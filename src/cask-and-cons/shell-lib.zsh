@@ -197,87 +197,8 @@ __cc_prompt () {
 }
 
 # ---- greeting ---------------------------------------------------------------
-# Pool of aphorisms, shared by all machines (identical list in the bash copies).
-CC_GREETINGS=(
-	"Acta non verba. (Daden, geen woorden.)"
-	"Alea iacta est. (De teerling is geworpen.)"
-	"Memento mori. (Gedenk te sterven.)"
-	"Per aspera ad astra. (Via moeilijkheden naar de sterren.)"
-	"Veni, vidi, vici. (Ik kwam, ik zag, ik overwon.)"
-	"Cogito, ergo sum. (Ik denk, dus ik ben.)"
-	"Errare humanum est. (Dwalen is menselijk.)"
-	"Si vis pacem, para bellum. (Als je vrede wilt, bereid je dan voor op oorlog.)"
-	"Carpe diem. (Pluk de dag.)"
-	"Festina lente. (Haast je langzaam.)"
-	"Scientia potentia est. (Kennis is macht.)"
-	"Dum spiro spero. (Zolang ik adem, hoop ik.)"
-	"Nosce te ipsum. (Ken jezelf.)"
-	"Ave, Caesar, morituri te salutant. (Gegroet, Caesar, zij die gaan sterven groeten u.)"
-	"Vi Vi Vi is the number of the beast. Emacs is salvation."
-	"M-x doctor. Tell me about your childhood."
-	"Evaluating buffer... Enlightenment achieved."
-	"C-x C-c. Are you sure you want to exit your entire reality?"
-	"Your .emacs file has more lines of code than most corporate startups."
-	"Emacs: The extensible, customizable, self-documenting, real-time display environment."
-	"Nu breekt mijn klomp!"
-	"Hoge bomen vangen veel wind."
-	"Gezelligheid kent geen tijd."
-	"Met de deur in huis vallen."
-	"Beter één vogel in de hand dan tien in de lucht."
-	"De soep wordt nooit zo heet gegeten als zij wordt opgediend."
-	"Al draagt een aap een gouden ring, het is en blijft een lelijk ding."
-	"Je kunt niet van een kale kip plukken."
-	"Als de kat van huis is, dansen de muizen op tafel."
-	"Welcome back, operator. Systems are nominal."
-	"Shall we play a game?"
-	"Initiating hackermode..."
-	"Wake up, Neo... The Matrix has you."
-	"I'm sorry, Dave. I'm afraid I can't do that."
-	"Don't panic. And always know where your towel is."
-	"All your base are belong to us."
-	"Stay awhile and listen!"
-	"A vast terminal emptiness awaits your input."
-	"There are 10 types of people: those who understand binary, and those who don't."
-	"Why do programmers wear glasses? Because they can't C#."
-	"Hardware: The parts of a computer system that can be kicked."
-	"There are two hard things in computer science: cache invalidation, naming things, and off-by-one errors."
-	"To understand recursion, you must first understand recursion."
-	"What is a programmer's favorite hangout place? Foo Bar."
-	"Algorithm: A word used by programmers when they do not want to explain what they did."
-	"Unix is user-friendly. It's just very selective about who its friends are."
-	"In the beginning was the command line."
-	"Everything is a file, until it's a process."
-	"May the source be with you."
-	"RTFM: Read The Fine Manual."
-	"Pipe it, grep it, sed it, love it."
-	"Form follows function, but errors follow shortcuts."
-	"Emacs is a magnificent operating system, it just lacks a good text editor."
-	"M-x butterfly"
-	"Escape Meta Alt Control Shift. Your pinky finger is strong."
-	"C-x C-s. Your progress is saved. Your soul is secure."
-	"Welcome to the Church of Emacs. Emacs is my editor, and GNU is its operating system."
-	"Living in the buffers since inception."
-	"GNU's Not Unix! Welcome to the recursive revolution."
-	"Free software is a matter of liberty, not price. Think free speech, not free beer."
-	"You are entering a 100% libre user space."
-	"Guile, Guix, and Glory. Welcome to the GNU system."
-	"Join us now and share the software; You'll be free, hackers, you'll be free."
-	"Happy Hacking!"
-	"There is no system but GNU, and Linux is one of its kernels."
-	"If we do not control our software, our software controls us."
-	"Proprietary software is a social problem. Keep your system clean."
-	"With digital technology, sharing is easy. Sharing is good."
-	"The sky above the port was the color of television, tuned to a dead channel."
-	"High tech, low life. Welcome back to the sprawl."
-	"Data is the new neon. Go get it."
-	"Jack in. Boot up. Clean the cache."
-	"The matrix is nothing but a spark in the dark."
-	"You have power over your mind - not outside events. Realize this, and you will find strength."
-	"We suffer more often in imagination than in reality."
-	"The best revenge is to be unlike him who performed the injury."
-	"Control your inputs; master your outputs."
-	"Amor Fati: Love your fate, for it is your life."
-)
+# The pool of sayings (CC_GREETINGS) is data and lives in zsh.scm
+# (`zsh-greetings'); it is emitted into the rc before this runs.
 
 shell-greeting () {
     local q=${CC_GREETINGS[$((RANDOM % $#CC_GREETINGS + 1))]}
@@ -567,17 +488,8 @@ rc-time () {
 }
 
 # ---- git -------------------------------------------------------------------
-gst () { git status --short --branch "$@"; }
-gd () { git diff "$@"; }
-gds () { git diff --stat "$@"; }
-gco () { git checkout "$@"; }
-gsw () { git switch "$@"; }
-gbr () { git branch -vv "$@"; }
-gcm () { git commit -m "$*"; }
-gpl () { git pull --ff-only "$@"; }
-gpu () { git push "$@"; }
-gfetch () { git fetch --all --prune "$@"; }
-groot () { cdroot; }
+# The one-line git shortcuts (gst, gd, gco, ...) are generated from
+# `zsh-git-shortcuts' in zsh.scm; only the multi-line ones stay here.
 
 glog () {
     local n=${1:-20}
@@ -586,25 +498,6 @@ glog () {
         -n "$n" --all
 }
 
-# -----------------------------------------------------------------------------
-# Aliases (shared set; never shadow a function defined above)
-# -----------------------------------------------------------------------------
-alias ..='cd ..;pwd'
-alias ...='cd ../..;pwd'
-alias ....='cd ../../..;pwd'
-alias c='clear'
-alias h='history'
-alias hg='hgrep'
-alias tree='tree --dirsfirst -F'
-alias mkdir='mkdir -p -v'
-alias df='df -h'
-alias e='emacsclient -t'
-alias k='pkill'
-alias fetch='fastfetch'
-alias vanilla-emacs='emacs -Q'
-alias restart-emacs='pkill emacs || true; pkill Emacs || true; emacs --daemon'
-alias docker='podman'
-alias docker-compose='podman compose'
 
 # caco: available everywhere; navigates to the repo, then runs the task.
 caco () {
@@ -612,7 +505,6 @@ caco () {
     ./caco "$@"
 }
 
-alias find-largest-files='du -h -x -s -- * 2>/dev/null | sort -r -h | head -20'
 
 # -----------------------------------------------------------------------------
 # Boot: colours, prompt hook, greeting. Called once at the end of the rc file.
