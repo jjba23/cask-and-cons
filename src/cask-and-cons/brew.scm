@@ -28,11 +28,13 @@
   #:export (brew-taps brew-formulae brew-casks install-brew-packages))
 
 (define brew-taps
-  '("d12frosted/emacs-plus"
+  '("koekeishiya/formulae"
+    "d12frosted/emacs-plus"
     "hashicorp/tap"))
 
 (define brew-formulae
   '("jq" "fzf"
+    "koekeishiya/formulae/skhd"
     "tree"
     "coreutils"
     "marksman"

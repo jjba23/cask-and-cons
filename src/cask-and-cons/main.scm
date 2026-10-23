@@ -29,6 +29,7 @@
   #:use-module (cask-and-cons zsh)
   #:use-module (cask-and-cons wezterm)
   #:use-module (cask-and-cons macos)
+  #:use-module (cask-and-cons skhd)
   #:export (main))
 
 (define (find-scm-files dir)
@@ -87,6 +88,17 @@
     (install-macos unquote
                     (lambda (args)
                       (install-macos-settings)))
+    (install-skhd unquote
+                  (lambda (args)
+                    (install-skhd-config)))
+    (hr unquote
+        (lambda (args)
+          ;; Run every install-* task, in the order listed above.
+          (for-each (lambda (name)
+                      (when (string-prefix? "install-"
+                                            (symbol->string name))
+                        (dispatch (symbol->string name)
+                                  '()))) (map car %tasks))))
     (list unquote
           (lambda (args)
             (log-info "Available tasks: ~a"

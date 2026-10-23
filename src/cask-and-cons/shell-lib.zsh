@@ -602,9 +602,16 @@ alias e='emacsclient -t'
 alias k='pkill'
 alias fetch='fastfetch'
 alias vanilla-emacs='emacs -Q'
-alias restart-emacs='pkill emacs; emacs --daemon'
+alias restart-emacs='pkill emacs || true; pkill Emacs || true; emacs --daemon'
 alias docker='podman'
 alias docker-compose='podman compose'
+
+# caco: available everywhere; navigates to the repo, then runs the task.
+caco () {
+    cd ~/Hacking/cask-and-cons || return
+    ./caco "$@"
+}
+
 alias find-largest-files='du -h -x -s -- * 2>/dev/null | sort -r -h | head -20'
 
 # -----------------------------------------------------------------------------
