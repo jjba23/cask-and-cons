@@ -372,6 +372,7 @@ NOTES_DIR=/tmp/notes-try zsh -f -c '
 Honest list of what the shell does /not/ do, so that you know when to reach for Emacs:
 
 - *Moving or renaming a note.*  Links are relative, so moving a note must rewrite links in other notes; the Emacs command (=C-c n r=) does it.  By hand, ~git mv~, then fix the links that ~grep -rn old-name.org~ shows, then ~n index~.
+- *Seeing how notes connect.*  The interactive graph and tree of the notes (=C-c n g= in Emacs) needs a browser and the Emacs side; from the shell, ~n cd~ and the index pages are the way to browse the structure.
 - *Backlinks and linking.*  ~n search "name.org"~ finds who links where; inserting links is an editor job.
 - *Habit tracking.*  ~n today~ shows habits that are due; completing one (which moves its date and records history for the graph) is an Org action.
 - *Nested bookmark categories that already have a parent* are added as a full new chain rather than merged.
