@@ -27,18 +27,18 @@
 ;; Both are Lisps, so the reader and printer round-trip it unchanged
 ;; ('ayu-dark reads as (quote ayu-dark) and prints back as 'ayu-dark).
 (define emacs-bridge-forms
-  '((setopt heks-emacs-font-mono
+  `((setopt heks/font-mono
             "Intel One Mono"
-            heks-emacs-font-sans
+            heks/font-sans
             "Lucida Sans"
-            heks-emacs-font-serif
+            heks/font-serif
             "Baskerville"
-            heks-emacs-theme
+            heks/theme
             'ayu-dark
-            heks-emacs-clone-dir
+            heks/clone-dir
             "~/Hacking/heks-emacs"
-            heks-emacs-notes-roam-dir
-            "~/Hacking/private-notes")))
+            heks/notes-dir
+            ,notes-directory)))
 
 (define emacs-bridge-dir
   (make-parameter (format #f "~a/.emacs.d"

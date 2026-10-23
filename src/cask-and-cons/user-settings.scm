@@ -20,4 +20,9 @@
 ;; (see `cask-and-cons prelude').
 
 (define-module (cask-and-cons user-settings)
-  #:export ())
+  #:export (notes-directory))
+
+;; Where the notes live.  One place for every consumer: the Emacs bridge sets
+;; heks/notes-dir to it and the ZSH config exports it as $NOTES_DIR for the
+;; `n' command.  $HOME is understood by both (the Emacs side turns it into ~).
+(define notes-directory "$HOME/Hacking/private-notes")

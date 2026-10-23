@@ -60,6 +60,7 @@
     "git-delta"
     "yq"
     "tmux"
+    "mongosh"
     "mas"
     "gnu-sed"
     "gawk"

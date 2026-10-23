@@ -1,0 +1,398 @@
+#+title: Notes from the terminal -- the ~n~ command
+#+author: Josep Bigorra
+#+options: toc:3
+
+This is the terminal half of a note taking setup whose main half is in Emacs.  It is for the moments Emacs is not there: an SSH session, a quick thought while you are in a shell, a machine you have not configured yet.
+
+It is *one command*, ~n~, written in plain zsh (with ~fzf~ for pickers when you have it), that reads and writes /exactly the same files/ as the Emacs side.  The two never disagree because they do not share code, they share a /format/.  The format, the philosophy and the Emacs workflows are written up in the [[https://codeberg.org/jjba23/heks-emacs/src/branch/trunk/docs/notes.org][heks-emacs notes guide]]; this document is about the shell side, and is complete on its own.
+
+#+begin_quote
+Contents: [[#quick][Quick start]] · [[#install][Install]] · [[#commands][The commands]] · [[#pickers][How the pickers behave]] · [[#contract][The file contract]] · [[#indexes][Index pages]] · [[#config][Configuration]] · [[#recipes][Recipes]] · [[#design][Design notes]] · [[#testing][Trying changes safely]] · [[#limits][Limits]] · [[#trouble][Troubleshooting]]
+#+end_quote
+
+* Quick start
+:PROPERTIES:
+:CUSTOM_ID: quick
+:END:
+
+#+begin_src sh
+# an idea, mid-command: file it
+echo "try the transducer version of this" | n capture -t engineering/ideas -T "Transducers"
+
+# a todo, without leaving the shell
+n todo "email the landlord about the radiator"
+
+# what's on today?  (birthdays this week, habits due, the inbox)
+n today
+
+# find something you wrote
+n find kubernetes          # pick by title, opens in Emacs (if running) or $EDITOR
+n search "rolling update"  # search the text, jump to the line
+
+# keep a link
+n bookmark add https://example.org/post "A good post" "Reading"
+
+# what did I save from that conference?
+n cd conferences           # cd into the topic folder
+#+end_src
+
+Run ~n help~ any time for the list.  Tab completes the subcommands and topic names.
+
+* Install
+:PROPERTIES:
+:CUSTOM_ID: install
+:END:
+
+~n~ is part of the ZSH configuration that cask-and-cons generates:
+
+#+begin_src sh
+./caco install-zsh      # writes ~/.zshrc (and the pager keymap)
+exec zsh                # or open a new terminal
+n help
+#+end_src
+
+How it gets there, so you can change it:
+
+- The helpers are plain zsh in =src/cask-and-cons/notes.zsh=.
+- =src/cask-and-cons/zsh.scm= reads that file and splices it into =~/.zshrc= right after the shared shell library (=shell-lib.zsh=), under the heading =# ---- notes (the `n' command) ----=, together with =export NOTES_DIR=…=.
+- The notes directory is defined *once*, as =notes-directory= in =src/cask-and-cons/user-settings.scm=.  The Emacs bridge (=./caco install-emacs-bridge=) takes ~heks/notes-dir~ from the same value, so the two halves cannot point at different places.  =$HOME= in it is understood by both.
+
+You do not need cask-and-cons to use ~n~.  Copy =notes.zsh= anywhere, ~source~ it from your own =~/.zshrc= after defining =__cc_has= (a one-line "is this command available" helper: =__cc_has () { command -v "$1" >/dev/null 2>&1; }=) and set ~NOTES_DIR~.
+
+Requirements: zsh, and the usual ~sed~, ~awk~, ~grep~, ~find~, ~cmp~.  Optional, and used when present: ~fzf~ (pickers), ~rg~ (faster search), ~curl~ (page titles for bookmarks), and a clipboard tool (~pbpaste~/~pbcopy~ on macOS, ~wl-paste~ or ~xclip~ elsewhere).
+
+* The commands
+:PROPERTIES:
+:CUSTOM_ID: commands
+:END:
+
+| Command | What it does |
+|---------+--------------|
+| ~n capture [-t topic] [-T title] [-g tags] [-c] [text]~ | File text as a note. |
+| ~n new [topic] [title]~ | Create a note and open it for writing. |
+| ~n find [query]~ | Pick a note by title and open it. |
+| ~n search <pattern>~ | Search the text of every note; open at the line. |
+| ~n todo <text>~ | Add a TODO to the inbox. |
+| ~n todos~ | Every open TODO/WIP/REVIEWING in the notes. |
+| ~n today~ | Birthdays this week, habits due, the inbox. |
+| ~n bookmark [query]~ | Pick a bookmark and open it. |
+| ~n bookmark add [url [title [category]]]~ | File a URL under a category. |
+| ~n contact [query]~ | Pick a contact; print and copy the address. |
+| ~n contact add <name> [email] [phone] [birthday]~ | Add a contact. |
+| ~n birthdays [days]~ | Birthdays coming up (default 30 days). |
+| ~n index~ | Regenerate every topic's =index.org=. |
+| ~n cd [topic]~ | ~cd~ into a topic folder. |
+| ~n dir~ | Print the notes directory. |
+| ~n help~ | The list. |
+
+Short names: ~c~ (capture), ~f~ (find), ~s~ (search), ~x~ (todo), ~t~ (todos), ~d~ (today), ~b~ (bookmark), ~k~ (contact), ~u~ (birthdays), ~i~ (index).  Aliases: ~nc~, ~nf~, ~nx~, ~nt~.
+
+** ~n capture~
+
+#+begin_src sh
+n capture -t engineering/ideas -T "Transducers" "try the transducer version"
+git log -5 --stat | n capture -t work/log -T "What I shipped"
+n capture -c                    # the clipboard
+n capture                       # asks for the text, then the topic
+#+end_src
+
+- *Where the text comes from:* the ~-c~ flag (clipboard) first; otherwise the arguments; otherwise standard input when it is a pipe; otherwise a prompt.
+- *Topic:* given with ~-t~ (normalised: =Work Stuff/Infra= → =work-stuff/infra=), or picked interactively (see [[#pickers][How the pickers behave]]).  A topic that does not exist is created; asked about first when picked interactively.
+- *Title:* ~-T~, or the first line of the text offered for you to edit.
+- *Tags:* ~-g "a b"~ becomes a =#+filetags: :a:b:= line.  No tags are asked about, to keep capture quick.
+- *Shape of the note:* a one-line capture is a paragraph; multi-line text is wrapped in =#+begin_quote= … =#+end_quote=.
+- The folder's =index.org= (and its parents') is updated, and the file's relative path is printed.
+
+** ~n new~
+
+~n new [topic] [title]~ asks for whatever you did not give, writes the note header (title and date) and opens the file.
+
+*Which editor:* =$NOTES_EDITOR= if you set it; else Emacs through ~emacsclient -t~ when an Emacs server is running; else =$VISUAL=, then =$EDITOR=, then ~vi~.  So with an Emacs daemon, "note taking from a shell" lands you in your real configuration, in the terminal.
+
+** ~n find~ and ~n search~
+
+- ~n find [query]~ lists every note by title with its path beside it, and previews the top of the file as you move.  Without fzf, it opens the first title that matches the query.
+- ~n search <pattern>~ greps the /text/ of every note (with ~rg~ if you have it, else ~grep~), shows =path:line:text=, and opens the one you pick *at that line*.  Without fzf, it prints the matches.
+- ~find~ lists the live notes only: the archive (~.archive/~), any dot-folder and the =diary/= are left out.  ~search~ and ~todos~ skip dot-folders (so the archive) too, but do read the diary.
+
+** ~n todo~, ~n todos~, ~n today~
+
+~n todo "text"~ appends this to the =* Inbox= heading of =todo.org=, exactly as Emacs's capture does:
+
+#+begin_src org
+,** TODO email the landlord about the radiator
+:PROPERTIES:
+:CREATED: [2026-10-23 Fri 11:42]
+:END:
+#+end_src
+
+(The file and heading are created if missing; the entry goes at the /end/ of the Inbox section, before the next top-level heading.)
+
+~n todos~ lists every =TODO=, =WIP= and =REVIEWING= headline in the notes (not the archive), and with fzf opens the one you pick at its line.
+
+~n today~ is the glance at the start of the day:
+
+#+begin_example
+today Fri 23 Oct
+
+Birthdays
+  tomorrow  🎂 Manon (34)
+
+Habits due
+  ◌ Vacuum  (2026-10-22)
+
+Inbox
+  ☐ buy milk
+  ☐ email the landlord about the radiator
+#+end_example
+
+Habits "due" are the =TODO= headings in =habits.org= whose =SCHEDULED:= date is today or earlier.  Doing a habit and marking it done is an Org action (it moves the date by its repeater), so that part is in Emacs, or in any editor by editing the date.
+
+** ~n bookmark~
+
+- ~n bookmark [query]~: pick a bookmark -- title and category on screen -- and open it (~open~ on macOS, ~xdg-open~ elsewhere).
+- ~n bookmark add [url [title [category]]]~: with no arguments, the URL is taken from the clipboard when it looks like one.  The page title is fetched with ~curl~ (four seconds at most) and offered for editing.  The category is picked from the existing headings of =bookmarks.org= (or typed: ctrl-n takes what you typed as a new category).  A URL already present is reported, not added twice.
+
+The link is appended to the end of the chosen heading's own text, before any sub-heading, as =- [[url][Title]]=.  A category that does not exist is added at the end of the file; a nested one (=Music / Guitar=) is added as a whole chain of new headings -- Emacs would merge into an existing parent, this does not.
+
+** ~n contact~ and ~n birthdays~
+
+- ~n contact [query]~: pick a contact; the =Name <email>= is printed, the phone below it, and the email (or name) is copied to the clipboard (macOS ~pbcopy~).  Without fzf it prints matching lines instead.
+- ~n contact add <name> [email] [phone] [birthday]~: appends an entry to =contacts.org=, leaving out empty properties.  A birthday must be =YYYY-MM-DD= or =MM-DD= (checked).
+- ~n birthdays [days]~: the next birthdays within N days (default 30), nearest first, with ages when the year is known:
+
+#+begin_example
+  tomorrow  🎂 Manon (34)
+  in 31d    🎂 David (27)  02-07
+#+end_example
+
+(29 February is treated as 28 February in years without one.)
+
+** ~n index~, ~n cd~, ~n dir~
+
+~n index~ rebuilds every =index.org= (see [[#indexes][Index pages]]).  ~n cd [topic]~ changes into a topic folder, choosing with fzf if you give nothing (it is a shell function, so ~cd~ takes effect in your shell).  ~n dir~ prints the notes directory, for scripts: =cd "$(n dir)"=.
+
+* How the pickers behave
+:PROPERTIES:
+:CUSTOM_ID: pickers
+:END:
+
+Where a choice is needed, ~n~ uses fzf if it is installed /and/ you are at a terminal; otherwise it falls back to a plain prompt or a plain list.  That means ~n~ is safe in scripts and pipes: nothing ever waits for a keypress when output is redirected.
+
+The *topic picker* is the one that matters most, because deciding where a note goes is the main cost of a folder-based system.  Each line is a topic with an annotation:
+
+#+begin_example
+Put the note in> _
+  engineering/languages/haskell     12 notes · 3d — How I use Haskell
+  work/log                           48 notes · 0d — Weekly log
+  home/house                          9 notes · 41d — Repairs, paint, contractors
+#+end_example
+
+Newest-changed topics are first (usually where the next note belongs), the number is how many notes it holds, the age is days since its newest note changed, and the text after the dash is the first line of the topic's =index.org= description.  The preview shows the top of the index.
+
+- *enter* picks the highlighted topic.
+- *ctrl-n* takes what you typed as a /new/ topic (also what happens if nothing matches).  You are asked to confirm before a folder is created, so a typo does not make one.
+
+The other pickers (notes, bookmarks, contacts, categories) work the same way: type to narrow, enter to choose, esc to cancel.
+
+* The file contract
+:PROPERTIES:
+:CUSTOM_ID: contract
+:END:
+
+~n~ is a /view/ onto a directory.  It works because it writes only what a person could have written by hand, in these formats:
+
+#+begin_example
+$NOTES_DIR/
+├── index.org              generated: topics
+├── todo.org               * Inbox → ** TODO items
+├── habits.org             TODO with SCHEDULED: <date .+1w> and :STYLE: habit
+├── birthdays.org          one line:  %%(heks/contacts-birthdays)
+├── contacts.org           * Name, with :EMAIL: :PHONE: :BIRTHDAY: :NICKNAME:
+├── bookmarks.org          headings are categories; [[url][title]] are bookmarks
+├── diary/…                kept by another tool; ignored by n
+├── <topic>/…/<slug>.org   one note each
+└── .archive/              old material, hidden from n find/search/todos
+#+end_example
+
+*A note* is:
+
+#+begin_src org
+,#+title: Transducers
+,#+date: [2026-10-23 Fri]
+,#+filetags: :a:b:
+
+body…
+#+end_src
+
+Rules ~n~ follows, and that any other tool should too:
+
+- *The title is the first =#+title:= line*; it is what pickers and indexes show (trailing spaces trimmed).
+- *The file name is the slug of the title* (lowercase ASCII words and digits, separated by dashes); if it is taken, =-2=, =-3=… is appended.
+- *Links between notes are relative =file:= links* (=[[file:../x/y.org][Y]]=), never absolute and never identifier-based.
+- *Dot-folders and =diary/= are not topics.*  The archive is the only dot-folder that gets index pages.
+- *Nothing is written outside the notes directory*; the only other files are short-lived =name.tmp= files beside the one being rewritten.
+
+A consequence worth saying out loud: you can write another front-end -- Babashka, Python, a phone shortcut -- in an afternoon, as long as it honours this.  The Emacs side is the reference implementation of the formats; this file is the second.
+
+* Index pages
+:PROPERTIES:
+:CUSTOM_ID: indexes
+:END:
+
+Every topic folder gets an =index.org=: its title, an optional hand-written description, and a generated list of its sub-topics and notes between marker comments:
+
+#+begin_src org
+,#+title: Engineering / Languages / Haskell
+,#+date: [2026-10-23 Fri]
+
+How I use Haskell.
+
+# BEGIN GENERATED INDEX
+,* Topics
+- [[file:./patterns/index.org][Patterns]]
+,* Notes
+- [[file:./freer-monads.org][Freer monads]]
+# END GENERATED INDEX
+#+end_src
+
+- Only the part between the markers is rewritten.  *Your description above, and anything after the END marker, is preserved.*
+- An =index.org= with no markers is yours; ~n index~ never touches it.
+- Pages are written only when they would change, so running ~n index~ twice reports =indexes: 0 written= the second time.
+- Sub-topic titles come from the folder names (=http-apis= → =HTTP APIs=, via a small acronym table at the top of =notes.zsh=: ~CC_NOTES_ACRONYMS~, extend it for your own words).  Note titles come from =#+title:=.  Entries are sorted by code point of the lower-cased title, the same way Emacs does.
+- ~n capture~ and ~n new~ refresh the index of the folder they write to and of every folder above it, so you rarely need ~n index~ at all; it is for after moving or deleting notes by hand.
+
+*The shell and Emacs generate byte-identical pages.*  This was verified on a real tree of about 480 notes and 116 index pages: generate with one, regenerate with the other, and nothing changes.  It is the property to preserve if you change either one; a quick check:
+
+#+begin_src sh
+git -C "$(n dir)" status --short     # clean
+n index                              # "indexes: 0 written"
+#+end_src
+
+A git pre-commit hook that runs ~n index~ and adds =**/index.org= keeps a repository's indexes honest.
+
+* Configuration
+:PROPERTIES:
+:CUSTOM_ID: config
+:END:
+
+| Variable | Default | Meaning |
+|----------+---------+---------|
+| ~NOTES_DIR~ | ~$HOME/Hacking/private-notes~ (set from =user-settings.scm= by the installer) | The notes directory. |
+| ~NOTES_EDITOR~ | unset | An editor command to use instead of the automatic choice, e.g. =emacsclient -nw= or =nvim=. |
+| ~VISUAL~ / ~EDITOR~ | your own | Used when there is no Emacs server and ~NOTES_EDITOR~ is unset. |
+| ~CC_NOTES_ACRONYMS~ | AH, HTTP, APIs, … | An associative array in =notes.zsh=: folder word → how it is written in index titles. |
+
+To change where the notes live, edit =notes-directory= in =user-settings.scm= and reinstall both halves in one go (tasks chain with a comma): =./caco install-zsh,install-emacs-bridge=.
+
+* Recipes
+:PROPERTIES:
+:CUSTOM_ID: recipes
+:END:
+
+*Capture the output of a command, with context:*
+
+#+begin_src sh
+kubectl describe pod my-pod | n capture -t work/incidents -T "my-pod crash, $(date +%F)"
+#+end_src
+
+*Capture a URL from the clipboard as a bookmark, in two keystrokes of thinking:*
+
+#+begin_src sh
+n bookmark add          # url from the clipboard, title fetched, pick a category
+#+end_src
+
+*Open today's work log, creating it when needed* (a topic of dated notes):
+
+#+begin_src sh
+log () { n new work/log "$(date +%F)"; }
+#+end_src
+
+*Process the inbox from the shell:*
+
+#+begin_src sh
+n today                       # see what's there
+$EDITOR "$(n dir)/todo.org"   # delete, or cut each item into a note
+#+end_src
+
+*Make ~git~ keep indexes right* (=.git/hooks/pre-commit=):
+
+#+begin_src sh
+#!/bin/sh
+zsh -ic 'n index' >/dev/null && git add -- '*index.org'
+#+end_src
+
+*Weekly review:* ~n todos~ (everything open), ~n birthdays 14~, then look at ~n cd~'s picker: topics with an age of several months and notes still in the inbox-like topics are the ones to tidy.
+
+* Design notes
+:PROPERTIES:
+:CUSTOM_ID: design
+:END:
+
+- *A second implementation, on purpose.*  The shell does not call Emacs.  If Emacs were required, the whole point -- working where Emacs is not -- would be lost.  Two small implementations of one format are cheaper than one dependency that is missing exactly when you need it.
+- *Shell, not a program.*  zsh functions in a file you can read in one sitting, with no build step, no runtime beyond tools every machine has, and tab completion for free.  The cost is that the zsh is dense in places (parsing a note's head and tail to keep your description around the generated list); the parts that are tricky are commented.
+- *Capture asks the least.*  Anything you give on the command line is not asked again; anything left out has a sensible default or a quick picker.  No questions about tags unless you pass ~-g~.
+- *Never block a script.*  Interactive pickers only when there is a terminal; otherwise plain output.
+- *Atomic enough.*  Existing files (indexes, =todo.org=, =bookmarks.org=) are rewritten via a temporary file and a move, so a crash leaves the old file or the new one; a new note is simply written.  The index generator compares before replacing, so unchanged pages keep their modification time (nice for sync tools and for ~git status~).
+- *Mirrors rather than a shared library.*  The slug rule, the title rule, the index format and the sort order are re-implemented here.  When you change one side, change the other and run the check in [[#indexes][Index pages]].
+
+* Trying changes safely
+:PROPERTIES:
+:CUSTOM_ID: testing
+:END:
+
+~n~ writes to real files, so test on a copy.  Everything reads =$NOTES_DIR= at run time:
+
+#+begin_src sh
+rm -rf /tmp/notes-try && cp -R "$(n dir)" /tmp/notes-try
+cd /tmp/notes-try && git status --short            # clean baseline
+NOTES_DIR=/tmp/notes-try zsh -ic '
+  n capture -t scratch/area -T "Try" "hello"
+  n todo "a test todo"
+  n bookmark add https://example.org/x "X" "Scratch"
+  n index
+'
+git -C /tmp/notes-try status --short               # exactly what changed
+git -C /tmp/notes-try diff
+#+end_src
+
+Because the notes are in git, the diff /is/ the test: it should show a new note, a new index entry or two, a line in =todo.org= and a line in =bookmarks.org=, and nothing else.  In =zsh -ic= the installed rc defines ~NOTES_DIR~ itself; to override it for a single run source =notes.zsh= instead of the whole rc:
+
+#+begin_src sh
+NOTES_DIR=/tmp/notes-try zsh -f -c '
+  source src/cask-and-cons/shell-lib.zsh; source src/cask-and-cons/notes.zsh
+  n index'
+#+end_src
+
+* Limits
+:PROPERTIES:
+:CUSTOM_ID: limits
+:END:
+
+Honest list of what the shell does /not/ do, so that you know when to reach for Emacs:
+
+- *Moving or renaming a note.*  Links are relative, so moving a note must rewrite links in other notes; the Emacs command (=C-c n r=) does it.  By hand, ~git mv~, then fix the links that ~grep -rn old-name.org~ shows, then ~n index~.
+- *Backlinks and linking.*  ~n search "name.org"~ finds who links where; inserting links is an editor job.
+- *Habit tracking.*  ~n today~ shows habits that are due; completing one (which moves its date and records history for the graph) is an Org action.
+- *Nested bookmark categories that already have a parent* are added as a full new chain rather than merged.
+- *Non-ASCII titles in file names.*  The slug keeps ASCII letters and digits only, so =Crème brûlée= becomes =cr-me-br-l-e=; the title inside the note is untouched.  (The Emacs side keeps Unicode letters in slugs.  Names differ only for such titles; both read each other's files fine.)
+- *Windows.*  zsh on macOS and Linux only.
+
+* Troubleshooting
+:PROPERTIES:
+:CUSTOM_ID: trouble
+:END:
+
+*~n: no notes directory (NOTES_DIR=…)~.*  The directory does not exist.  Check ~echo $NOTES_DIR~; =user-settings.scm= has the source of truth; rerun ~./caco install-zsh~.
+
+*~n: command not found~ after installing.*  Open a new shell (or ~exec zsh~); the function is defined by =~/.zshrc=.
+
+*Pickers do not appear, plain prompts do.*  fzf is not installed, or the output is not a terminal (a pipe, ~$(…)~).  Install fzf (~brew install fzf~).
+
+*~emacsclient: could not get terminal name~.*  You ran ~n find~/~n new~ without a terminal (a script or a pipe) while an Emacs server is up.  Set =NOTES_EDITOR= to something that suits the context, or run it from an interactive shell.
+
+*Index pages came out with different order or titles from Emacs's.*  Check that both sides are up to date; the formats are in [[#contract][The file contract]] and the comparison in [[#indexes][Index pages]].  A hand-edited page without markers is deliberately never regenerated.
+
+*I get a line printing a topic name when creating a note.*  It is a shell alias leaking in (an alias for =mkdir -v=, for instance); ~notes.zsh~ calls =command mkdir= to avoid it, and any new code should use =command= for aliased tools too.
+
+*A note I created has an unexpected file name.*  See the slug rule above; a title of only punctuation becomes =untitled.org=.

@@ -22,8 +22,9 @@
   #:use-module (cask-and-cons prelude)
   #:use-module (cask-and-cons user-settings)
   #:export (zsh-identity zsh-shell-lib-filename zsh-lesskey-filename
+                         zsh-notes-lib-filename zsh-notes-exports
                          zsh-read-source-file lesskey-config-dir
-                         zsh-read-shell-lib
+                         zsh-read-shell-lib zsh-read-notes-lib
                          serialize-zsh-assignment
                          zsh-completion-setopts zsh-shell-setopts
                                    zsh-history-setopts
@@ -146,6 +147,16 @@ setopt CORRECT
 (define zsh-shell-lib-filename
   (make-parameter "shell-lib.zsh"))
 
+;; The notes helpers: the `n' command (capture, find, todo, bookmarks,
+;; contacts, birthdays, index pages) for when Emacs is not at hand.  Plain
+;; zsh next to this module, spliced into ~/.zshrc after the shared library.
+(define zsh-notes-lib-filename
+  (make-parameter "notes.zsh"))
+
+;; Where the notes are: the same directory the Emacs bridge points at.
+(define zsh-notes-exports
+  `(("NOTES_DIR" . ,notes-directory)))
+
 ;; The pager keymap: a plain data file next to this module, shared verbatim
 ;; with heks-bash and wolk-jjba, installed as $XDG_CONFIG_HOME/lesskey.
 (define zsh-lesskey-filename
@@ -180,6 +191,10 @@ repository-relative path for setups that load compiled code."
 (define (zsh-read-shell-lib)
   "Return the contents of the shared zsh library as a string."
   (zsh-read-source-file (zsh-shell-lib-filename)))
+
+(define (zsh-read-notes-lib)
+  "Return the contents of the notes helpers for zsh as a string."
+  (zsh-read-source-file (zsh-notes-lib-filename)))
 
 (define (lesskey-config-dir)
   "Directory less(1) searches first for its keymap: @env{XDG_CONFIG_HOME},
@@ -246,6 +261,11 @@ else @file{~/.config}."
    "\n"
    ;; the shared prompt engine, git segment, helpers and greeting pool
    (zsh-read-shell-lib)
+   "\n"
+   ;; the notes: where they are, and the `n' command that works on them
+   "# ---- notes (the `n' command) ----\n"
+   (mk-export-lines zsh-notes-exports)
+   (zsh-read-notes-lib)
    "\n"
    "# ---- macOS specifics -------------------------------------------------------\n"
    "brewu () {\n"

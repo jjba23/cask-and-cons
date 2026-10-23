@@ -263,12 +263,12 @@ cp -rfv src/* ~/.emacs.d
 You can also configure it with  a =~/.emacs.d/cask-and-cons-bridge.el=
 #+begin_src emacs-lisp
 ;; cask-and-cons-bridge.el --- Bridge to Heks Emacs  -*- lexical-binding: t -*-
-(setopt heks-emacs-font-mono "Intel One Mono"
-        heks-emacs-font-sans "Lucida Sans"
-        heks-emacs-font-serif "Baskerville"
-        heks-emacs-theme 'ayu-dark
-        heks-emacs-clone-dir "~/Hacking/heks-emacs"
-        heks-emacs-notes-roam-dir "~/Hacking/private-notes")
+(setopt heks/font-mono "Intel One Mono"
+        heks/font-sans "Lucida Sans"
+        heks/font-serif "Baskerville"
+        heks/theme 'ayu-dark
+        heks/clone-dir "~/Hacking/heks-emacs"
+        heks/notes-dir "$HOME/Hacking/private-notes")
 #+end_src
 
 
@@ -444,9 +444,29 @@ forward-search in zle instead of a frozen terminal.
 ./caco install-zsh
 #+end_src
 
-This writes =~/.zshrc= and =$XDG_CONFIG_HOME/lesskey=. As with the other install targets, a machine-specific override can be dropped at =$XDG_CONFIG_HOME/cask-and-cons/zsh-settings.scm= (defaulting to =~/.config/cask-and-cons/zsh-settings.scm=) to tweak the alists above before the file is rendered.
+This writes =~/.zshrc= and =$XDG_CONFIG_HOME/lesskey=.
 
----------
+** Notes from the terminal: =n=
+
+The notes of the Emacs setup (see the [[https://codeberg.org/jjba23/heks-emacs/src/branch/trunk/docs/notes.org][heks-emacs notes guide]]) are plain files, so the basics work from ZSH when Emacs is not at hand. One command, =n=, installed with the rest of the ZSH configuration, reads and writes exactly the same files in exactly the same formats (so the two never disagree); it uses =fzf= for the pickers when it is installed, and plain prompts otherwise.
+
+#+begin_src sh
+echo "try the transducer version" | n capture -t engineering/ideas -T "Transducers"
+n todo "email the landlord"       # into the inbox of todo.org
+n today                           # birthdays, habits due, the inbox
+n find kubernetes                 # pick a note by title and open it
+n search "rolling update"         # search the text, jump to the line
+n bookmark add                    # the clipboard URL, title fetched, pick a category
+n index                           # regenerate every topic's index.org
+#+end_src
+
+How it is wired:
+
+- =src/cask-and-cons/notes.zsh= is plain zsh; =zsh.scm= splices it into =~/.zshrc= after the shared library, with =export NOTES_DIR=…=.
+- The notes directory is defined once, as =notes-directory= in =user-settings.scm=; the Emacs bridge takes =heks/notes-dir= from the same value.
+- The index pages it writes are byte-identical to the ones Emacs writes.
+
+Everything -- every command, how the pickers behave, the file formats the two sides share, recipes, how to test changes on a copy of your notes, limits and troubleshooting -- is in *[[file:docs/notes-from-the-terminal.org][docs/notes-from-the-terminal.org]]*. Moving a note is deliberately left to Emacs, because it has to repair the links that point at it. Run =./caco install-zsh= and open a new shell to get it.
 
 * Install the Emacs bridge
 
