@@ -3,6 +3,8 @@
 #+email: jjbigorra@gmail.com
 #+options: toc:nil
 
+* ⚠️ THIS REPOSITORY WAS ARCHIVED HERE AND MOVED TO GITHUB, GO TO: https://github.com/jjba23/nix-jointhefreeworld  ⚠️
+
 *My work macOS dotfiles.*
 
 ~cask-and-cons~ provides a convenience CLI tool (~caco~). Naming stems from a pun on Homebrew casks of macOS and the cons cells of Lisp.
