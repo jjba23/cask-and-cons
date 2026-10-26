@@ -23,6 +23,7 @@
   #:use-module (ice-9 ftw)
   #:use-module (cask-and-cons prelude)
   #:use-module (cask-and-cons git)
+  #:use-module (cask-and-cons gpg)
   #:use-module (cask-and-cons brew)
   #:use-module (cask-and-cons omniwm)
   #:use-module (cask-and-cons emacs)
@@ -70,6 +71,9 @@
     (install-git unquote
                  (lambda (args)
                    (install-git-config)))
+    (install-gpg unquote
+                 (lambda (args)
+                   (install-gpg-config)))
     (install-brew unquote
                   (lambda (args)
                     (install-brew-packages)))

@@ -56,6 +56,7 @@
     "eza"
     "htop"
     "wget"
+    "pinentry-mac"
     "watch"
     "git-delta"
     "yq"
