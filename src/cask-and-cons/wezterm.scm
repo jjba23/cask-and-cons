@@ -113,17 +113,11 @@
 
 ;; --- Settings ---
 
-;; The palette, as semantic keys.  It is the `ayu-dark' the Emacs bridge asks
-;; Heks Emacs to load (see `emacs-bridge-forms'), with the face colours Heks
-;; Emacs overrides on top of the upstream theme: the default foreground, the
-;; cursor and the hl-line background.  There is no palette registry on macOS, so
-;; the values live here.
+;; The palette, as semantic keys.  It follows `global-theme' from
+;; (cask-and-cons user-settings), the same theme the Emacs bridge asks Heks
+;; Emacs to load, so changing that one value rethemes both.
 (define wezterm-palette
-  (make-parameter '(("foreground" . "#d4d1cc") ("background" . "#0f1419")
-                    ("cursor_bg" . "#ffb07c")
-                    ("cursor_fg" . "#0f1419")
-                    ("selection_fg" . "#d4d1cc")
-                    ("selection_bg" . "#1d252a"))))
+  (make-parameter (theme-palette global-theme)))
 
 ;; The applications that get the keyboard back while they run.  The list is
 ;; matched against the base name of the pane's foreground process, lower-cased

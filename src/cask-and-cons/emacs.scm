@@ -34,7 +34,7 @@
             heks/font-serif
             "Baskerville"
             heks/theme
-            'ayu-dark
+            ,(list 'quote (theme-emacs-theme global-theme))
             heks/clone-dir
             "~/Hacking/heks-emacs"
             heks/notes-dir
