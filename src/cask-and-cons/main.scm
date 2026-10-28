@@ -31,6 +31,7 @@
   #:use-module (cask-and-cons wezterm)
   #:use-module (cask-and-cons macos)
   #:use-module (cask-and-cons skhd)
+  #:use-module (cask-and-cons mcp)
   #:export (main))
 
 (define (find-scm-files dir)
@@ -95,6 +96,9 @@
     (install-skhd unquote
                   (lambda (args)
                     (install-skhd-config)))
+    (install-mcp unquote
+                 (lambda (args)
+                   (install-mcp-config)))
     (hr unquote
         (lambda (args)
           ;; Run every install-* task, in the order listed above.
