@@ -79,11 +79,13 @@
     "terraform-docs"
     "terragrunt"
     "trivy"
-    "infracost"))
+    "infracost"
+    "httpie"))
 
 (define brew-casks
   '("iterm2" "the-unarchiver"
     "bruno"
+    "httpie-desktop"
     "dbgate"
     "claude"
     "claude-code"
