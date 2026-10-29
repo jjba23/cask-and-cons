@@ -80,7 +80,9 @@
     "terragrunt"
     "trivy"
     "infracost"
-    "httpie"))
+    "httpie"
+    "ffmpeg"
+    "gifsicle"))
 
 (define brew-casks
   '("iterm2" "the-unarchiver"
