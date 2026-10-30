@@ -17,7 +17,9 @@
 
 (define mcp-servers
   (make-parameter
-   '(("atlassian" . "https://mcp.atlassian.com/v1/mcp"))))
+   ;;'(("atlassian" . "https://mcp.atlassian.com/v1/mcp"))
+   '()
+   ))
 
 (define (home)
   (or (getenv "HOME") "/tmp"))
