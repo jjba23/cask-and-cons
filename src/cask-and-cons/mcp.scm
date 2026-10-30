@@ -13,6 +13,7 @@
   #:use-module (ice-9 match)
   #:use-module (cask-and-cons prelude)
   #:export (mcp-servers
+            copilot-allowed-urls
             install-mcp-config))
 
 (define mcp-servers
@@ -20,6 +21,12 @@
    ;;'(("atlassian" . "https://mcp.atlassian.com/v1/mcp"))
    '()
    ))
+
+(define copilot-allowed-urls
+  (make-parameter
+   '("https://github.com"
+     "https://api.github.com"
+     "https://docs.github.com")))
 
 (define (home)
   (or (getenv "HOME") "/tmp"))
@@ -92,6 +99,15 @@ additional (name . value) pairs merged into each server entry."
   (write-json! (format #f "~a/.copilot" (home))
                "mcp-config.json"
                (servers-json "mcpServers" '(("tools" . ("*")))))
+  ;; Copilot CLI user settings.  Mouse support is off so the terminal keeps
+  ;; selection and copy/paste to itself.
+  (write-json! (format #f "~a/.copilot" (home))
+               "settings.json"
+               (string-append
+                (json `(obj ("mouse" . #f)
+                            ("allowedUrls" . ,(copilot-allowed-urls)))
+                      0)
+                "\n"))
   ;; ECA (remote servers only need a url)
   (write-json! (format #f "~a/.config/eca" (home))
                "config.json"
