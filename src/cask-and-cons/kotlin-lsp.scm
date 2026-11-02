@@ -33,9 +33,9 @@ exits with a non-zero status."
 @code{kotlin-lsp-release}, and symlink its @code{intellij-server} binary to
 @file{~/.local/bin/intellij-server}."
   (let* ((release kotlin-lsp-release)
-         (url (format #f "https://download.jetbrains.com/language-server/kotlin-server/~a/kotlin-server-~a-aarch64.tar.gz"
+         (url (format #f "https://download.jetbrains.com/language-server/kotlin-server/~a/kotlin-server-~a-aarch64.sit"
                       release release))
-         (download-dest (home-path "Downloads" "kotlin-lsp-latest.tar.gz"))
+         (download-dest (home-path "Downloads" "kotlin-lsp-latest.zip"))
          (extract-dest (home-path "Downloads" "kotlin-lsp-latest"))
          (server (string-append extract-dest "/kotlin-server-" release
                                 "/bin/intellij-server"))
@@ -46,7 +46,7 @@ exits with a non-zero status."
     (run! "mkdir" "-p" extract-dest bin-dir)
     (run! "curl" "--fail" "--location" "--silent" "--show-error"
           url "--output" download-dest)
-    (run! "tar" "-xf" download-dest "-C" extract-dest)
+    (run! "unzip" "-q" download-dest "-d" extract-dest)
     (run! "chmod" "+x" server)
     (run! "ln" "-s" server bin-dest)
     (log-success "Kotlin LSP ~a installed at ~a" release bin-dest)))
