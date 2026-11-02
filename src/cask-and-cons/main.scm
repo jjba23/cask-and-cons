@@ -22,6 +22,7 @@
   #:use-module (cask-and-cons skhd)
   #:use-module (cask-and-cons mcp)
   #:use-module (cask-and-cons kotlin-lsp)
+  #:use-module (cask-and-cons nix)
   #:export (main))
 
 (define (find-scm-files dir)
@@ -89,6 +90,9 @@
     (install-mcp unquote
                  (lambda (args)
                    (install-mcp-config)))
+    (install-nix unquote
+                 (lambda (args)
+                   (install-nix-tools)))
     (install-kotlin-lsp unquote
                         (lambda (args)
                           (install-kotlin-lsp)))
