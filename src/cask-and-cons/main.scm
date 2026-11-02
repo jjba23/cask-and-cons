@@ -21,6 +21,7 @@
   #:use-module (cask-and-cons macos)
   #:use-module (cask-and-cons skhd)
   #:use-module (cask-and-cons mcp)
+  #:use-module (cask-and-cons kotlin-lsp)
   #:export (main))
 
 (define (find-scm-files dir)
@@ -88,6 +89,9 @@
     (install-mcp unquote
                  (lambda (args)
                    (install-mcp-config)))
+    (install-kotlin-lsp unquote
+                        (lambda (args)
+                          (install-kotlin-lsp)))
     (hr unquote
         (lambda (args)
           ;; Run every install-* task, in the order listed above.
