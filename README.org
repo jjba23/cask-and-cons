@@ -513,8 +513,9 @@ Create =~/.config/cask-and-cons/confluence-settings.scm=:
 (confluence-base-url "https://acme.atlassian.net")
 (confluence-spaces '("ENG" "OPS"))     ; '() = every space you can see
 ;; optional
-(confluence-destination "/Users/me/Hacking/confluence-mirror")
+(confluence-destination "/Users/me/Work/confluence-mirror")
 (confluence-schedule '(1 9 0))         ; weekday (0 = Sunday), hour, minute
+(confluence-request-delay '(2 5))      ; random pause in seconds between requests
 ;; token mode only
 ;; (confluence-auth 'token) (confluence-email "me@acme.com")
 #+end_src
@@ -532,18 +533,51 @@ caco install-confluence    # weekly schedule
 - =install-confluence= writes =~/Library/LaunchAgents/org.jointhefreeworld.caco.confluence-sync.plist=
   and loads it. Default: Mondays 09:00; launchd runs a missed job after wake.
   Logs go to =~/Library/Logs/caco-confluence.log=.
-- Output is =<destination>/<SPACE>/<title-slug>-<page-id>.md=, flat per space,
-  each with front matter (title, id, space, updated, url).
+- Output goes to =~/Work/confluence-mirror/<SPACE>/<title-slug>-<page-id>.md=
+  (override with =confluence-destination=), flat per space, each with front
+  matter (title, id, space, updated, url).
 - The mirror is exact: pages deleted in Confluence are deleted locally. Do not
   edit the files; changes are overwritten. A =.git= directory in the
   destination is preserved, so you can version the history.
 - If nothing is fetched, or authentication fails, the destination is left untouched.
 
+** Being gentle with Confluence
+
+Requests are strictly one at a time, never in parallel. Pages are fetched 50 per
+request (a 7000-page space is about 150 requests), with a random pause of
+=confluence-request-delay= seconds between requests plus a longer "reading"
+pause every ten requests. On HTTP 429/5xx the script backs off, honouring
+=Retry-After=, and gives up after six attempts. A full sync of ~7000 pages
+takes roughly ten minutes.
+
+** Progress
+
+The log (terminal or =~/Library/Logs/caco-confluence.log=) shows timestamped
+progress per space and per batch (pages so far, requests made, elapsed time),
+and a summary at the end: pages new / changed / removed / unchanged, any
+macros that were not understood (kept as a placeholder), and any page that
+failed to convert.
+
+** Markdown conversion
+
+Confluence's storage format is cleaned before pandoc converts it:
+
+- Code and no-format macros become fenced code blocks with their language
+  (and title); inside table cells, where a fence is impossible, one code span
+  per line.
+- Tables become pipe tables, with colspan/rowspan expanded, block content in cells
+  turned into line breaks, and the first row used as the header.
+- Info/note/warning/tip/panel macros become blockquotes; expand, status,
+  Jira, emoji, task lists, page links and images get readable text equivalents.
+- draw.io, PlantUML, Mermaid, Gliffy and similar are not rendered; they leave a
+  placeholder such as =[drawio: Offer Flow]=.
+- Table-of-contents, page-tree, change-history and similar dynamic macros are dropped.
+
 ** Limitations
 
-Confluence Cloud only (v2 API). Macros (code blocks, panels, ...) become plain
-text; attachments and images are not downloaded; the page tree is not
-reproduced as folders. Don't use the Chrome profile while a sync is running.
+Confluence Cloud only (v2 API). Attachments and images are not downloaded;
+diagrams are placeholders; the page tree is not reproduced as folders. Don't
+use the Chrome profile while a sync is running.
 
 * Licensing
 Cask & Cons, its source code and its documentation are licensed under the *MIT License*. The full text is in [[file:LICENSE][LICENSE]].

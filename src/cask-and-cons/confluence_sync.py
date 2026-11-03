@@ -185,10 +185,18 @@ PANELS = {"info": "Info", "note": "Note", "warning": "Warning", "tip": "Tip",
           "success": "Success", "error": "Error", "panel": None}
 UNWRAP_MACROS = {"expand", "ui-expand", "details", "section", "column",
                  "excerpt", "excerpt-include", "div", "span", "multiexcerpt",
-                 "content-block", "aside", "view-file"}
+                 "content-block", "aside", "view-file", "table-processor",
+                 "table-joiner", "table-filter", "table-excerpt",
+                 "table-excerpt-include", "toc-zone", "numberedheadings",
+                 "html-bobswift", "spreadsheet-table"}
 DROP_MACROS = {"toc", "children", "pagetree", "recently-updated", "anchor",
                "livesearch", "contentbylabel", "page-index", "chart",
-               "profile-picture", "space-details", "attachments", "tasks-report-macro"}
+               "profile-picture", "space-details", "attachments",
+               "tasks-report-macro", "change-history", "profile",
+               "create-from-template", "popular-labels", "contributors-summary",
+               "pagetreesearch", "widget", "content-report-table",
+               "detailssummary", "calendar", "roadmap", "jirachart",
+               "table-chart", "gallery", "multimedia", "code", "noformat"}
 CODE_RE = re.compile(
     r'<ac:structured-macro\b[^>]*?ac:name="(code|noformat)"[^>]*>(.*?)</ac:structured-macro>',
     re.S)
@@ -212,7 +220,9 @@ def _code_block(m):
         pm = re.search(r"<ac:plain-text-body>(.*?)</ac:plain-text-body>", inner, re.S)
         body = html.unescape(pm.group(1)) if pm else ""
     cls = f' class="language-{lang}"' if lang else ""
-    return f"<pre><code{cls}>{html.escape(body.strip(chr(10)))}</code></pre>"
+    tm = re.search(r'<ac:parameter\s+ac:name="title">(.*?)</ac:parameter>', inner, re.S)
+    title = f"<p><strong>{tm.group(1).strip()}</strong></p>" if tm and tm.group(1).strip() else ""
+    return f"{title}<pre><code{cls}>{html.escape(body.strip(chr(10)))}</code></pre>"
 
 
 def _text(soup, text):
@@ -273,7 +283,35 @@ def _macro(el, soup, stats):
         if body is not None:
             _unwrap_body(el)
         else:
-            el.replace_with(NavigableString(f"[{name} macro]"))
+            what = (params.get("diagramName") or params.get("filename")
+                    or params.get("name") or params.get("page") or "")
+            em = soup.new_tag("em")
+            em.string = f"[{name}: {what}]" if what else f"[{name}]"
+            el.replace_with(em)
+
+
+def _adf_extension(el, soup):
+    """ADF extensions: keep real content (panels...), else a titled placeholder."""
+    node = el.find("ac:adf-node")
+    content = node.find("ac:adf-content") if node is not None else None
+    if content is not None and content.get_text(strip=True):
+        el.replace_with(*list(content.contents))
+        return
+    title = ""
+    if node is not None:
+        for attr in node.find_all("ac:adf-attribute", recursive=False):
+            if attr.get("key") == "text":
+                title = attr.get_text().strip()
+        if not title:
+            for par in node.find_all("ac:adf-parameter"):
+                if par.get("key") == "extension-title":
+                    title = par.get_text().strip()
+    if title:
+        em = soup.new_tag("em")
+        em.string = f"[{title}]"
+        el.replace_with(em)
+    else:
+        el.decompose()
 
 
 def _link_text(el):
@@ -289,38 +327,36 @@ def _link_text(el):
     return el.get("ac:anchor") or ""
 
 
+BR = "CACOBR"  # line-break token: pandoc cannot put <br> inside pipe-table cells
+
+
 def _flatten_cell(cell, soup):
-    """Reduce table-cell content to inline text separated by <br>, so the
-    table can be written as a pipe table."""
+    """Reduce table-cell content to inline text with BR tokens between lines,
+    so pandoc can write it as a pipe table (BR becomes <br> afterwards)."""
     for t in cell.find_all("table"):
         t.replace_with(NavigableString(t.get_text(" ", strip=True)))
     for pre in cell.find_all("pre"):
-        code = pre.get_text().strip("\n")
-        new = soup.new_tag("code")
-        new.string = code.replace("\n", " ")
-        pre.replace_with(new)
+        lines = [ln for ln in pre.get_text().strip("\n").split("\n") if ln.strip()]
+        holder = soup.new_tag("span")
+        for k, ln in enumerate(lines):
+            if k:
+                holder.append(NavigableString(BR))
+            code = soup.new_tag("code")
+            code.string = ln.strip()
+            holder.append(code)
+        pre.replace_with(holder)
     for li in cell.find_all("li"):
-        li.insert(0, NavigableString("• "))
-        li.append(soup.new_tag("br"))
+        li.insert(0, NavigableString("\u2022 "))
+        li.append(NavigableString(BR))
         li.unwrap()
     for lst in cell.find_all(["ul", "ol"]):
         lst.unwrap()
     for blk in cell.find_all(["p", "div", "blockquote", "h1", "h2", "h3", "h4", "h5", "h6"]):
         if blk.get_text(strip=True) or blk.find(["img", "a", "code"]):
-            blk.append(soup.new_tag("br"))
+            blk.append(NavigableString(BR))
         blk.unwrap()
-    # drop leading/trailing/duplicate <br>
-    brs = cell.find_all("br")
-    while cell.contents and getattr(cell.contents[-1], "name", None) == "br":
-        cell.contents[-1].decompose()
-    while cell.contents and getattr(cell.contents[0], "name", None) == "br":
-        cell.contents[0].decompose()
-    prev_br = False
-    for ch in list(cell.children):
-        is_br = getattr(ch, "name", None) == "br"
-        if is_br and prev_br:
-            ch.decompose()
-        prev_br = is_br or (isinstance(ch, NavigableString) and not str(ch).strip() and prev_br)
+    for br in cell.find_all(["br", "hr"]):
+        br.replace_with(NavigableString(BR))
 
 
 def _normalize_table(table, soup):
@@ -388,6 +424,10 @@ def clean(storage, stats):
     storage = CODE_RE.sub(_code_block, storage)
     soup = BeautifulSoup(storage, "html.parser")
 
+    for el in reversed(soup.find_all("ac:adf-extension")):
+        _adf_extension(el, soup)
+    for el in soup.find_all(["ac:adf-attribute", "ac:adf-parameter", "ac:adf-node"]):
+        el.decompose()
     for el in reversed(soup.find_all("ac:structured-macro")):
         _macro(el, soup, stats)
     for el in soup.find_all("ac:emoji"):
@@ -441,7 +481,13 @@ def to_markdown(storage, stats):
          "--wrap=none"],
         input=clean(storage, stats), capture_output=True, text=True, check=True,
     ).stdout
-    out = html.unescape(out) if "&#10;" in out else out
+    if "[TABLE]" in out:  # pandoc could not express a table as a pipe table
+        stats["<table-fallback>"] += 1
+    # Tidy line-break tokens inside table cells, then make them real <br>s.
+    out = re.sub(r"\|\s*(?:CACOBR\s*)+", "| ", out)
+    out = re.sub(r"(?:\s*CACOBR)+\s*\|", " |", out)
+    out = re.sub(r"(?:\s*CACOBR){2,}", BR, out)
+    out = re.sub(r"\s*CACOBR\s*", "<br>", out)
     out = re.sub(r"[ \t]+\n", "\n", out)
     out = re.sub(r"\n{3,}", "\n\n", out)
     return out.strip() + "\n"
@@ -545,6 +591,8 @@ def sync():
                 ", ".join(f"{k}×{v}" for k, v in stats.most_common() if k in macros))
         if stats["<pandoc-failure>"]:
             log(f"  {stats['<pandoc-failure>']} page(s) failed to convert")
+        if stats["<table-fallback>"]:
+            log(f"  {stats['<table-fallback>']} page(s) have a table pandoc could not write as Markdown")
         log(f"Finished in {elapsed()} ({fetcher.count} requests)")
     finally:
         shutil.rmtree(stage, ignore_errors=True)
