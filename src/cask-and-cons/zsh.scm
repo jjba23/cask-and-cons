@@ -404,6 +404,11 @@ else @file{~/.config}."
    (mk-alias-lines zsh-shared-aliases)
    (mk-alias-lines zsh-aliases)
    "\n# ---- PATH ----\n"
+   ;; Nix: macOS updates rewrite /etc/zshrc and drop the installer's hook, so
+   ;; load it from here.  It puts the nix binary and the user profile on PATH.
+   "if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then\n"
+   "  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh\n"
+   "fi\n"
    "path+=(\"$HOME/.bin\")\n"
    "path+=(\"$HOME/.local/bin\")\n"
    "path+=(\"$HOME/.nix-profile/bin\")\n"
