@@ -22,7 +22,7 @@
     "hashicorp/tap"))
 
 (define brew-formulae
-  '("jq" "fzf"
+  '("jq" "fzf" "pandoc" "rsync"
     "koekeishiya/formulae/skhd"
     "tree"
     "coreutils"

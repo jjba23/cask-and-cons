@@ -16,6 +16,8 @@ set -euo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+export CACO_DIR="$DIR"
+
 exec guile --no-auto-compile \
      -L "$DIR/src" \
      -e '(@ (cask-and-cons main) main)' \

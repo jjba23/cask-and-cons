@@ -24,6 +24,7 @@
   #:use-module (cask-and-cons mcp)
   #:use-module (cask-and-cons kotlin-lsp)
   #:use-module (cask-and-cons nix)
+  #:use-module (cask-and-cons confluence)
   #:export (main))
 
 (define (find-scm-files dir)
@@ -103,6 +104,12 @@
     (install-kotlin-lsp unquote
                         (lambda (args)
                           (install-kotlin-lsp)))
+    (sync-confluence unquote
+                     (lambda (args)
+                       (sync-confluence)))
+    (install-confluence unquote
+                        (lambda (args)
+                          (install-confluence-sync)))
     (hr unquote
         (lambda (args)
           ;; Run every install-* task, in the order listed above.

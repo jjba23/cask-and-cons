@@ -193,6 +193,8 @@ Available tasks:
 - =install-zsh= — install the ZSH configuration (=~/.zshrc= and the pager keymap)
 - =install-wezterm= — install the WezTerm configuration (=~/.config/wezterm/wezterm.lua=)
 - =install-macos= — converge macOS system preferences (Dock, Finder, trackpad, clock, ...) declared in =src/cask-and-cons/macos.scm=; only changed keys are written and only affected processes (Dock, Finder) restart. Override with =~/.config/cask-and-cons/macos-settings.scm=, e.g. =(macos-settings (append (macos-settings) '(("com.apple.dock" (tilesize . 36)))))=
+- =sync-confluence= — one-off sync of Confluence Cloud to local Markdown (see [[*Confluence mirror]])
+- =install-confluence= — install the launchd agent that runs =sync-confluence= weekly
 
 Install targets are just plain tasks named =install-<target>=; there is no separate =install= sub-command or target argument to parse.
 
@@ -479,6 +481,60 @@ caco install-emacs-bridge
 #+end_src
 
 ----------
+
+* Confluence mirror
+
+A local, read-only copy of Confluence Cloud as Markdown files, refreshed weekly.
+Declared in =src/cask-and-cons/confluence.scm=; the work is done by
+=src/cask-and-cons/confluence-sync.sh= (needs =curl=, =jq=, =pandoc=, =rsync=;
+=pandoc= and =rsync= are in =brew.scm=).
+
+** Setup
+
+1. Create =~/.config/cask-and-cons/confluence-settings.scm=:
+
+#+begin_src scheme
+(confluence-base-url "https://acme.atlassian.net")
+(confluence-email "me@acme.com")
+(confluence-spaces '("ENG" "OPS"))     ; '() = every space you can see
+;; optional
+(confluence-destination "/Users/me/Hacking/confluence-mirror")
+(confluence-schedule '(1 9 0))         ; weekday (0 = Sunday), hour, minute
+#+end_src
+
+2. Create an API token at https://id.atlassian.com/manage-profile/security/api-tokens
+   and store it in the keychain (never in the repo):
+
+#+begin_src shell
+security add-generic-password -a me@acme.com -s caco-confluence -w
+#+end_src
+
+   For manual runs =CONFLUENCE_API_TOKEN= in the environment is used first.
+
+3. Sync once, then schedule:
+
+#+begin_src shell
+caco sync-confluence
+caco install-confluence
+#+end_src
+
+** How it behaves
+
+- =install-confluence= writes =~/Library/LaunchAgents/org.jointhefreeworld.caco.confluence-sync.plist=
+  and loads it. Default: Mondays 09:00; launchd runs a missed job after wake.
+  Logs go to =~/Library/Logs/caco-confluence.log=.
+- Output is =<destination>/<SPACE>/<title-slug>-<page-id>.md=, flat per space,
+  each with front matter (title, id, space, updated, url).
+- The mirror is exact: pages deleted in Confluence are deleted locally. Do not
+  edit the files; changes are overwritten. A =.git= directory in the
+  destination is preserved, so you can version the history.
+- If nothing is fetched the destination is left untouched.
+
+** Limitations
+
+Confluence Cloud only (v2 API). Macros (code blocks, panels, ...) become plain
+text; attachments and images are not downloaded; the page tree is not
+reproduced as folders.
 
 * Licensing
 Cask & Cons, its source code and its documentation are licensed under the *MIT License*. The full text is in [[file:LICENSE][LICENSE]].
