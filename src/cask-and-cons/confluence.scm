@@ -1,34 +1,34 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
-;; Declarative local Markdown mirror of Confluence Cloud, refreshed weekly.
-;;
-;; `./caco sync-confluence' does one sync; `./caco install-confluence' writes
-;; a launchd agent that runs it every week (Monday 09:00 by default; launchd
-;; also runs missed jobs after wake).  The work is done by confluence_sync.py
-;; (run through `uv', which fetches playwright on first use).
-;;
-;; Two ways to authenticate, picked by `confluence-auth':
-;;
-;; 'browser (default) -- for organisations that block API tokens.  Run
-;;   `./caco login-confluence' once: it opens Chrome on a dedicated profile,
-;;   you log in through SSO/MFA, and the session stays in that profile.  Syncs
-;;   then run headless in the same profile and reuse its cookies.  When the
-;;   session expires the sync fails with a macOS notification; log in again.
-;;   Check that your organisation's policy allows automated use of your own
-;;   session before relying on this.
-;;
-;; 'token -- Basic auth with an Atlassian API token kept in the macOS keychain:
-;;   security add-generic-password -a "$EMAIL" -s caco-confluence -w
-;;   (or export CONFLUENCE_API_TOKEN for manual runs).
-;;
-;; Override per machine in ~/.config/cask-and-cons/confluence-settings.scm:
-;;   (confluence-base-url "https://acme.atlassian.net")
-;;   (confluence-spaces '("ENG" "OPS"))
-;;   (confluence-auth 'token) (confluence-email "me@acme.com")
+;;; Declarative local Markdown mirror of Confluence Cloud, refreshed weekly.
+;;;
+;;; `./caco sync-confluence' does one sync; `./caco install-confluence' writes
+;;; a launchd agent that runs it every week (Monday 09:00 by default; launchd
+;;; also runs missed jobs after wake).  The work is done by confluence_sync.py
+;;; (run through `uv', which fetches playwright on first use).
+;;;
+;;; Two ways to authenticate, picked by `confluence-auth':
+;;;
+;;; 'browser (default) -- for organisations that block API tokens.  Run
+;;; `./caco login-confluence' once: it opens Chrome on a dedicated profile,
+;;; you log in through SSO/MFA, and the session stays in that profile.  Syncs
+;;; then run headless in the same profile and reuse its cookies.  When the
+;;; session expires the sync fails with a macOS notification; log in again.
+;;; Check that your organisation's policy allows automated use of your own
+;;; session before relying on this.
+;;;
+;;; 'token -- Basic auth with an Atlassian API token kept in the macOS keychain:
+;;; security add-generic-password -a "$EMAIL" -s caco-confluence -w
+;;; (or export CONFLUENCE_API_TOKEN for manual runs).
+;;;
+;;; Override per machine in ~/.config/cask-and-cons/confluence-settings.scm:
+;;; (confluence-base-url "https://acme.atlassian.net")
+;;; (confluence-spaces '("ENG" "OPS"))
+;;; (confluence-auth 'token) (confluence-email "me@acme.com")
 
 (define-module (cask-and-cons confluence)
   #:declarative? #f
@@ -50,30 +50,30 @@
 (define (home) (or (getenv "HOME") "/tmp"))
 
 (define confluence-base-url (make-parameter "https://CHANGE-ME.atlassian.net"))
-;; 'browser or 'token.
+;;; 'browser or 'token.
 (define confluence-auth (make-parameter 'browser))
-;; Token mode only.
+;;; Token mode only.
 (define confluence-email (make-parameter "CHANGE-ME@example.com"))
 (define confluence-keychain-service (make-parameter "caco-confluence"))
-;; Browser mode: the Chrome profile holding the login session, and the
-;; playwright channel naming the browser ("chrome" = installed Google Chrome).
+;;; Browser mode: the Chrome profile holding the login session, and the
+;;; playwright channel naming the browser ("chrome" = installed Google Chrome).
 (define confluence-profile-directory
   (make-parameter (string-append (home) "/.local/share/caco/confluence-profile")))
 (define confluence-browser-channel (make-parameter "chrome"))
-;; Space keys to mirror; '() means every space you can see.
+;;; Space keys to mirror; '() means every space you can see.
 (define confluence-spaces (make-parameter '()))
 (define confluence-destination
   (make-parameter (string-append (home) "/Work/confluence-mirror")))
-;; Random pause, in seconds, between two requests: (min max).  Requests are
-;; strictly sequential; the script also adds a longer "reading" pause every
-;; ten requests and backs off on HTTP 429/5xx.
+;;; Random pause, in seconds, between two requests: (min max).  Requests are
+;;; strictly sequential; the script also adds a longer "reading" pause every
+;;; ten requests and backs off on HTTP 429/5xx.
 (define confluence-request-delay (make-parameter '(2 5)))
-;; Weekday (0 = Sunday .. 6), hour, minute.
+;;; Weekday (0 = Sunday .. 6), hour, minute.
 (define confluence-schedule (make-parameter '(1 9 0)))
 
 (define label "org.jointhefreeworld.caco.confluence-sync")
 
-;; The `caco' launcher exports CACO_DIR (the repo root).
+;;; The `caco' launcher exports CACO_DIR (the repo root).
 (define (project-dir)
   (or (getenv "CACO_DIR") (getcwd)))
 
@@ -83,11 +83,11 @@
 (define (read-token)
   (or (let ((t (getenv "CONFLUENCE_API_TOKEN")))
         (and t (not (string-null? t)) t))
-      (let* ((port (open-pipe* OPEN_READ "security" "find-generic-password"
-                               "-s" (confluence-keychain-service) "-w"))
-             (line (read-line port)))
-        (close-pipe port)
-        (and (string? line) (not (string-null? line)) line))))
+    (let* ((port (open-pipe* OPEN_READ "security" "find-generic-password"
+                             "-s" (confluence-keychain-service) "-w"))
+           (line (read-line port)))
+      (close-pipe port)
+      (and (string? line) (not (string-null? line)) line))))
 
 (define (load-settings)
   (load-local-overrides '(cask-and-cons confluence) 'confluence-settings))

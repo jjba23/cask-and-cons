@@ -1,8 +1,8 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
 (define-module (cask-and-cons zsh)
   #:declarative? #t
@@ -10,34 +10,39 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (cask-and-cons prelude)
   #:use-module (cask-and-cons user-settings)
-  #:export (zsh-identity zsh-shell-lib-filename zsh-lesskey-filename
-                         zsh-notes-lib-filename zsh-notes-exports
-                         zsh-read-source-file lesskey-config-dir
-                         zsh-read-shell-lib zsh-read-notes-lib
+  #:export (zsh-identity zsh-shell-lib-filename
+                         zsh-lesskey-filename
+                         zsh-notes-lib-filename
+                         zsh-notes-exports
+                         zsh-read-source-file
+                         lesskey-config-dir
+                         zsh-read-shell-lib
+                         zsh-read-notes-lib
                          serialize-zsh-assignment
-                         zsh-completion-setopts zsh-shell-setopts
-                                   zsh-history-setopts
-                                   zsh-color-exports
-                                   zsh-path-exports
-                                   zsh-history-exports
-                                   zsh-guile-exports
-                                   zsh-sdkman-exports
-                                   zsh-nvm-exports
-                                   zsh-aliases
-                                   zshrc-config
-                                   install-zsh-config
-                                   zsh-config-dir
-                                   zshrc-filename))
+                         zsh-completion-setopts
+                         zsh-shell-setopts
+                         zsh-history-setopts
+                         zsh-color-exports
+                         zsh-path-exports
+                         zsh-history-exports
+                         zsh-guile-exports
+                         zsh-sdkman-exports
+                         zsh-nvm-exports
+                         zsh-aliases
+                         zshrc-config
+                         install-zsh-config
+                         zsh-config-dir
+                         zshrc-filename))
 
-;; Each setopt list holds plain symbols, rendered verbatim as `setopt NAME`.
-;; Explanations are kept as regular Scheme comments next to the entry they
-;; describe instead of being serialized into the generated `.zshrc`.
+;;; Each setopt list holds plain symbols, rendered verbatim as `setopt NAME`.
+;;; Explanations are kept as regular Scheme comments next to the entry they
+;;; describe instead of being serialized into the generated `.zshrc`.
 
 (define zsh-completion-setopts
   '(LIST_AMBIGUOUS ;like show-all-if-ambiguous
-                   MARK_DIRS ;mark symlinked/completed dirs with /
-                   COMPLETE_IN_WORD))
- ;; mark symlinked/completed dirs with /
+    MARK_DIRS ;mark symlinked/completed dirs with /
+    COMPLETE_IN_WORD))
+;;; mark symlinked/completed dirs with /
 
 (define zsh-shell-setopts
   '(AUTO_CD CORRECT ;like dirspell/cdspell (spelling correction for commands)
@@ -47,22 +52,22 @@
             PUSHD_SILENT
             INTERACTIVE_COMMENTS ;allow # comments in an interactive shell
             NO_BEEP))
- ;; extends correction to all arguments (optional, close to dirspell)
+;;; extends correction to all arguments (optional, close to dirspell)
 
 (define zsh-history-setopts
   '(EXTENDED_HISTORY ;adds timestamps (like HISTTIMEFORMAT), shown via `history -i`
-                     HIST_IGNORE_SPACE ;like HISTCONTROL=ignorespace
-                     HIST_IGNORE_DUPS
-                     HIST_IGNORE_ALL_DUPS ;closest to HISTCONTROL=erasedups
-                     HIST_SAVE_NO_DUPS
-                     HIST_FIND_NO_DUPS
-                     HIST_REDUCE_BLANKS
-                     INC_APPEND_HISTORY ;write each command to HISTFILE immediately
-                     SHARE_HISTORY))
- ;; merge history from other sessions live
+    HIST_IGNORE_SPACE ;like HISTCONTROL=ignorespace
+    HIST_IGNORE_DUPS
+    HIST_IGNORE_ALL_DUPS ;closest to HISTCONTROL=erasedups
+    HIST_SAVE_NO_DUPS
+    HIST_FIND_NO_DUPS
+    HIST_REDUCE_BLANKS
+    INC_APPEND_HISTORY ;write each command to HISTFILE immediately
+    SHARE_HISTORY))
+;;; merge history from other sessions live
 
-;; Alist of NAME -> VALUE, rendered as `export NAME="VALUE"`. Explanations
-;; are kept as Scheme comments rather than being serialized.
+;;; Alist of NAME -> VALUE, rendered as `export NAME="VALUE"`. Explanations
+;;; are kept as Scheme comments rather than being serialized.
 
 (define zsh-color-exports
   '(("GREEN_TEXT" . "$(tput setaf 2)") ("RED_TEXT" . "$(tput setaf 1)")
@@ -87,7 +92,7 @@
 (define zsh-nvm-exports
   '(("NVM_DIR" . "$HOME/.nvm")))
 
-;; Alist of alias name -> command, rendered as `alias name="command"`.
+;;; Alist of alias name -> command, rendered as `alias name="command"`.
 
 (define zsh-shared-aliases
   ;; Navigation, emacs, podman, fetch, ...: the set every machine shares.
@@ -109,8 +114,8 @@
     ("docker-compose" . "podman compose")
     ("find-largest-files" . "du -h -x -s -- * 2>/dev/null | sort -r -h | head -20")))
 
-;; One-line git shortcuts, as data: (NAME . BODY).  glog is multi-line and
-;; stays in shell-lib.zsh.
+;;; One-line git shortcuts, as data: (NAME . BODY).  glog is multi-line and
+;;; stays in shell-lib.zsh.
 (define zsh-git-shortcuts
   '(("gst" . "git status --short --branch \"$@\"")
     ("gd" . "git diff \"$@\"")
@@ -124,8 +129,8 @@
     ("gfetch" . "git fetch --all --prune \"$@\"")
     ("groot" . "cdroot")))
 
-;; The greeting pool: nerd-style sayings about free software, RMS, GNU, Emacs
-;; and Linux/Unix.  Plain data; extend freely.  Keep in step with heks-bash.
+;;; The greeting pool: nerd-style sayings about free software, RMS, GNU, Emacs
+;;; and Linux/Unix.  Plain data; extend freely.  Keep in step with heks-bash.
 (define zsh-greetings
   '(;; emacs
     "Vi Vi Vi is the number of the beast. Emacs is salvation."
@@ -179,26 +184,26 @@
     "chmod +x your life."
     "Talk is cheap. Show me the code."))
 
-(define (shell-double-quote s)
-  "Return @var{s} escaped for use inside a double-quoted shell string."
+(define (shell-double-quote str)
+  "Return @var{str} escaped for use inside a double-quoted shell string."
   (string-concatenate
-   (map (lambda (c)
-          (if (memv c '(#\\ #\" #\$ #\`))
-              (string #\\ c)
-              (string c)))
-        (string->list s))))
+   (map (lambda (char)
+          (if (memv char '(#\\ #\" #\$ #\`))
+            (string #\\ char)
+            (string char)))
+        (string->list str))))
 
 (define (serialize-zsh-greetings)
   (string-append
    "CC_GREETINGS=(\n"
-   (string-join (map (lambda (g)
-                       (format #f "\t\"~a\"" (shell-double-quote g)))
+   (string-join (map (lambda (greeting)
+                       (format #f "\t\"~a\"" (shell-double-quote greeting)))
                      zsh-greetings)
                 "\n")
    "\n)\n"))
 
-(define (serialize-zsh-function f)
-  (format #f "~a () { ~a; }\n" (car f) (cdr f)))
+(define (serialize-zsh-function func)
+  (format #f "~a () { ~a; }\n" (car func) (cdr func)))
 
 (define zsh-aliases
   ;; Only what is truly machine specific.
@@ -246,46 +251,46 @@ setopt CORRECT
 (define zsh-shell-lib-filename
   (make-parameter "shell-lib.zsh"))
 
-;; The notes helpers: the `n' command (capture, find, todo, bookmarks,
-;; contacts, birthdays, index pages) for when Emacs is not at hand.  Plain
-;; zsh next to this module, spliced into ~/.zshrc after the shared library.
+;;; The notes helpers: the `n' command (capture, find, todo, bookmarks,
+;;; contacts, birthdays, index pages) for when Emacs is not at hand.  Plain
+;;; zsh next to this module, spliced into ~/.zshrc after the shared library.
 (define zsh-notes-lib-filename
   (make-parameter "notes.zsh"))
 
-;; Where the notes are: the same directory the Emacs bridge points at.
+;;; Where the notes are: the same directory the Emacs bridge points at.
 (define zsh-notes-exports
   `(("NOTES_DIR" . ,notes-directory)))
 
-;; The pager keymap: a plain data file next to this module, shared verbatim
-;; with heks-bash and wolk-jjba, installed as $XDG_CONFIG_HOME/lesskey.
+;;; The pager keymap: a plain data file next to this module, shared verbatim
+;;; with heks-bash and wolk-jjba, installed as $XDG_CONFIG_HOME/lesskey.
 (define zsh-lesskey-filename
   (make-parameter "lesskey"))
 
-(define (serialize-zsh-assignment a)
-  "Serialize a single @var{a} (@code{NAME . VALUE}) as a plain shell assignment.
+(define (serialize-zsh-assignment assignment)
+  "Serialize a single @var{assignment} (@code{NAME . VALUE}) as a plain shell assignment.
 Nothing is exported: the @code{CC_*} variables are only read by the shared
 shell library."
   (format #f "~a=\"~a\"\n"
-          (car a)
-          (cdr a)))
+          (car assignment)
+          (cdr assignment)))
 
 (define (zsh-read-source-file name)
   "Return the contents of the repository file @var{name} as a string.
 The file sits next to this module, so look there first and fall back to the
 repository-relative path for setups that load compiled code."
-  (let* ((here (and (current-filename)
-                    (dirname (current-filename)))))
+  (let ((here (and (current-filename)
+                (dirname (current-filename)))))
     (let loop
-        ((paths (list (and here
-                           (format #f "~a/~a" here name))
-                      (format #f "src/cask-and-cons/~a" name))))
-      (cond ((null? paths)
-             (error "cask-and-cons: cannot find the shared file" name))
-            ((and (car paths)
-                  (file-exists? (car paths)))
+      ((paths (list (and here
+                      (format #f "~a/~a" here name))
+                    (format #f "src/cask-and-cons/~a" name))))
+      (cond [(null? paths)
+             (error "cask-and-cons: cannot find the shared file" name)]
+            [(and (car paths)
+               (file-exists? (car paths)))
              (call-with-input-file (car paths)
-               get-string-all))
-            (else (loop (cdr paths)))))))
+                                   get-string-all)]
+            [else (loop (cdr paths))]))))
 
 (define (zsh-read-shell-lib)
   "Return the contents of the shared zsh library as a string."
@@ -298,11 +303,11 @@ repository-relative path for setups that load compiled code."
 (define (lesskey-config-dir)
   "Directory less(1) searches first for its keymap: @env{XDG_CONFIG_HOME},
 else @file{~/.config}."
-  (let* ((home (or (getenv "HOME") "/tmp"))
-         (xdg (getenv "XDG_CONFIG_HOME")))
+  (let ((home (or (getenv "HOME") "/tmp"))
+        (xdg (getenv "XDG_CONFIG_HOME")))
     (if (and xdg (not (string-null? xdg)))
-        xdg
-        (format #f "~a/.config" home))))
+      xdg
+      (format #f "~a/.config" home))))
 
 (define zshrc-config
   (string-append
@@ -416,17 +421,17 @@ else @file{~/.config}."
    "export PATH\n"
    "\n"
    (mk-export-lines zsh-sdkman-exports)
-   """
+   "" "
 [[ -s \"$HOME/.sdkman/bin/sdkman-init.sh\" ]] && source \"$HOME/.sdkman/bin/sdkman-init.sh\"
-"""
+" ""
    (mk-export-lines zsh-nvm-exports)
-   """
+   "" "
 [ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\"  # This loads nvm
 [ -s \"$NVM_DIR/bash_completion\" ] && \\. \"$NVM_DIR/bash_completion\"  # This loads nvm bash_completion
 
 # ---- boot: colours, prompt hook, greeting ---------------------------------
 cc_boot
-"""))
+" ""))
 
 (define zsh-config-dir
   (make-parameter (format #f "~a"
@@ -450,5 +455,4 @@ cc_boot
                           #:dir dir
                           #:contents (zsh-read-source-file
                                       (zsh-lesskey-filename))))
-
   (log-success "Installed ZSH configuration"))

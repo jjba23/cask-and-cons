@@ -1,8 +1,8 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
 (define-module (cask-and-cons kotlin-lsp)
   #:declarative? #f

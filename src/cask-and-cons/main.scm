@@ -1,10 +1,10 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
-;; Scheme entrypoint for the cask-and-cons CLI.
+;;; Scheme entrypoint for the cask-and-cons CLI.
 
 (define-module (cask-and-cons main)
   #:declarative? #f
@@ -34,7 +34,7 @@
          (lambda (filename statinfo flag)
            (when (and (eq? flag
                            'regular)
-                      (string-suffix? ".scm" filename))
+                   (string-suffix? ".scm" filename))
              (set! acc
                    (cons filename acc))) #t)) acc))
 
@@ -55,9 +55,9 @@
                     (exit 1)))) files))
   (log-success "Compiled project sources"))
 
-;; name -> thunk taking the remaining task args.  Install targets are plain
-;; tasks named "install-<target>" (e.g. "install-git"), so adding a new
-;; dotfile module just means adding one more entry here.
+;;; name -> thunk taking the remaining task args.  Install targets are plain
+;;; tasks named "install-<target>" (e.g. "install-git"), so adding a new
+;;; dotfile module just means adding one more entry here.
 (define %tasks
   `((compile unquote
              (lambda (args)
@@ -90,8 +90,8 @@
                              (lambda (args)
                                (install-jetbrains-fonts)))
     (install-macos unquote
-                    (lambda (args)
-                      (install-macos-settings)))
+                   (lambda (args)
+                     (install-macos-settings)))
     (install-skhd unquote
                   (lambda (args)
                     (install-skhd-config)))
@@ -128,19 +128,19 @@
 
 (define (dispatch task-name task-args)
   (let* ((task-name (string->symbol (if (string=? task-name "--list") "list"
-                                        task-name)))
+                                      task-name)))
          (entry (assq task-name %tasks)))
     (if entry
-        (begin
-          (log-info "Running task ~a ~a" task-name task-args)
-          ((cdr entry)
-           task-args)
-          (log-success "Task ~a finished" task-name))
-        (begin
-          (log-error "Unknown task: ~a" task-name)
-          (log-info "Available tasks: ~a"
-                    (map car %tasks))
-          (exit 1)))))
+      (begin
+        (log-info "Running task ~a ~a" task-name task-args)
+        ((cdr entry)
+         task-args)
+        (log-success "Task ~a finished" task-name))
+      (begin
+        (log-error "Unknown task: ~a" task-name)
+        (log-info "Available tasks: ~a"
+                  (map car %tasks))
+        (exit 1)))))
 
 (define (run-chain task-names rest)
   "Run each comma-separated task in @var{task-names} in order, with no args.
@@ -155,11 +155,11 @@ must be run on their own."
 
 (define (main args)
   (match (cdr args)
-     ;drop argv[0] (script path)
+    ;; drop argv[0] (script path)
     ((task-arg . rest) (let ((task-names (string-split task-arg #\,)))
                          (if (> (length task-names) 1)
-                             (run-chain task-names rest)
-                             (dispatch task-arg rest))))
+                           (run-chain task-names rest)
+                           (dispatch task-arg rest))))
     (() (log-error "No task given.")
      (log-info "Usage: ~a <task> [args...]"
                (car args))

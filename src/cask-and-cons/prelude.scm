@@ -1,8 +1,8 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
 (define-module (cask-and-cons prelude)
   #:declarative? #f
@@ -79,7 +79,7 @@ bar
                                        (format #t "~a {\n"
                                                (car x))
                                        (display (mk-kv-conf-lines (cdr x)
-                                                 #:template css-conf-pair))
+                                                                  #:template css-conf-pair))
                                        (display "}\n\n")) pairs))))
 
 (define* (mk-kv-conf-lines pairs
@@ -95,11 +95,11 @@ port=80
   (with-output-to-string (lambda ()
                            (for-each (lambda (x)
                                        (cond
-                                         ((pair? x)
+                                         [(pair? x)
                                           (format #t template
                                                   (car x)
-                                                  (cdr x)))
-                                         (else (format #t "~a" x)))) pairs))))
+                                                  (cdr x))]
+                                         [else (format #t "~a" x)])) pairs))))
 
 (define (serialize-rec-conf-item template item)
   "Serialize a single configuration @var{item} using @var{template} to the current output port.
@@ -113,18 +113,18 @@ If the item's value is a list, it formats the key as an INI-style section header
 \"
 @end example"
   (cond
-    ((list? (cdr item))
+    [(list? (cdr item))
      (cond
-       ((string? (car item))
+       [(string? (car item))
         (display (string-append "\n["
-                                (car item) "]\n")))
-       (else (display (string-append "\n["
-                                     (symbol->string (car item)) "]\n"))))
+                                (car item) "]\n"))]
+       [else (display (string-append "\n["
+                                     (symbol->string (car item)) "]\n"))])
      (display (mk-rec-kv-conf-lines (cdr item)
-                                    #:template template)))
-    (else (format #t template
+                                    #:template template))]
+    [else (format #t template
                   (car item)
-                  (cdr item)))))
+                  (cdr item))]))
 
 (define* (mk-rec-kv-conf-lines pairs
                                #:key (template equal-conf-pair))
@@ -175,12 +175,12 @@ port=8080
 @result{} (1 2 3 4 5)
 @end example"
   (cond
-    ((null? xs)
-     '())
-    ((pair? xs)
+    [(null? xs)
+     '()]
+    [(pair? xs)
      (append (flatten-list (car xs))
-             (flatten-list (cdr xs))))
-    (else (list xs))))
+             (flatten-list (cdr xs)))]
+    [else (list xs)]))
 
 (define* (install-config-file! #:key name dir contents
                                (perms 420))
@@ -218,21 +218,21 @@ port = 8080\")
 
 (define (get-config-dir xdg-config)
   (if (and xdg-config
-           (not (string=? xdg-config "")))
-      (begin
-        (log-info "load-local-overrides: Using $XDG_CONFIG_HOME: ~a"
-                  xdg-config) xdg-config)
-      (let ((home (getenv "HOME")))
-        (if home
-            (begin
-              (log-info
-               "load-local-overrides: $XDG_CONFIG_HOME empty/unset, falling back to $HOME/.config")
-              (format #f "~a/.config" home))
+        (not (string=? xdg-config "")))
+    (begin
+      (log-info "load-local-overrides: Using $XDG_CONFIG_HOME: ~a"
+                xdg-config) xdg-config)
+    (let ((home (getenv "HOME")))
+      (if home
+        (begin
+          (log-info
+           "load-local-overrides: $XDG_CONFIG_HOME empty/unset, falling back to $HOME/.config")
+          (format #f "~a/.config" home))
 
-            (begin
-              (log-info
-               "load-local-overrides: Warning - Neither $XDG_CONFIG_HOME nor $HOME is defined.")
-              #f)))))
+        (begin
+          (log-info
+           "load-local-overrides: Warning - Neither $XDG_CONFIG_HOME nor $HOME is defined.")
+          #f)))))
 
 (define (load-local-overrides module-name profile-name)
   "Dynamically load a machine-specific configuration file within a target module.
@@ -257,31 +257,31 @@ preventing unbound variable errors.
   (let* ((xdg-config (getenv "XDG_CONFIG_HOME"))
          (config-dir (get-config-dir xdg-config)))
     (if config-dir
-        (let ((local-file (format #f "~a/cask-and-cons/~a.scm" config-dir
-                                  profile-name)))
-          (log-info "load-local-overrides: Checking for override file at: ~a"
-                    local-file)
-          (if (file-exists? local-file)
-              (begin
-                (log-info
-                 "load-local-overrides: Override file found (~a). Entering module excursion into ~a..."
-                 local-file module-name)
-                (save-module-excursion (lambda ()
-                                         (set-current-module (resolve-module
-                                                              module-name))
-                                         (log-info
+      (let ((local-file (format #f "~a/cask-and-cons/~a.scm" config-dir
+                                profile-name)))
+        (log-info "load-local-overrides: Checking for override file at: ~a"
+                  local-file)
+        (if (file-exists? local-file)
+          (begin
+            (log-info
+             "load-local-overrides: Override file found (~a). Entering module excursion into ~a..."
+             local-file module-name)
+            (save-module-excursion (lambda ()
+                                     (set-current-module (resolve-module
+                                                          module-name))
+                                     (log-info
 
-                                          "load-local-overrides: Loading ~a into ~a scope..."
-                                          local-file module-name)
-                                         (load local-file)
-                                         (log-info
-                                          "load-local-overrides: Successfully loaded ~a"
-                                          local-file))))
-              (log-info
-               "load-local-overrides: No override file found at ~a. Skipping."
-               local-file)))
-        (log-info
-         "load-local-overrides: Could not resolve a config directory. Skipping."))))
+                                      "load-local-overrides: Loading ~a into ~a scope..."
+                                      local-file module-name)
+                                     (load local-file)
+                                     (log-info
+                                      "load-local-overrides: Successfully loaded ~a"
+                                      local-file))))
+          (log-info
+           "load-local-overrides: No override file found at ~a. Skipping."
+           local-file)))
+      (log-info
+       "load-local-overrides: Could not resolve a config directory. Skipping."))))
 
 (define (log--timestamp)
   (date->string (current-date) "~H:~M:~S"))

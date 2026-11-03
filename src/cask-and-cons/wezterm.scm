@@ -1,62 +1,62 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
-;; Renders ~/.config/wezterm/wezterm.lua.
-;;
-;; WezTerm is configured in Lua, so this module generates a Lua file: the
-;; settings, the application list and the key bindings are Scheme data rendered
-;; by `serialize-wezterm-value' and `serialize-wezterm-key', wrapped by a fixed
-;; block of Lua (`wezterm-lua-runtime') that turns them into a configuration.
-;; Keeping the mechanism in one visible place is the point of the split: the
-;; parts a user changes are data, and the part that implements the policy never
-;; has to be re-read.
-;;
-;; The key bindings are the Emacs ones, and that is what replaces the manual
-;; iTerm2 setup described in the README: instead of telling iTerm2 by hand that
-;; Option should behave like Meta, every chord WezTerm claims here is *guarded*.
-;; WezTerm hands each action a callback, and the callback can ask the pane which
-;; process is in front of it, so when the foreground process is one of
-;; `wezterm-yield-apps' - Emacs above all, but also `less' and every full-screen
-;; program - the chord is re-sent to that application untouched and the terminal
-;; stays out of the way.  C-x is the clearest example: at a shell prompt it is the
-;; prefix of the window commands, and inside Emacs it is Emacs's own C-x.
-;;
-;; Because every chord is guarded, WezTerm can claim the Emacs page keys that the
-;; other terminals have to leave alone.  C-v and M-v page the scrollback forward
-;; and back, and inside Emacs or the pager they are handed over untouched - the
-;; shared lesskey file still gets its forw-screen and back-screen, and Emacs
-;; still gets its scroll-up-command.  The same rule is applied to the few defaults
-;; WezTerm ships on a bare modifier (CTRL+Tab, ALT+Enter, CTRL+PageUp,
-;; CTRL+PageDown, CTRL+Insert): each is re-registered through the guard, so a
-;; full-screen program receives it instead of the terminal.  C-c is never bound:
-;; it is Emacs's leader key, but in a terminal it is also the interrupt signal.
-;;
-;; The guard is not free: `pane:get_foreground_process_name' only answers for
-;; local panes (not for a multiplexer or a plain ssh session), and when it does
-;; not answer the terminal keeps its own binding.  That is the right failure
-;; mode - a chord that scrolls where it should have scrolled is better than a
-;; chord silently dropped - and it is why the scrollback also stays on S-PageUp
-;; and S-PageDown.
-;;
-;; The window asks for a title bar and a resize border: `window_decorations' is
-;; `TITLE | RESIZE' on both platforms.  macOS draws the native title bar and the
-;; traffic lights.  On Wayland the same value is the default, so WezTerm asks the
-;; compositor to follow the server's decorations instead of painting its own;
-;; Niri has none to offer, so nothing is drawn there - and no blank band either.
-;; The tab bar is WezTerm's own and stays hidden while there is a single tab.
-;;
-;; The prefix table maps Emacs's window commands onto panes and its buffer
-;; commands onto tabs: C-x 2 splits below, C-x 3 splits right, C-x 0 closes,
-;; C-x 1 zooms, C-x o moves to the next pane, C-x b picks a pane by name, and
-;; C-x <left> / C-x <right> walk the tabs the way they walk buffers in Emacs.
-;;
-;; This module is the macOS twin of `(heks-linux wezterm)'.  The two repos share
-;; no library, so the renderers and `wezterm-lua-runtime' are duplicated
-;; verbatim, the way the `lesskey' file and the shell libs already are: the
-;; colours, the shell and the font differ, everything else is the same.
+;;; Renders ~/.config/wezterm/wezterm.lua.
+;;;
+;;; WezTerm is configured in Lua, so this module generates a Lua file: the
+;;; settings, the application list and the key bindings are Scheme data rendered
+;;; by `serialize-wezterm-value' and `serialize-wezterm-key', wrapped by a fixed
+;;; block of Lua (`wezterm-lua-runtime') that turns them into a configuration.
+;;; Keeping the mechanism in one visible place is the point of the split: the
+;;; parts a user changes are data, and the part that implements the policy never
+;;; has to be re-read.
+;;;
+;;; The key bindings are the Emacs ones, and that is what replaces the manual
+;;; iTerm2 setup described in the README: instead of telling iTerm2 by hand that
+;;; Option should behave like Meta, every chord WezTerm claims here is *guarded*.
+;;; WezTerm hands each action a callback, and the callback can ask the pane which
+;;; process is in front of it, so when the foreground process is one of
+;;; `wezterm-yield-apps' - Emacs above all, but also `less' and every full-screen
+;;; program - the chord is re-sent to that application untouched and the terminal
+;;; stays out of the way.  C-x is the clearest example: at a shell prompt it is the
+;;; prefix of the window commands, and inside Emacs it is Emacs's own C-x.
+;;;
+;;; Because every chord is guarded, WezTerm can claim the Emacs page keys that the
+;;; other terminals have to leave alone.  C-v and M-v page the scrollback forward
+;;; and back, and inside Emacs or the pager they are handed over untouched - the
+;;; shared lesskey file still gets its forw-screen and back-screen, and Emacs
+;;; still gets its scroll-up-command.  The same rule is applied to the few defaults
+;;; WezTerm ships on a bare modifier (CTRL+Tab, ALT+Enter, CTRL+PageUp,
+;;; CTRL+PageDown, CTRL+Insert): each is re-registered through the guard, so a
+;;; full-screen program receives it instead of the terminal.  C-c is never bound:
+;;; it is Emacs's leader key, but in a terminal it is also the interrupt signal.
+;;;
+;;; The guard is not free: `pane:get_foreground_process_name' only answers for
+;;; local panes (not for a multiplexer or a plain ssh session), and when it does
+;;; not answer the terminal keeps its own binding.  That is the right failure
+;;; mode - a chord that scrolls where it should have scrolled is better than a
+;;; chord silently dropped - and it is why the scrollback also stays on S-PageUp
+;;; and S-PageDown.
+;;;
+;;; The window asks for a title bar and a resize border: `window_decorations' is
+;;; `TITLE | RESIZE' on both platforms.  macOS draws the native title bar and the
+;;; traffic lights.  On Wayland the same value is the default, so WezTerm asks the
+;;; compositor to follow the server's decorations instead of painting its own;
+;;; Niri has none to offer, so nothing is drawn there - and no blank band either.
+;;; The tab bar is WezTerm's own and stays hidden while there is a single tab.
+;;;
+;;; The prefix table maps Emacs's window commands onto panes and its buffer
+;;; commands onto tabs: C-x 2 splits below, C-x 3 splits right, C-x 0 closes,
+;;; C-x 1 zooms, C-x o moves to the next pane, C-x b picks a pane by name, and
+;;; C-x <left> / C-x <right> walk the tabs the way they walk buffers in Emacs.
+;;;
+;;; This module is the macOS twin of `(heks-linux wezterm)'.  The two repos share
+;;; no library, so the renderers and `wezterm-lua-runtime' are duplicated
+;;; verbatim, the way the `lesskey' file and the shell libs already are: the
+;;; colours, the shell and the font differ, everything else is the same.
 
 (define-module (cask-and-cons wezterm)
   #:declarative? #t
@@ -100,22 +100,22 @@
                             wezterm-lua-runtime
                             install-wezterm-config))
 
-;; --- Settings ---
+;;; --- Settings ---
 
-;; The palette, as semantic keys.  It follows `global-theme' from
-;; (cask-and-cons user-settings), the same theme the Emacs bridge asks Heks
-;; Emacs to load, so changing that one value rethemes both.
+;;; The palette, as semantic keys.  It follows `global-theme' from
+;;; (cask-and-cons user-settings), the same theme the Emacs bridge asks Heks
+;;; Emacs to load, so changing that one value rethemes both.
 (define wezterm-palette
   (make-parameter (theme-palette global-theme)))
 
-;; The applications that get the keyboard back while they run.  The list is
-;; matched against the base name of the pane's foreground process, lower-cased
-;; and with any version suffix allowed - `emacs-29', `python3.13' - so a full
-;; path such as /opt/homebrew/bin/less matches `less' and nothing has to be
-;; spelled once per release.  It covers the
-;; cases the rest of the project cares about - Emacs and the pager first of all -
-;; plus the editors, the multiplexers and the REPLs, which take their keys from
-;; the same Emacs vocabulary (readline, for one, has its own C-x prefix).
+;;; The applications that get the keyboard back while they run.  The list is
+;;; matched against the base name of the pane's foreground process, lower-cased
+;;; and with any version suffix allowed - `emacs-29', `python3.13' - so a full
+;;; path such as /opt/homebrew/bin/less matches `less' and nothing has to be
+;;; spelled once per release.  It covers the
+;;; cases the rest of the project cares about - Emacs and the pager first of all -
+;;; plus the editors, the multiplexers and the REPLs, which take their keys from
+;;; the same Emacs vocabulary (readline, for one, has its own C-x prefix).
 (define wezterm-yield-apps
   (make-parameter '("alsamixer" "atop"
                     "bat"
@@ -182,57 +182,57 @@
                     "weechat"
                     "yazi")))
 
-;; The monospaced family, the same one the Emacs bridge gives Heks Emacs.
+;;; The monospaced family, the same one the Emacs bridge gives Heks Emacs.
 (define wezterm-font-family
   (make-parameter font-mono))
 
-;; Fallback families, for the glyphs the monospaced font does not carry.
+;;; Fallback families, for the glyphs the monospaced font does not carry.
 (define wezterm-font-fallbacks
   (make-parameter '("Apple Color Emoji")))
 
-;; Terminal font size, in points.
+;;; Terminal font size, in points.
 (define wezterm-font-size
   (make-parameter 12))
 
-;; Background opacity.
+;;; Background opacity.
 (define wezterm-window-opacity
   (make-parameter 0.88))
 
-;; How much macOS blurs what is behind the window, in points.  iTerm2 was
-;; configured by hand for this; WezTerm can declare it.
+;;; How much macOS blurs what is behind the window, in points.  iTerm2 was
+;;; configured by hand for this; WezTerm can declare it.
 (define wezterm-window-blur
   (make-parameter 20))
 
-;; Window padding, in pixels, applied on every side.
+;;; Window padding, in pixels, applied on every side.
 (define wezterm-window-padding
   (make-parameter 16))
 
-;; Number of scrollback lines kept per pane, as the README asks of the other
-;; terminal.
+;;; Number of scrollback lines kept per pane, as the README asks of the other
+;;; terminal.
 (define wezterm-scrollback-lines
   (make-parameter 100000))
 
-;; How long a prefix table waits for its second key, in milliseconds.  Emacs has
-;; no such timeout, but a key table that never resolves would swallow every key,
-;; so an abandoned C-x gives up on its own.
+;;; How long a prefix table waits for its second key, in milliseconds.  Emacs has
+;;; no such timeout, but a key table that never resolves would swallow every key,
+;;; so an abandoned C-x gives up on its own.
 (define wezterm-prefix-timeout
   (make-parameter 4000))
 
-;; The shell to start.  The ZSH configuration installed by `install-zsh-config'
-;; is a login shell, so WezTerm has to start one too.
+;;; The shell to start.  The ZSH configuration installed by `install-zsh-config'
+;;; is a login shell, so WezTerm has to start one too.
 (define wezterm-default-prog
   (make-parameter '("/bin/zsh" "-l")))
 
-;; WezTerm's configuration directory; defaults to ~/.config/wezterm.
+;;; WezTerm's configuration directory; defaults to ~/.config/wezterm.
 (define wezterm-config-dir
   (make-parameter (format #f "~a/.config/wezterm"
                           (or (getenv "HOME") "/tmp"))))
 
-;; WezTerm reads wezterm.lua from its configuration directory.
+;;; WezTerm reads wezterm.lua from its configuration directory.
 (define wezterm-config-filename
   (make-parameter "wezterm.lua"))
 
-;; --- Lua values ---
+;;; --- Lua values ---
 
 (define (wezterm-raw-lua text)
   "Return @var{text} wrapped so that `serialize-wezterm-value' emits it as
@@ -247,9 +247,9 @@ literal Lua instead of quoting it.
 (define (wezterm-raw-lua? value)
   "Return @code{#t} when @var{value} is a literal Lua fragment."
   (and (pair? value)
-       (eq? (car value)
-            'raw-lua)
-       (string? (cdr value))))
+    (eq? (car value)
+         'raw-lua)
+    (string? (cdr value))))
 
 (define (wezterm-compact value)
   "Return @var{value} marked to be rendered as a single-line Lua table, for
@@ -259,19 +259,19 @@ values short enough that spreading them over several lines would only add noise.
 (define (wezterm-compact? value)
   "Return @code{#t} when @var{value} was marked with `wezterm-compact'."
   (and (pair? value)
-       (eq? (car value)
-            'compact-lua)))
+    (eq? (car value)
+         'compact-lua)))
 
 (define (wezterm-wrapped? value)
   "Return @code{#t} when @var{value} is a tagged Lua fragment rather than data."
   (or (wezterm-raw-lua? value)
-      (wezterm-compact? value)))
+    (wezterm-compact? value)))
 
 (define (wezterm-indent level)
   "Return the indentation string for @var{level} nested Lua tables."
   (make-string (* 2 level) #\space))
 
-;; Width of the section banners of the generated file.
+;;; Width of the section banners of the generated file.
 (define wezterm-banner-width
   74)
 
@@ -288,7 +288,7 @@ sections line up."
 (define (wezterm-name? name)
   "Return @code{#t} when @var{name} can key a Lua table field."
   (or (string? name)
-      (symbol? name)))
+    (symbol? name)))
 
 (define (serialize-wezterm-name name)
   "Render @var{name} as a Lua table field name.
@@ -301,13 +301,13 @@ bracketed and quoted, the way Lua requires.
 @result{} ['emacs-cx']
 @end example"
   (let* ((name (if (symbol? name)
-                   (symbol->string name) name))
+                 (symbol->string name) name))
          (identifier? (string-every (lambda (c)
                                       (or (char-alphabetic? c)
-                                          (char-numeric? c)
-                                          (char=? c #\_))) name)))
+                                        (char-numeric? c)
+                                        (char=? c #\_))) name)))
     (if identifier? name
-        (format #f "['~a']" name))))
+      (format #f "['~a']" name))))
 
 (define (wezterm-object? value)
   "Return @code{#t} when @var{value} is a Lua table keyed by field names.
@@ -316,11 +316,11 @@ A list of pairs whose keys are strings or symbols is an object, which is what
 the palette, the settings tables and the key bindings all are.  A list of
 anything else is an array, and a tagged fragment is never an object."
   (and (pair? value)
-       (not (wezterm-wrapped? value))
-       (every (lambda (entry)
-                (and (pair? entry)
-                     (not (wezterm-wrapped? entry))
-                     (wezterm-name? (car entry)))) value)))
+    (not (wezterm-wrapped? value))
+    (every (lambda (entry)
+             (and (pair? entry)
+               (not (wezterm-wrapped? entry))
+               (wezterm-name? (car entry)))) value)))
 
 (define* (serialize-wezterm-table lines
                                   #:key (level 0) compact?)
@@ -329,11 +329,11 @@ anything else is an array, and a tagged fragment is never an object."
 @var{level} is the nesting depth, used for indentation, and @var{compact?} keeps
 the whole table on the line it starts on."
   (cond
-    ((null? lines)
-     "{}")
-    (compact? (format #f "{ ~a }"
-                      (string-join lines ", ")))
-    (else (string-append "{"
+    [(null? lines)
+     "{}"]
+    [compact? (format #f "{ ~a }"
+                      (string-join lines ", "))]
+    [else (string-append "{"
                          "\n"
                          (string-join (map (lambda (line)
                                              (string-append (wezterm-indent (1+
@@ -342,7 +342,7 @@ the whole table on the line it starts on."
                                       "\n")
                          "\n"
                          (wezterm-indent level)
-                         "}"))))
+                         "}")]))
 
 (define* (serialize-wezterm-value value
                                   #:key (level 0) compact?)
@@ -359,34 +359,34 @@ from `wezterm-raw-lua' are emitted verbatim.
 @result{} true
 @end example"
   (cond
-    ((wezterm-raw-lua? value)
-     (cdr value))
-    ((wezterm-compact? value)
+    [(wezterm-raw-lua? value)
+     (cdr value)]
+    [(wezterm-compact? value)
      (serialize-wezterm-value (cdr value)
                               #:level level
-                              #:compact? #t))
-    ((eq? value #t)
-     "true")
-    ((eq? value #f)
-     "false")
-    ((string? value)
-     (format #f "'~a'" value))
-    ((number? value)
-     (format #f "~a" value))
-    ((null? value)
-     "{}")
-    ((wezterm-object? value)
+                              #:compact? #t)]
+    [(eq? value #t)
+     "true"]
+    [(eq? value #f)
+     "false"]
+    [(string? value)
+     (format #f "'~a'" value)]
+    [(number? value)
+     (format #f "~a" value)]
+    [(null? value)
+     "{}"]
+    [(wezterm-object? value)
      (serialize-wezterm-table (map (lambda (entry)
                                      (format #f "~a = ~a"
                                              (serialize-wezterm-name (car
                                                                       entry))
                                              (serialize-wezterm-value (cdr
                                                                        entry)
-                                              #:level (1+ level)
-                                              #:compact? compact?))) value)
+                                                                      #:level (1+ level)
+                                                                      #:compact? compact?))) value)
                               #:level level
-                              #:compact? compact?))
-    ((list? value)
+                              #:compact? compact?)]
+    [(list? value)
      (serialize-wezterm-table (map (lambda (item)
                                      (serialize-wezterm-value item
                                                               #:level (1+
@@ -394,8 +394,8 @@ from `wezterm-raw-lua' are emitted verbatim.
                                                               #:compact?
                                                               compact?)) value)
                               #:level level
-                              #:compact? compact?))
-    (else (error "serialize-wezterm-value: cannot render as Lua:" value))))
+                              #:compact? compact?)]
+    [else (error "serialize-wezterm-value: cannot render as Lua:" value)]))
 
 (define (translate-wezterm-mods mods)
   "Translate the project's short modifier syntax into WezTerm's spelling.
@@ -407,15 +407,15 @@ For example, @code{C-S} becomes @code{CTRL|SHIFT}."
   (let* ((parts (string-split mods #\-))
          (translated-parts (map (lambda (p)
                                   (cond
-                                    ((string=? p "C")
-                                     "CTRL")
-                                    ((string=? p "M")
-                                     "ALT")
-                                    ((string=? p "S")
-                                     "SHIFT")
-                                    ((string=? p "s")
-                                     "SUPER")
-                                    (else p))) parts)))
+                                    [(string=? p "C")
+                                     "CTRL"]
+                                    [(string=? p "M")
+                                     "ALT"]
+                                    [(string=? p "S")
+                                     "SHIFT"]
+                                    [(string=? p "s")
+                                     "SUPER"]
+                                    [else p])) parts)))
     (string-join translated-parts "|")))
 
 (define* (serialize-wezterm-key #:key key mods action)
@@ -441,7 +441,7 @@ runtime expands it into the two spellings a prefix needs - with and without
 @kbd{2} work."
   (format #f "{ key = '~a', action = ~a }" key action))
 
-;; --- The configuration ---
+;;; --- The configuration ---
 
 (define* (wezterm-font)
   "Return the Lua expression for the @code{font} setting.
@@ -555,8 +555,8 @@ namespace, which neither Emacs nor a pager wants."
   (list (serialize-wezterm-key #:key "x"
                                #:mods "C"
                                #:action (format #f
-                                         "act.ActivateKeyTable { name = 'emacs-cx', one_shot = true, until_unknown = true, timeout_milliseconds = ~a }"
-                                         (wezterm-prefix-timeout)))
+                                                "act.ActivateKeyTable { name = 'emacs-cx', one_shot = true, until_unknown = true, timeout_milliseconds = ~a }"
+                                                (wezterm-prefix-timeout)))
         (serialize-wezterm-key #:key "y"
                                #:mods "C"
                                #:action "act.PasteFrom 'Clipboard'")
@@ -632,12 +632,12 @@ handling the keyboard."
          (serialize-wezterm-key #:key (car spec)
                                 #:mods (cadr spec)
                                 #:action (caddr spec)))
-       '( ("Tab" "C" "act.ActivateTabRelative(1)")
-          ("Tab" "C-S" "act.ActivateTabRelative(-1)")
-          ("Enter" "M" "act.ToggleFullScreen")
-          ("PageUp" "C" "act.ActivateTabRelative(-1)")
-          ("PageDown" "C" "act.ActivateTabRelative(1)")
-          ("Insert" "C" "act.CopyTo 'PrimarySelection'"))))
+       '(("Tab" "C" "act.ActivateTabRelative(1)")
+         ("Tab" "C-S" "act.ActivateTabRelative(-1)")
+         ("Enter" "M" "act.ToggleFullScreen")
+         ("PageUp" "C" "act.ActivateTabRelative(-1)")
+         ("PageDown" "C" "act.ActivateTabRelative(1)")
+         ("Insert" "C" "act.CopyTo 'PrimarySelection'"))))
 
 (define* (wezterm-prefix-tables)
   "Return the prefix key tables, as a list of @code{(name . entries)} pairs.
@@ -692,12 +692,12 @@ accepts a version suffix, so that @file{python3.13} matches @code{python}."
                         (list "  },")))
               (wezterm-prefix-tables)))
 
-;; The mechanism, as opposed to the policy.  It is plain Lua and is emitted as
-;; written: it reads `yield_apps', `settings', `emacs_keys' and
-;; `emacs_prefix_tables' from the generated part above and turns them into a
-;; WezTerm configuration.  The only Lua syntax constraint the renderer imposes is
-;; that this block is written with single-quoted strings and no backslashes, so
-;; that it needs no escaping inside the Scheme string it lives in.
+;;; The mechanism, as opposed to the policy.  It is plain Lua and is emitted as
+;;; written: it reads `yield_apps', `settings', `emacs_keys' and
+;;; `emacs_prefix_tables' from the generated part above and turns them into a
+;;; WezTerm configuration.  The only Lua syntax constraint the renderer imposes is
+;;; that this block is written with single-quoted strings and no backslashes, so
+;;; that it needs no escaping inside the Scheme string it lives in.
 (define wezterm-lua-runtime
   "-- Strip the directory part of a path, so that '/usr/bin/less' and 'less'
 -- compare equal.
@@ -807,20 +807,20 @@ and finally `wezterm-lua-runtime', which consumes all three.  Passing the result
 to @code{string-join} with a newline produces the file that is written to disk;
 `serialize-wezterm-config' does exactly that."
   (append (list "-- ====== Cask and Cons WezTerm configuration ======"
-           "--"
-           "-- auto-generated file, DO NOT EDIT!"
-           "-- Generated by (cask-and-cons wezterm); install it with"
-           "-- `./caco install-wezterm'.  Edit src/cask-and-cons/wezterm.scm instead."
-           "--"
-           "-- The key bindings are the Emacs ones, and every chord WezTerm"
-           "-- claims is guarded: while Emacs, a pager or another full-screen"
-           "-- program owns the keyboard the chord is handed back to it."
-           "")
+                "--"
+                "-- auto-generated file, DO NOT EDIT!"
+                "-- Generated by (cask-and-cons wezterm); install it with"
+                "-- `./caco install-wezterm'.  Edit src/cask-and-cons/wezterm.scm instead."
+                "--"
+                "-- The key bindings are the Emacs ones, and every chord WezTerm"
+                "-- claims is guarded: while Emacs, a pager or another full-screen"
+                "-- program owns the keyboard the chord is handed back to it."
+                "")
           (list "local wezterm = require 'wezterm'"
                 "local act = wezterm.action"
                 "local config = wezterm.config_builder()" "")
           (list (wezterm-banner #:title
-                 "generated: applications that own the keyboard") ""
+                                "generated: applications that own the keyboard") ""
                 "local yield_apps = {")
           (wezterm-yield-app-lines)
           (list "}" "")
@@ -834,7 +834,7 @@ to @code{string-join} with a newline produces the file that is written to disk;
           (wezterm-prefix-table-lines)
           (list "}" ""
                 (wezterm-banner #:title
-                 "static runtime: keep the keyboard out of the way") "")
+                                "static runtime: keep the keyboard out of the way") "")
           (list wezterm-lua-runtime)
           (list "" "return config" "")))
 

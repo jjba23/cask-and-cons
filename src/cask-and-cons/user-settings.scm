@@ -1,12 +1,12 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
-;; Per-user, per-machine settings shared across cask-and-cons modules.
-;; Individual modules can read/override these via `load-local-overrides'
-;; (see `cask-and-cons prelude').
+;;; Per-user, per-machine settings shared across cask-and-cons modules.
+;;; Individual modules can read/override these via `load-local-overrides'
+;;; (see `cask-and-cons prelude').
 
 (define-module (cask-and-cons user-settings)
   #:use-module (srfi srfi-1)
@@ -15,29 +15,29 @@
                             font-sans font-serif font-mono font-casks
                             font-mono-postscript-name))
 
-;; The one place that picks the typefaces: sans, serif and monospace.  Emacs and
-;; WezTerm follow these, and `font-casks' (installed by the Homebrew module)
-;; guarantees they are present.
+;;; The one place that picks the typefaces: sans, serif and monospace.  Emacs and
+;;; WezTerm follow these, and `font-casks' (installed by the Homebrew module)
+;;; guarantees they are present.
 (define font-sans "Work Sans")
 (define font-serif "Source Serif 4")
 (define font-mono "JuliaMono")
 
-;; The PostScript name of the regular weight of `font-mono', for the macOS
-;; defaults that take that rather than the family name.
+;;; The PostScript name of the regular weight of `font-mono', for the macOS
+;;; defaults that take that rather than the family name.
 (define font-mono-postscript-name "JuliaMono-Regular")
 
-;; The Homebrew casks that provide the three families above.
+;;; The Homebrew casks that provide the three families above.
 (define font-casks '("font-work-sans" "font-source-serif-4" "font-juliamono"))
 
-;; The one place that picks the colour scheme: a name from `theme-names'.
-;; Emacs and WezTerm both follow it.  Change it here to retheme every consumer.
+;;; The one place that picks the colour scheme: a name from `theme-names'.
+;;; Emacs and WezTerm both follow it.  Change it here to retheme every consumer.
 (define global-theme 'modus-operandi-tinted)
 
-;; The palettes come from heks-linux (codeberg.org/jjba23/heks-linux), so a
-;; theme looks the same on both systems.  Each row is
-;;   (name emacs-theme dark? text background primary selection)
-;; where `name' is what `global-theme' takes and `emacs-theme' is the theme
-;; Heks Emacs loads for it (a few palettes borrow a close Emacs theme).
+;;; The palettes come from heks-linux (codeberg.org/jjba23/heks-linux), so a
+;;; theme looks the same on both systems.  Each row is
+;;; (name emacs-theme dark? text background primary selection)
+;;; where `name' is what `global-theme' takes and `emacs-theme' is the theme
+;;; Heks Emacs loads for it (a few palettes borrow a close Emacs theme).
 (define theme-definitions
   '((ef-melissa-light ef-melissa-light #f "#484431" "#fff6d8" "#efbf00" "#f5e9cb")
     (ef-dream ef-dream #t "#efd5c5" "#232025" "#675072" "#322f34")
@@ -80,8 +80,8 @@
     (golden-gate-light modus-operandi #f "#1d1d1f" "#f5f5f7" "#007aff" "#e5e5ea")
     (golden-gate-dark modus-vivendi #t "#f5f5f7" "#1e1e1e" "#0a84ff" "#2c2c2e")))
 
-;; Optional hand-tuned ANSI colours, for themes where the terminal should not
-;; fall back on WezTerm's defaults.
+;;; Optional hand-tuned ANSI colours, for themes where the terminal should not
+;;; fall back on WezTerm's defaults.
 (define theme-ansi-overrides
   '((modus-operandi ("ansi" "#000000" "#a60000" "#006800" "#6f5500"
                      "#0031a9" "#721045" "#005e8b" "#a6a6a6")
@@ -119,7 +119,7 @@
               ("selection_bg" . ,selection))
             (or (assq-ref theme-ansi-overrides name) '()))))
 
-;; Where the notes live.  One place for every consumer: the Emacs bridge sets
-;; heks/notes-dir to it and the ZSH config exports it as $NOTES_DIR for the
-;; `n' command.  $HOME is understood by both (the Emacs side turns it into ~).
+;;; Where the notes live.  One place for every consumer: the Emacs bridge sets
+;;; heks/notes-dir to it and the ZSH config exports it as $NOTES_DIR for the
+;;; `n' command.  $HOME is understood by both (the Emacs side turns it into ~).
 (define notes-directory "$HOME/Hacking/private-notes")

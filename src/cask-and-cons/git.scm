@@ -1,13 +1,12 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
 (define-module (cask-and-cons git)
   #:declarative? #t
   #:use-module (cask-and-cons prelude)
-  #:use-module (cask-and-cons user-settings)
   #:export (gitignore-global gitconfig-personal
                              gitconfig-work
                              gitconfig
@@ -74,17 +73,17 @@
   (install-config-file! #:name (gitconfig-filename)
                         #:dir (git-config-dir)
                         #:contents (mk-rec-kv-conf-lines gitconfig
-                                    #:template spaced-equal-conf-pair))
+                                                         #:template spaced-equal-conf-pair))
 
   (install-config-file! #:name (gitconfig-personal-filename)
                         #:dir (git-config-dir)
                         #:contents (mk-rec-kv-conf-lines gitconfig-personal
-                                    #:template spaced-equal-conf-pair))
+                                                         #:template spaced-equal-conf-pair))
 
   (install-config-file! #:name (gitconfig-work-filename)
                         #:dir (git-config-dir)
                         #:contents (mk-rec-kv-conf-lines gitconfig-work
-                                    #:template spaced-equal-conf-pair))
+                                                         #:template spaced-equal-conf-pair))
 
   (install-config-file! #:name (gitignore-global-filename)
                         #:dir (git-config-dir)

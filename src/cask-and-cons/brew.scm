@@ -1,10 +1,10 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
-;; Declarative list of Homebrew taps, formulae and casks.
+;;; Declarative list of Homebrew taps, formulae and casks.
 
 (define-module (cask-and-cons brew)
   #:declarative? #f
@@ -130,12 +130,12 @@
   (let ((tapped (brew-output "tap"))
         (formulae (brew-output "list" "--formula" "-1"))
         (casks (brew-output "list" "--cask" "-1")))
-    (for-each (lambda (t)
-                (unless (member t tapped)
-                  (log-info "Tapping ~a" t)
-                  (system* "brew" "tap" t))) brew-taps)
+    (for-each (lambda (tap)
+                (unless (member tap tapped)
+                  (log-info "Tapping ~a" tap)
+                  (system* "brew" "tap" tap))) brew-taps)
     (brew-install! '("-y")
                    (missing brew-formulae formulae))
     (brew-install! '("-y" "--cask")
-                                       (missing (append brew-casks font-casks) casks)))
+                   (missing (append brew-casks font-casks) casks)))
   (log-success "Homebrew packages are installed"))

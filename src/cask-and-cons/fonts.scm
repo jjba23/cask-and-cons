@@ -1,13 +1,13 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
-;; Typeface configuration for the places that have their own font settings:
-;; fontconfig (the generic sans-serif, serif and monospace aliases) and the
-;; JetBrains IDEs (editor font).  The families come from (cask-and-cons
-;; user-settings); the fonts themselves are installed by the Homebrew module.
+;;; Typeface configuration for the places that have their own font settings:
+;;; fontconfig (the generic sans-serif, serif and monospace aliases) and the
+;;; JetBrains IDEs (editor font).  The families come from (cask-and-cons
+;;; user-settings); the fonts themselves are installed by the Homebrew module.
 
 (define-module (cask-and-cons fonts)
   #:declarative? #t
@@ -25,20 +25,20 @@
             install-fontconfig
             install-jetbrains-fonts))
 
-;; --- fontconfig ---
+;;; --- fontconfig ---
 
 (define fontconfig-dir
   (make-parameter (format #f "~a/fontconfig"
                           (let ((xdg (getenv "XDG_CONFIG_HOME")))
                             (if (and xdg (not (string=? xdg "")))
-                                xdg
-                                (format #f "~a/.config"
-                                        (or (getenv "HOME") "/tmp")))))))
+                              xdg
+                              (format #f "~a/.config"
+                                      (or (getenv "HOME") "/tmp")))))))
 
 (define fontconfig-filename
   (make-parameter "fonts.conf"))
 
-;; Generic family -> the family that should win for it.
+;;; Generic family -> the family that should win for it.
 (define fontconfig-aliases
   (make-parameter
    (list (cons "sans-serif" font-sans)
@@ -70,10 +70,10 @@ which is put first so it is preferred over every other candidate."
                         #:contents (fontconfig-xml))
   (log-success "Installed fontconfig configuration"))
 
-;; --- JetBrains IDEs ---
+;;; --- JetBrains IDEs ---
 
-;; Directories holding one sub-directory per installed IDE version, such as
-;; IntelliJIdea2025.2.
+;;; Directories holding one sub-directory per installed IDE version, such as
+;;; IntelliJIdea2025.2.
 (define jetbrains-config-roots
   (make-parameter
    (let ((home (or (getenv "HOME") "/tmp")))
@@ -99,13 +99,13 @@ which is put first so it is preferred over every other candidate."
   (append-map
    (lambda (root)
      (if (file-exists? root)
-         (map (lambda (name) (string-append root "/" name))
-              (filter (lambda (name)
-                        (and (not (string-prefix? "." name))
-                             (eq? 'directory
-                                  (stat:type (stat (string-append root "/" name))))))
-                      (scandir root)))
-         '()))
+       (map (lambda (name) (string-append root "/" name))
+            (filter (lambda (name)
+                      (and (not (string-prefix? "." name))
+                        (eq? 'directory
+                             (stat:type (stat (string-append root "/" name))))))
+                    (scandir root)))
+       '()))
    (jetbrains-config-roots)))
 
 (define (install-jetbrains-fonts)
@@ -115,12 +115,12 @@ for it to take effect; the IDE rewrites this file on exit if it is running."
   (load-local-overrides '(cask-and-cons fonts) 'fonts-settings)
   (let ((dirs (jetbrains-ide-dirs)))
     (if (null? dirs)
-        (log-warning "No JetBrains IDE configuration found, skipping")
-        (for-each (lambda (dir)
-                    (let ((options (string-append dir "/options")))
-                      (system* "mkdir" "-p" options)
-                      (install-config-file! #:name "editor-font.xml"
-                                            #:dir options
-                                            #:contents (jetbrains-editor-font-xml))))
-                  dirs)))
+      (log-warning "No JetBrains IDE configuration found, skipping")
+      (for-each (lambda (dir)
+                  (let ((options (string-append dir "/options")))
+                    (system* "mkdir" "-p" options)
+                    (install-config-file! #:name "editor-font.xml"
+                                          #:dir options
+                                          #:contents (jetbrains-editor-font-xml))))
+                dirs)))
   (log-success "Installed JetBrains editor font"))

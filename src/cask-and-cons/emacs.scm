@@ -1,8 +1,8 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
 (define-module (cask-and-cons emacs)
   #:declarative? #t
@@ -12,9 +12,9 @@
   #:export (emacs-bridge-forms install-emacs-bridge emacs-bridge-dir
                                emacs-bridge-filename))
 
-;; ELisp is data to Scheme: the bridge is a quoted list of ELisp forms.
-;; Both are Lisps, so the reader and printer round-trip it unchanged
-;; ('ayu-dark reads as (quote ayu-dark) and prints back as 'ayu-dark).
+;;; ELisp is data to Scheme: the bridge is a quoted list of ELisp forms.
+;;; Both are Lisps, so the reader and printer round-trip it unchanged
+;;; ('ayu-dark reads as (quote ayu-dark) and prints back as 'ayu-dark).
 (define emacs-bridge-forms
   `((setopt heks/font-mono
             ,font-mono

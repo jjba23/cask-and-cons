@@ -1,13 +1,12 @@
 ;;; cask-and-cons
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; SPDX-License-Identifier: MIT
+;;; SPDX-License-Identifier: MIT
 
 (define-module (cask-and-cons gpg)
   #:declarative? #t
   #:use-module (cask-and-cons prelude)
-  #:use-module (cask-and-cons user-settings)
   #:export (gpg-agent-conf
             install-gpg-config
             gpg-config-dir
