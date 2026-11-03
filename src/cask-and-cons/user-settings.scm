@@ -31,7 +31,7 @@
 
 ;; The one place that picks the colour scheme: a name from `theme-names'.
 ;; Emacs and WezTerm both follow it.  Change it here to retheme every consumer.
-(define global-theme 'modus-operandi)
+(define global-theme 'modus-operandi-tinted)
 
 ;; The palettes come from heks-linux (codeberg.org/jjba23/heks-linux), so a
 ;; theme looks the same on both systems.  Each row is
@@ -94,7 +94,7 @@
 
 (define (theme-definition name)
   (or (assq-ref theme-definitions name)
-      (error "Unknown theme:" name (theme-names))))
+    (error "Unknown theme:" name (theme-names))))
 
 (define (theme-emacs-theme name)
   "Return the Emacs theme symbol Heks Emacs should load for @var{name}."
