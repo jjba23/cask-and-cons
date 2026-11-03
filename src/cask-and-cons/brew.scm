@@ -100,8 +100,8 @@
                   ((acc '()))
                   (let ((l (read-line port)))
                     (if (eof-object? l)
-                        (reverse acc)
-                        (loop (cons l acc)))))))
+                      (reverse acc)
+                      (loop (cons l acc)))))))
     (close-pipe port) lines))
 
 (define (short-name name)
@@ -137,5 +137,5 @@
     (brew-install! '("-y")
                    (missing brew-formulae formulae))
     (brew-install! '("-y" "--cask")
-                   (missing brew-casks casks)))
+                                       (missing (append brew-casks font-casks) casks)))
   (log-success "Homebrew packages are installed"))

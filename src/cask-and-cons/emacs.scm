@@ -17,11 +17,11 @@
 ;; ('ayu-dark reads as (quote ayu-dark) and prints back as 'ayu-dark).
 (define emacs-bridge-forms
   `((setopt heks/font-mono
-            "Intel One Mono"
+            ,font-mono
             heks/font-sans
-            "Lucida Sans"
+            ,font-sans
             heks/font-serif
-            "Baskerville"
+            ,font-serif
             heks/theme
             ,(list 'quote (theme-emacs-theme global-theme))
             heks/clone-dir

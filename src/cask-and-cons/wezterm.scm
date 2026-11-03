@@ -184,7 +184,7 @@
 
 ;; The monospaced family, the same one the Emacs bridge gives Heks Emacs.
 (define wezterm-font-family
-  (make-parameter "Intel One Mono"))
+  (make-parameter font-mono))
 
 ;; Fallback families, for the glyphs the monospaced font does not carry.
 (define wezterm-font-fallbacks

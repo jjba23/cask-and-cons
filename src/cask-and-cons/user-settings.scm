@@ -11,7 +11,18 @@
 (define-module (cask-and-cons user-settings)
   #:use-module (srfi srfi-1)
   #:export (notes-directory global-theme theme-names theme-emacs-theme
-                            theme-dark? theme-palette))
+                            theme-dark? theme-palette
+                            font-sans font-serif font-mono font-casks))
+
+;; The one place that picks the typefaces: sans, serif and monospace.  Emacs and
+;; WezTerm follow these, and `font-casks' (installed by the Homebrew module)
+;; guarantees they are present.
+(define font-sans "Work Sans")
+(define font-serif "Source Serif 4")
+(define font-mono "JuliaMono")
+
+;; The Homebrew casks that provide the three families above.
+(define font-casks '("font-work-sans" "font-source-serif-4" "font-juliamono"))
 
 ;; The one place that picks the colour scheme: a name from `theme-names'.
 ;; Emacs and WezTerm both follow it.  Change it here to retheme every consumer.
