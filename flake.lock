@@ -375,11 +375,11 @@
         "veritas": "veritas"
       },
       "locked": {
-        "lastModified": 1793699172,
-        "narHash": "sha256-0qSFVNxI+zcYaofB9sXm865fSspfpPkl/Sn6r0Mo9/8=",
+        "lastModified": 1793709939,
+        "narHash": "sha256-/7J6fdzR7yEdrLkU6kxATRgn6CebCmV6va1rTTPsP9g=",
         "ref": "refs/heads/trunk",
-        "rev": "db0dd360bdb7d8e8c6242fee05639575ae42427e",
-        "revCount": 81,
+        "rev": "d2a6eb162010d94ec48cab71dc4bb1fe46e8ed5b",
+        "revCount": 82,
         "type": "git",
         "url": "https://github.com/jjba23/nix-jointhefreeworld"
       },
@@ -467,16 +467,16 @@
     "sift": {
       "flake": false,
       "locked": {
-        "lastModified": 1793699096,
-        "narHash": "sha256-mKatPxe6MLj0d78e5zyFt1voYeIdg5mVlnoRiZlGUlE=",
-        "ref": "refs/tags/v1.21.0",
-        "rev": "b8802ca0cdc90a260376a067ceffe2a5c34c88db",
-        "revCount": 111,
+        "lastModified": 1793709892,
+        "narHash": "sha256-30wJXz4hqCU8+X1qmERC7X79rhB8FPYpTQb+HGYTlZE=",
+        "ref": "refs/tags/v1.22.0",
+        "rev": "f14c4cfa2e5a1738175ff8bd090ca42610c65234",
+        "revCount": 114,
         "type": "git",
         "url": "https://github.com/jjba23/sift"
       },
       "original": {
-        "ref": "refs/tags/v1.21.0",
+        "ref": "refs/tags/v1.22.0",
         "type": "git",
         "url": "https://github.com/jjba23/sift"
       }
