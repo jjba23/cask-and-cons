@@ -8,16 +8,27 @@
 ;;
 ;; `./caco sync-confluence' does one sync; `./caco install-confluence' writes
 ;; a launchd agent that runs it every week (Monday 09:00 by default; launchd
-;; also runs missed jobs after wake).
+;; also runs missed jobs after wake).  The work is done by confluence_sync.py
+;; (run through `uv', which fetches playwright on first use).
 ;;
-;; Credentials: store the API token once in the macOS keychain:
+;; Two ways to authenticate, picked by `confluence-auth':
+;;
+;; 'browser (default) -- for organisations that block API tokens.  Run
+;;   `./caco login-confluence' once: it opens Chrome on a dedicated profile,
+;;   you log in through SSO/MFA, and the session stays in that profile.  Syncs
+;;   then run headless in the same profile and reuse its cookies.  When the
+;;   session expires the sync fails with a macOS notification; log in again.
+;;   Check that your organisation's policy allows automated use of your own
+;;   session before relying on this.
+;;
+;; 'token -- Basic auth with an Atlassian API token kept in the macOS keychain:
 ;;   security add-generic-password -a "$EMAIL" -s caco-confluence -w
-;; (or export CONFLUENCE_API_TOKEN for manual runs).
+;;   (or export CONFLUENCE_API_TOKEN for manual runs).
 ;;
 ;; Override per machine in ~/.config/cask-and-cons/confluence-settings.scm:
 ;;   (confluence-base-url "https://acme.atlassian.net")
-;;   (confluence-email "me@acme.com")
 ;;   (confluence-spaces '("ENG" "OPS"))
+;;   (confluence-auth 'token) (confluence-email "me@acme.com")
 
 (define-module (cask-and-cons confluence)
   #:declarative? #f
@@ -27,19 +38,31 @@
   #:use-module (cask-and-cons prelude)
   #:export (confluence-base-url confluence-email confluence-spaces
                                 confluence-destination
+                                confluence-auth
+                                confluence-profile-directory
+                                confluence-browser-channel
                                 confluence-keychain-service
                                 confluence-schedule
+                                login-confluence
                                 sync-confluence install-confluence-sync))
 
 (define (home) (or (getenv "HOME") "/tmp"))
 
 (define confluence-base-url (make-parameter "https://CHANGE-ME.atlassian.net"))
+;; 'browser or 'token.
+(define confluence-auth (make-parameter 'browser))
+;; Token mode only.
 (define confluence-email (make-parameter "CHANGE-ME@example.com"))
+(define confluence-keychain-service (make-parameter "caco-confluence"))
+;; Browser mode: the Chrome profile holding the login session, and the
+;; playwright channel naming the browser ("chrome" = installed Google Chrome).
+(define confluence-profile-directory
+  (make-parameter (string-append (home) "/.local/share/caco/confluence-profile")))
+(define confluence-browser-channel (make-parameter "chrome"))
 ;; Space keys to mirror; '() means every space you can see.
 (define confluence-spaces (make-parameter '()))
 (define confluence-destination
   (make-parameter (string-append (home) "/Hacking/confluence-mirror")))
-(define confluence-keychain-service (make-parameter "caco-confluence"))
 ;; Weekday (0 = Sunday .. 6), hour, minute.
 (define confluence-schedule (make-parameter '(1 9 0)))
 
@@ -50,7 +73,7 @@
   (or (getenv "CACO_DIR") (getcwd)))
 
 (define (script-path)
-  (string-append (project-dir) "/src/cask-and-cons/confluence-sync.sh"))
+  (string-append (project-dir) "/src/cask-and-cons/confluence_sync.py"))
 
 (define (read-token)
   (or (let ((t (getenv "CONFLUENCE_API_TOKEN")))
@@ -64,26 +87,44 @@
 (define (load-settings)
   (load-local-overrides '(cask-and-cons confluence) 'confluence-settings))
 
+(define (export-environment!)
+  "Pass the declared settings to the Python script."
+  (when (string-contains (confluence-base-url) "CHANGE-ME")
+    (log-error "Set confluence-base-url in ~~/.config/cask-and-cons/confluence-settings.scm")
+    (exit 1))
+  (setenv "CONFLUENCE_BASE_URL" (confluence-base-url))
+  (setenv "CONFLUENCE_AUTH" (symbol->string (confluence-auth)))
+  (setenv "CONFLUENCE_PROFILE" (confluence-profile-directory))
+  (setenv "CONFLUENCE_CHANNEL" (confluence-browser-channel))
+  (setenv "CONFLUENCE_SPACES" (string-join (confluence-spaces) " "))
+  (setenv "CONFLUENCE_DEST" (confluence-destination))
+  (when (eq? (confluence-auth) 'token)
+    (let ((token (read-token)))
+      (unless token
+        (log-error "No API token: add it to the keychain (service ~a) or set CONFLUENCE_API_TOKEN"
+                   (confluence-keychain-service))
+        (exit 1))
+      (setenv "CONFLUENCE_EMAIL" (confluence-email))
+      (setenv "CONFLUENCE_TOKEN" token))))
+
+(define (run-script mode)
+  (unless (zero? (system* "uv" "run" "--script" (script-path) mode))
+    (log-error "Confluence ~a failed" mode)
+    (exit 1)))
+
+(define (login-confluence)
+  "Open Chrome on the dedicated profile so you can log in once."
+  (load-settings)
+  (export-environment!)
+  (run-script "login")
+  (log-success "Confluence login saved"))
+
 (define (sync-confluence)
   (load-settings)
-  (let ((token (read-token)))
-    (unless token
-      (log-error "No API token: add it to the keychain (service ~a) or set CONFLUENCE_API_TOKEN"
-                 (confluence-keychain-service))
-      (exit 1))
-    (when (string-contains (confluence-base-url) "CHANGE-ME")
-      (log-error "Set confluence-base-url in ~~/.config/cask-and-cons/confluence-settings.scm")
-      (exit 1))
-    (setenv "CONFLUENCE_BASE_URL" (confluence-base-url))
-    (setenv "CONFLUENCE_EMAIL" (confluence-email))
-    (setenv "CONFLUENCE_TOKEN" token)
-    (setenv "CONFLUENCE_SPACES" (string-join (confluence-spaces) " "))
-    (setenv "CONFLUENCE_DEST" (confluence-destination))
-    (log-info "Syncing Confluence to ~a" (confluence-destination))
-    (unless (zero? (system* "bash" (script-path)))
-      (log-error "Confluence sync failed")
-      (exit 1))
-    (log-success "Confluence synced")))
+  (export-environment!)
+  (log-info "Syncing Confluence to ~a" (confluence-destination))
+  (run-script "sync")
+  (log-success "Confluence synced"))
 
 (define (plist)
   (let ((log-file (string-append (home) "/Library/Logs/caco-confluence.log"))

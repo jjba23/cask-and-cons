@@ -194,6 +194,7 @@ Available tasks:
 - =install-wezterm= — install the WezTerm configuration (=~/.config/wezterm/wezterm.lua=)
 - =install-macos= — converge macOS system preferences (Dock, Finder, trackpad, clock, ...) declared in =src/cask-and-cons/macos.scm=; only changed keys are written and only affected processes (Dock, Finder) restart. Override with =~/.config/cask-and-cons/macos-settings.scm=, e.g. =(macos-settings (append (macos-settings) '(("com.apple.dock" (tilesize . 36)))))=
 - =sync-confluence= — one-off sync of Confluence Cloud to local Markdown (see [[*Confluence mirror]])
+- =login-confluence= — log in to Confluence once in a browser (browser auth mode)
 - =install-confluence= — install the launchd agent that runs =sync-confluence= weekly
 
 Install targets are just plain tasks named =install-<target>=; there is no separate =install= sub-command or target argument to parse.
@@ -486,36 +487,44 @@ caco install-emacs-bridge
 
 A local, read-only copy of Confluence Cloud as Markdown files, refreshed weekly.
 Declared in =src/cask-and-cons/confluence.scm=; the work is done by
-=src/cask-and-cons/confluence-sync.sh= (needs =curl=, =jq=, =pandoc=, =rsync=;
-=pandoc= and =rsync= are in =brew.scm=).
+=src/cask-and-cons/confluence_sync.py=, run with =uv= (which fetches Playwright
+on first use). Needs =uv=, =pandoc=, =rsync=, and Google Chrome for browser mode.
+
+** Authentication
+
+Set by =confluence-auth=:
+
+- ='browser= (default), for organisations that block API tokens. Run
+  =caco login-confluence= once: Chrome opens on a dedicated profile
+  (=~/.local/share/caco/confluence-profile=), you log in through SSO/MFA and press
+  Enter. Syncs then run headless in that profile and reuse its cookies. When the
+  session expires the sync fails with a macOS notification; run the login again.
+  Check that your organisation's policy allows automated use of your own session.
+- ='token=: Basic auth with an API token from
+  https://id.atlassian.com/manage-profile/security/api-tokens, kept in the
+  keychain: =security add-generic-password -a me@acme.com -s caco-confluence -w=
+  (=CONFLUENCE_API_TOKEN= in the environment wins for manual runs).
 
 ** Setup
 
-1. Create =~/.config/cask-and-cons/confluence-settings.scm=:
+Create =~/.config/cask-and-cons/confluence-settings.scm=:
 
 #+begin_src scheme
 (confluence-base-url "https://acme.atlassian.net")
-(confluence-email "me@acme.com")
 (confluence-spaces '("ENG" "OPS"))     ; '() = every space you can see
 ;; optional
 (confluence-destination "/Users/me/Hacking/confluence-mirror")
 (confluence-schedule '(1 9 0))         ; weekday (0 = Sunday), hour, minute
+;; token mode only
+;; (confluence-auth 'token) (confluence-email "me@acme.com")
 #+end_src
 
-2. Create an API token at https://id.atlassian.com/manage-profile/security/api-tokens
-   and store it in the keychain (never in the repo):
+Then:
 
 #+begin_src shell
-security add-generic-password -a me@acme.com -s caco-confluence -w
-#+end_src
-
-   For manual runs =CONFLUENCE_API_TOKEN= in the environment is used first.
-
-3. Sync once, then schedule:
-
-#+begin_src shell
-caco sync-confluence
-caco install-confluence
+caco login-confluence      # browser mode, once (and whenever the session expires)
+caco sync-confluence       # one sync
+caco install-confluence    # weekly schedule
 #+end_src
 
 ** How it behaves
@@ -528,13 +537,13 @@ caco install-confluence
 - The mirror is exact: pages deleted in Confluence are deleted locally. Do not
   edit the files; changes are overwritten. A =.git= directory in the
   destination is preserved, so you can version the history.
-- If nothing is fetched the destination is left untouched.
+- If nothing is fetched, or authentication fails, the destination is left untouched.
 
 ** Limitations
 
 Confluence Cloud only (v2 API). Macros (code blocks, panels, ...) become plain
 text; attachments and images are not downloaded; the page tree is not
-reproduced as folders.
+reproduced as folders. Don't use the Chrome profile while a sync is running.
 
 * Licensing
 Cask & Cons, its source code and its documentation are licensed under the *MIT License*. The full text is in [[file:LICENSE][LICENSE]].

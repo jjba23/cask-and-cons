@@ -107,6 +107,9 @@
     (sync-confluence unquote
                      (lambda (args)
                        (sync-confluence)))
+    (login-confluence unquote
+                      (lambda (args)
+                        (login-confluence)))
     (install-confluence unquote
                         (lambda (args)
                           (install-confluence-sync)))
