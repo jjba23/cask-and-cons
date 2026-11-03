@@ -24,13 +24,14 @@
   #:use-module (ice-9 popen)
   #:use-module (ice-9 textual-ports)
   #:use-module (cask-and-cons prelude)
+  #:use-module (cask-and-cons user-settings)
   #:export (macos-settings
             macos-default-settings
             macos-domain-processes
             install-macos-settings))
 
 (define macos-default-settings
-  '(("com.apple.dock"
+  `(("com.apple.dock"
      ;; Dock behaviour
      (autohide . #t)
      (tilesize . 50)
@@ -55,7 +56,11 @@
      (com.apple.sound.beep.flash . #f)
      (com.apple.springing.enabled . #t)
      (com.apple.springing.delay . 0.5)
-     (com.apple.trackpad.forceClick . #t))
+     (com.apple.trackpad.forceClick . #t)
+     ;; Fixed-pitch font for the (legacy) Cocoa apps that honour it.  This
+     ;; key wants the PostScript name, which is not the family name.
+     (NSFixedPitchFont . ,font-mono-postscript-name)
+     (NSFixedPitchFontSize . 12))
 
     ("com.apple.menuextra.clock"
      (ShowAMPM . #t)

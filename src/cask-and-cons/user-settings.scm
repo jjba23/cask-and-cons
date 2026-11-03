@@ -12,7 +12,8 @@
   #:use-module (srfi srfi-1)
   #:export (notes-directory global-theme theme-names theme-emacs-theme
                             theme-dark? theme-palette
-                            font-sans font-serif font-mono font-casks))
+                            font-sans font-serif font-mono font-casks
+                            font-mono-postscript-name))
 
 ;; The one place that picks the typefaces: sans, serif and monospace.  Emacs and
 ;; WezTerm follow these, and `font-casks' (installed by the Homebrew module)
@@ -20,6 +21,10 @@
 (define font-sans "Work Sans")
 (define font-serif "Source Serif 4")
 (define font-mono "JuliaMono")
+
+;; The PostScript name of the regular weight of `font-mono', for the macOS
+;; defaults that take that rather than the family name.
+(define font-mono-postscript-name "JuliaMono-Regular")
 
 ;; The Homebrew casks that provide the three families above.
 (define font-casks '("font-work-sans" "font-source-serif-4" "font-juliamono"))

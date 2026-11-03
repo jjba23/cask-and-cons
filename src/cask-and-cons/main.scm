@@ -18,6 +18,7 @@
   #:use-module (cask-and-cons emacs)
   #:use-module (cask-and-cons zsh)
   #:use-module (cask-and-cons wezterm)
+  #:use-module (cask-and-cons fonts)
   #:use-module (cask-and-cons macos)
   #:use-module (cask-and-cons skhd)
   #:use-module (cask-and-cons mcp)
@@ -81,6 +82,12 @@
     (install-wezterm unquote
                      (lambda (args)
                        (install-wezterm-config)))
+    (install-fontconfig unquote
+                        (lambda (args)
+                          (install-fontconfig)))
+    (install-jetbrains-fonts unquote
+                             (lambda (args)
+                               (install-jetbrains-fonts)))
     (install-macos unquote
                     (lambda (args)
                       (install-macos-settings)))
