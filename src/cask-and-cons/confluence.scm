@@ -38,6 +38,7 @@
   #:use-module (cask-and-cons prelude)
   #:export (confluence-base-url confluence-email confluence-spaces
                                 confluence-destination
+                                confluence-request-delay
                                 confluence-auth
                                 confluence-profile-directory
                                 confluence-browser-channel
@@ -62,7 +63,11 @@
 ;; Space keys to mirror; '() means every space you can see.
 (define confluence-spaces (make-parameter '()))
 (define confluence-destination
-  (make-parameter (string-append (home) "/Hacking/confluence-mirror")))
+  (make-parameter (string-append (home) "/Work/confluence-mirror")))
+;; Random pause, in seconds, between two requests: (min max).  Requests are
+;; strictly sequential; the script also adds a longer "reading" pause every
+;; ten requests and backs off on HTTP 429/5xx.
+(define confluence-request-delay (make-parameter '(2 5)))
 ;; Weekday (0 = Sunday .. 6), hour, minute.
 (define confluence-schedule (make-parameter '(1 9 0)))
 
@@ -98,6 +103,8 @@
   (setenv "CONFLUENCE_CHANNEL" (confluence-browser-channel))
   (setenv "CONFLUENCE_SPACES" (string-join (confluence-spaces) " "))
   (setenv "CONFLUENCE_DEST" (confluence-destination))
+  (setenv "CONFLUENCE_DELAY"
+          (string-join (map number->string (confluence-request-delay)) " "))
   (when (eq? (confluence-auth) 'token)
     (let ((token (read-token)))
       (unless token
