@@ -187,16 +187,16 @@
     "heks-toon": {
       "flake": false,
       "locked": {
-        "lastModified": 1792956774,
-        "narHash": "sha256-gJgw1uCIS9dayvPBGUtFi19qr+EA77ss/DeQYDnVCPk=",
-        "ref": "refs/tags/v0.3.2",
-        "rev": "71c718dd0510c0367d94577ff74cbe08cf7d3668",
-        "revCount": 10,
+        "lastModified": 1793657810,
+        "narHash": "sha256-r9zOhpavZAosXVdjOssML6W4M/z9Sf9xxJDKvq/hPlI=",
+        "ref": "refs/tags/v0.3.3",
+        "rev": "8a6040877a579a94e6f5118d5fb210b296d2b530",
+        "revCount": 12,
         "type": "git",
         "url": "https://codeberg.org/jjba23/heks-toon"
       },
       "original": {
-        "ref": "refs/tags/v0.3.2",
+        "ref": "refs/tags/v0.3.3",
         "type": "git",
         "url": "https://codeberg.org/jjba23/heks-toon"
       }
@@ -375,11 +375,11 @@
         "veritas": "veritas"
       },
       "locked": {
-        "lastModified": 1793611136,
-        "narHash": "sha256-luEVMTGRmXme+gmo7jdUbmHjONsXFotiGspfvXyRMr0=",
+        "lastModified": 1793699172,
+        "narHash": "sha256-0qSFVNxI+zcYaofB9sXm865fSspfpPkl/Sn6r0Mo9/8=",
         "ref": "refs/heads/trunk",
-        "rev": "498335270db73052ae54731059ec3ed4e0092d69",
-        "revCount": 75,
+        "rev": "db0dd360bdb7d8e8c6242fee05639575ae42427e",
+        "revCount": 81,
         "type": "git",
         "url": "https://github.com/jjba23/nix-jointhefreeworld"
       },
@@ -467,16 +467,16 @@
     "sift": {
       "flake": false,
       "locked": {
-        "lastModified": 1793610880,
-        "narHash": "sha256-OMoChFZ5oU/QyTV6PwOmvNxbL4LJgUWelRU73MqRulQ=",
-        "ref": "refs/tags/v1.15.0",
-        "rev": "9f55646749751453fb62fe9fde572b15d4d7b7d9",
-        "revCount": 99,
+        "lastModified": 1793699096,
+        "narHash": "sha256-mKatPxe6MLj0d78e5zyFt1voYeIdg5mVlnoRiZlGUlE=",
+        "ref": "refs/tags/v1.21.0",
+        "rev": "b8802ca0cdc90a260376a067ceffe2a5c34c88db",
+        "revCount": 111,
         "type": "git",
         "url": "https://github.com/jjba23/sift"
       },
       "original": {
-        "ref": "refs/tags/v1.15.0",
+        "ref": "refs/tags/v1.21.0",
         "type": "git",
         "url": "https://github.com/jjba23/sift"
       }
