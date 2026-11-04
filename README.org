@@ -3,12 +3,14 @@
 #+email: jjbigorra@gmail.com
 #+options: toc:nil
 
+#+attr_html: :width 160 :alt Cask & Cons logo
+[[file:logo.svg]]
+
 *My work macOS dotfiles.*
 
 ~cask-and-cons~ provides a convenience CLI tool (~caco~). Naming stems from a pun on Homebrew casks of macOS and the cons cells of Lisp.
 
 [[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://img.shields.io/badge/license-MIT-blue.svg]]
-
 
 ------------------
 
@@ -166,7 +168,6 @@ Guile libraries can now be installed here:
   Compiled files: /opt/homebrew/lib/guile/3.0/site-ccache
       Extensions: /opt/homebrew/lib/guile/3.0/extensions
 
-
 ----------
 
 * The =cask-and-cons= CLI
@@ -259,7 +260,6 @@ Heks Emacs is fully compatible with macOS and GNU/Linux systems
 
 https://codeberg.org/jjba23/heks-emacs
 
-
 #+begin_src shell
 rm -rfv ~/.emacs.d && mkdir ~/.emacs.d
 cp -rfv src/* ~/.emacs.d
@@ -275,7 +275,6 @@ You can also configure it with  a =~/.emacs.d/cask-and-cons-bridge.el=
         heks/clone-dir "~/Hacking/heks-emacs"
         heks/notes-dir "$HOME/Hacking/private-notes")
 #+end_src
-
 
 ---------
 
