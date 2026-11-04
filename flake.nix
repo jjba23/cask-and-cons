@@ -38,6 +38,15 @@
         "mutastructura"
       ];
 
+      # Plain nixpkgs attributes: linters and language servers.
+      nixpkgsWanted = [
+        "shellcheck"
+        "bash-language-server"
+        "yaml-language-server"
+        "nil"
+        "marksman"
+      ];
+
       toolsFor = system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
@@ -50,7 +59,8 @@
           name = "caco-tools";
           # maak and iter-vitae both ship share/resources/help.txt.
           ignoreCollisions = true;
-          paths = map (name: set.${name}) present;
+          paths = map (name: set.${name}) present
+            ++ map (name: pkgs.${name}) nixpkgsWanted;
         };
     in
     {
