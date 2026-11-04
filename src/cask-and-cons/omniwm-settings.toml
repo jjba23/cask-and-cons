@@ -496,15 +496,15 @@ binding = "Unassigned"
 id = "moveToWorkspaceSlot.9"
 
 [[hotkeys]]
-binding = "Control+Option+Tab"
+binding = "Control+Command+Tab"
 id = "workspaceBackAndForth"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Command+Page Down"
 id = "switchWorkspace.next"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Command+Page Up"
 id = "switchWorkspace.previous"
 
 [[hotkeys]]
@@ -568,19 +568,19 @@ binding = "Unassigned"
 id = "centerVisibleColumns"
 
 [[hotkeys]]
-binding = "Control+Option+Shift+Up Arrow"
+binding = "Unassigned"
 id = "moveWindowToWorkspaceUp"
 
 [[hotkeys]]
-binding = "Control+Option+Shift+Down Arrow"
+binding = "Unassigned"
 id = "moveWindowToWorkspaceDown"
 
 [[hotkeys]]
-binding = "Control+Option+Shift+Page Up"
+binding = "Shift+Command+Page Up"
 id = "moveColumnToWorkspaceUp"
 
 [[hotkeys]]
-binding = "Control+Option+Shift+Page Down"
+binding = "Shift+Command+Page Down"
 id = "moveColumnToWorkspaceDown"
 
 [[hotkeys]]
@@ -624,11 +624,11 @@ binding = "Shift+Command+Left Arrow"
 id = "move.left"
 
 [[hotkeys]]
-binding = "Shift+Command+Down Arrow"
+binding = "Unassigned"
 id = "move.down"
 
 [[hotkeys]]
-binding = "Shift+Command+Up Arrow"
+binding = "Unassigned"
 id = "move.up"
 
 [[hotkeys]]
@@ -636,11 +636,11 @@ binding = "Shift+Command+Right Arrow"
 id = "move.right"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Shift+Command+Down Arrow"
 id = "moveWindowDown"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Shift+Command+Up Arrow"
 id = "moveWindowUp"
 
 [[hotkeys]]
@@ -652,19 +652,19 @@ binding = "Unassigned"
 id = "moveWindowUpOrToWorkspaceUp"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Control+Command+Comma"
 id = "consumeWindowIntoColumn"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Control+Command+Period"
 id = "expelWindowFromColumn"
 
 [[hotkeys]]
-binding = "Control+Command+Tab"
+binding = "Control+Option+Right Arrow"
 id = "focusMonitorNext"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Control+Option+Left Arrow"
 id = "focusMonitorPrevious"
 
 [[hotkeys]]
@@ -688,19 +688,19 @@ binding = "Unassigned"
 id = "moveWorkspaceToMonitor.down"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Control+Option+Shift+Left Arrow"
 id = "moveWindowToMonitor.left"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Control+Option+Shift+Right Arrow"
 id = "moveWindowToMonitor.right"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Control+Option+Shift+Up Arrow"
 id = "moveWindowToMonitor.up"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Control+Option+Shift+Down Arrow"
 id = "moveWindowToMonitor.down"
 
 [[hotkeys]]
@@ -712,11 +712,11 @@ binding = "Unassigned"
 id = "toggleNativeFullscreen"
 
 [[hotkeys]]
-binding = "Control+Option+Shift+Left Arrow"
+binding = "Unassigned"
 id = "moveColumn.left"
 
 [[hotkeys]]
-binding = "Control+Option+Shift+Right Arrow"
+binding = "Unassigned"
 id = "moveColumn.right"
 
 [[hotkeys]]
@@ -728,15 +728,15 @@ binding = "Unassigned"
 id = "moveColumn.down"
 
 [[hotkeys]]
-binding = "Control+Option+Home"
+binding = "Control+Command+Home"
 id = "moveColumnToFirst"
 
 [[hotkeys]]
-binding = "Control+Option+End"
+binding = "Control+Command+End"
 id = "moveColumnToLast"
 
 [[hotkeys]]
-binding = "Option+T"
+binding = "Control+Command+T"
 id = "toggleColumnTabbed"
 
 [[hotkeys]]
@@ -748,39 +748,39 @@ binding = "Option+End"
 id = "focusColumnLast"
 
 [[hotkeys]]
-binding = "Control+Option+1"
+binding = "Control+Command+1"
 id = "focusColumn.0"
 
 [[hotkeys]]
-binding = "Control+Option+2"
+binding = "Control+Command+2"
 id = "focusColumn.1"
 
 [[hotkeys]]
-binding = "Control+Option+3"
+binding = "Control+Command+3"
 id = "focusColumn.2"
 
 [[hotkeys]]
-binding = "Control+Option+4"
+binding = "Control+Command+4"
 id = "focusColumn.3"
 
 [[hotkeys]]
-binding = "Control+Option+5"
+binding = "Control+Command+5"
 id = "focusColumn.4"
 
 [[hotkeys]]
-binding = "Control+Option+6"
+binding = "Control+Command+6"
 id = "focusColumn.5"
 
 [[hotkeys]]
-binding = "Control+Option+7"
+binding = "Control+Command+7"
 id = "focusColumn.6"
 
 [[hotkeys]]
-binding = "Control+Option+8"
+binding = "Control+Command+8"
 id = "focusColumn.7"
 
 [[hotkeys]]
-binding = "Control+Option+9"
+binding = "Control+Command+9"
 id = "focusColumn.8"
 
 [[hotkeys]]
@@ -860,7 +860,7 @@ binding = "Command+R"
 id = "cycleSizeForward"
 
 [[hotkeys]]
-binding = "Option+Comma"
+binding = "Shift+Command+R"
 id = "cycleSizeBackward"
 
 [[hotkeys]]
@@ -884,19 +884,19 @@ binding = "Command+F"
 id = "toggleContainerFullPrimarySpan"
 
 [[hotkeys]]
-binding = "Control+Option+F"
+binding = "Control+Command+F"
 id = "expandContainerToAvailablePrimarySpan"
 
 [[hotkeys]]
-binding = "Control+Option+R"
+binding = "Control+Shift+Command+R"
 id = "resetWindowSecondarySpan"
 
 [[hotkeys]]
-binding = "Option+Minus"
+binding = "Control+Command+Minus"
 id = "setContainerPrimarySpan.decrease10Percent"
 
 [[hotkeys]]
-binding = "Option+Equal"
+binding = "Control+Command+Equal"
 id = "setContainerPrimarySpan.increase10Percent"
 
 [[hotkeys]]
@@ -908,15 +908,15 @@ binding = "Unassigned"
 id = "setWindowPrimarySpan.increase10Percent"
 
 [[hotkeys]]
-binding = "Option+Shift+Minus"
+binding = "Control+Shift+Command+Minus"
 id = "setWindowSecondarySpan.decrease10Percent"
 
 [[hotkeys]]
-binding = "Option+Shift+Equal"
+binding = "Control+Shift+Command+Equal"
 id = "setWindowSecondarySpan.increase10Percent"
 
 [[hotkeys]]
-binding = "Option+Shift+B"
+binding = "Control+Command+B"
 id = "balanceSizes"
 
 [[hotkeys]]
@@ -976,11 +976,11 @@ binding = "Unassigned"
 id = "preselectClear"
 
 [[hotkeys]]
-binding = "Control+Option+Space"
+binding = "Control+Command+P"
 id = "openCommandPalette"
 
 [[hotkeys]]
-binding = "Option+Shift+R"
+binding = "Control+Command+R"
 id = "raiseAllFloatingWindows"
 
 [[hotkeys]]
@@ -988,7 +988,7 @@ binding = "Unassigned"
 id = "rescueOffscreenWindows"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Shift+Command+Space"
 id = "toggleFocusedWindowFloating"
 
 [[hotkeys]]
@@ -996,7 +996,7 @@ binding = "Command+K"
 id = "closeFocusedWindow"
 
 [[hotkeys]]
-binding = "Control+Option+M"
+binding = "Control+Command+M"
 id = "openMenuAnywhere"
 
 [[hotkeys]]
@@ -1020,11 +1020,11 @@ binding = "Option+Grave"
 id = "toggleQuakeTerminal"
 
 [[hotkeys]]
-binding = "Option+Shift+L"
+binding = "Control+Command+L"
 id = "toggleWorkspaceLayout"
 
 [[hotkeys]]
-binding = "Option+Shift+O"
+binding = "Control+Command+O"
 id = "toggleOverview"
 
 [[hotkeys]]

@@ -26,6 +26,11 @@
             ,(list 'quote (theme-emacs-theme global-theme))
             heks/clone-dir
             "~/Hacking/heks-emacs"
+            ;; Same keys as on Linux, where Super is Command and Alt is Meta.
+            ns-command-modifier
+            'super
+            ns-alternate-modifier
+            'meta
             heks/notes-dir
             ,notes-directory)))
 
