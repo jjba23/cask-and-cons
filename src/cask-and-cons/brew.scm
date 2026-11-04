@@ -46,6 +46,7 @@
     "fd"
     "bat"
     "eza"
+    "onefetch"
     "htop"
     "wget"
     "pinentry-mac"
