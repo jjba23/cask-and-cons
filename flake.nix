@@ -43,6 +43,8 @@
         "shellcheck"
         "bash-language-server"
         "yaml-language-server"
+        # vscode-json-language-server (plus html/css/eslint servers)
+        "vscode-langservers-extracted"
         "nil"
         "marksman"
       ];
