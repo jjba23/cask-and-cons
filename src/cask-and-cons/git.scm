@@ -38,7 +38,21 @@
 
 (define gitconfig
   `((core (editor . "emacsclient")
-          (excludesfile . "~/.gitignore-global"))
+          (excludesfile . "~/.gitignore-global")
+          ;; Every diff - `git diff', `git log -p', `git show' - is paged
+          ;; through delta, which `caco install-brew' installs as the
+          ;; `git-delta' formula (see brew.scm).  Same setting as on heks-linux.
+          (pager . "delta"))
+    (interactive
+     ;; `git add -p' hands delta a patch, not a pager's input: without this it
+     ;; pages a stream that is already formatted and the hunks come out plain.
+     (diffFilter . "delta --color-only"))
+    ;; n and N move between the sections of a diff instead of scrolling a
+    ;; screen at a time.
+    (delta (navigate . "true"))
+    ;; zdiff3 keeps the common ancestor in view, which is what makes a
+    ;; conflict readable rather than a wall of two versions.
+    (merge (conflictStyle . "zdiff3"))
     (commit (gpgsign . "true"))
     (format (thread . "shallow"))
     (sendemail (thread . "no"))

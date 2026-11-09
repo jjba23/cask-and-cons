@@ -42,6 +42,11 @@
       nixpkgsWanted = [
         "just"
         "shellcheck"
+        # delta, the diff viewer `~/.gitconfig' pages through.  macOS gets it
+        # from the `git-delta' formula in brew.scm; nixpkgs calls the package
+        # `delta' and it covers the Linux systems this flake builds for, where
+        # there is no brew.
+        "delta"
         "bash-language-server"
         "yaml-language-server"
         # vscode-json-language-server (plus html/css/eslint servers)
