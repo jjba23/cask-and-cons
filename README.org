@@ -433,6 +433,15 @@ later look, so =man=, =git=, =journalctl= and every other pager user share
 one set of keys. =PAGER= and =MANPAGER= are =less=, =LESS= is
 =-F -I -M -R=.
 
+Git is the exception: its diffs are paged through =delta= (the =git-delta=
+formula in =brew.scm=, and the =delta= package in the flake's package set for
+machines without brew), exactly as on the Guix desktop. =core.pager= is
+=delta=, =delta.navigate= is =true= so =n= and =N= jump between the sections
+of a diff, and =interactive.diffFilter= is =delta --color-only= so the hunks
+=git add -p= hands over come out coloured rather than plain. Conflicts are
+shown with =merge.conflictStyle = zdiff3=, which keeps the common ancestor in
+view.
+
 | Key          | What it does                                   |
 |--------------+------------------------------------------------|
 | =C-n= =C-p=  | one line down / up                             |
