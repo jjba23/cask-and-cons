@@ -40,6 +40,7 @@
 
       # Plain nixpkgs attributes: linters and language servers.
       nixpkgsWanted = [
+        "just"
         "shellcheck"
         "bash-language-server"
         "yaml-language-server"
