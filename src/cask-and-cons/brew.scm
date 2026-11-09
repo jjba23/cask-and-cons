@@ -75,7 +75,9 @@
     "infracost"
     "httpie"
     "ffmpeg"
-    "gifsicle"))
+    "gifsicle"
+    "mpv"
+    "fastfetch"))
 
 (define brew-casks
   '("iterm2" "the-unarchiver"
