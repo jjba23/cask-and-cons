@@ -315,14 +315,25 @@ curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh
 * Setup SSH config
 
 #+begin_src
-Host github.com
-     Hostname ssh.github.com
-     Port 443
-     IdentityFile ~/.ssh/gitlab_prive
+Host *
+     AddKeysToAgent yes
+     UseKeychain yes
 
 Host codeberg.org
-     Hostname codeberg.org
+     HostName codeberg.org
      IdentityFile ~/.ssh/gitlab_prive
+
+Host wolk-jjba
+     HostName 178.105.172.226
+     User joe
+     Port 2323
+     IdentityFile ~/.ssh/wolk_id
+
+Host wolkenschlosslagerung
+     HostName u600604.your-storagebox.de
+     User u600604
+     Port 23
+     IdentityFile ~/.ssh/wolk_id
 #+end_src
 
 -------
