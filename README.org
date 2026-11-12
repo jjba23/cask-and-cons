@@ -197,6 +197,7 @@ Available tasks:
 - =sync-confluence= — one-off sync of Confluence Cloud to local Markdown (see [[*Confluence mirror]])
 - =login-confluence= — log in to Confluence once in a browser (browser auth mode)
 - =install-confluence= — install the launchd agent that runs =sync-confluence= weekly
+- =install-mcp= — write the MCP server config for Copilot (JetBrains, CLI) and ECA (see [[*MCP servers]])
 
 Install targets are just plain tasks named =install-<target>=; there is no separate =install= sub-command or target argument to parse.
 
@@ -508,6 +509,28 @@ Writes =~/.emacs.d/cask-and-cons-bridge.el= (settings consumed by Heks Emacs). T
 #+begin_src shell
 caco install-emacs-bridge
 #+end_src
+
+----------
+
+* MCP servers
+
+Declared in =src/cask-and-cons/mcp.scm= (=mcp-servers=) and written by =caco install-mcp= to the GitHub Copilot JetBrains plugin (=~/.config/github-copilot/intellij/mcp.json=), the Copilot CLI (=~/.copilot/mcp-config.json=) and ECA, which Heks Emacs uses (=~/.config/eca/config.json=). Override the list with =~/.config/cask-and-cons/mcp-settings.scm=.
+
+Each entry is =(name url (header . env-var) ...)=. A header's value is never written to disk; the generated config references the environment variable instead.
+
+The default server is the Cerebro Grafana MCP (production), see the Confluence page "Cerebro - Grafana MCP server".
+
+1. Create a Grafana service account token, scoped to your team, at https://grafana-technl.cerebro.prd.k8s.ah.technology/org/serviceaccounts.
+2. Export it as =GRAFANA_SERVICE_ACCOUNT_TOKEN= in your shell environment.
+3. Run =caco install-mcp=.
+4. Restart the Copilot CLI and Emacs.
+
+#+begin_src shell
+export GRAFANA_SERVICE_ACCOUNT_TOKEN=...
+caco install-mcp
+#+end_src
+
+The server can modify alerts, folders and dashboards within the token's scope, and everything sent or retrieved is passed to the LLM provider. Scope the token accordingly.
 
 ----------
 

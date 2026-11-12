@@ -18,8 +18,11 @@
 
 (define mcp-servers
   (make-parameter
-   ;;'(("atlassian" . "https://mcp.atlassian.com/v1/mcp"))
-   '()))
+   ;; Each entry is (name url (header . env-var) ...); the token is read
+   ;; from the environment variable, never written to the config.
+   '(("grafana-mcp"
+      "https://grafana-mcp-technl.cerebro.prd.k8s.ah.technology/mcp"
+      ("X-Grafana-Api-Key" . "GRAFANA_SERVICE_ACCOUNT_TOKEN")))))
 
 (define copilot-allowed-urls
   (make-parameter
@@ -71,13 +74,24 @@
                                                     (json i indent)) x) ", ")
                                 "]")))))
 
-(define (servers-json key extra)
+(define (headers-obj headers expand)
+  "Headers as a JSON object, each value being @var{expand} of its env var."
+  `("headers" . (obj ,@(map (lambda (h)
+                              `(,(car h) . ,(expand (cdr h))))
+                            headers))))
+
+(define (servers-json key extra expand)
   "Build the document with servers under @var{key}; @var{extra} is a list of
 additional (name . value) pairs merged into each server entry."
   (string-append
    (json `(obj (,key . (obj ,@(map (lambda (s)
                                      `(,(car s) . (obj ("type" . "http")
-                                                       ("url" . ,(cdr s))
+                                                       ("url" . ,(cadr s))
+                                                       ,@(if (null? (cddr s))
+                                                           '()
+                                                           (list (headers-obj
+                                                                  (cddr s)
+                                                                  expand)))
                                                        ,@extra)))
                                    (mcp-servers)))))
          0)
@@ -93,11 +107,13 @@ additional (name . value) pairs merged into each server entry."
   ;; GitHub Copilot for JetBrains
   (write-json! (format #f "~a/.config/github-copilot/intellij" (home))
                "mcp.json"
-               (servers-json "servers" '()))
+               (servers-json "servers" '()
+                             (lambda (v) (string-append "${env:" v "}"))))
   ;; GitHub Copilot CLI
   (write-json! (format #f "~a/.copilot" (home))
                "mcp-config.json"
-               (servers-json "mcpServers" '(("tools" . ("*")))))
+               (servers-json "mcpServers" '(("tools" . ("*")))
+                             (lambda (v) (string-append "${" v "}"))))
   ;; Copilot CLI user settings.  Mouse support is off so the terminal keeps
   ;; selection and copy/paste to itself.
   (write-json! (format #f "~a/.copilot" (home))
@@ -112,7 +128,13 @@ additional (name . value) pairs merged into each server entry."
                "config.json"
                (json `(obj ("mcpServers"
                             . (obj ,@(map (lambda (s)
-                                            `(,(car s) . (obj ("url" . ,(cdr s)))))
+                                            `(,(car s) . (obj ("url" . ,(cadr s))
+                                                              ,@(if (null? (cddr s))
+                                                                  '()
+                                                                  (list (headers-obj
+                                                                         (cddr s)
+                                                                         (lambda (v)
+                                                                           (string-append "${env:" v "}"))))))))
                                           (mcp-servers)))))
                      0))
   (log-success "Installed MCP configuration"))
