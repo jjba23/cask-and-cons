@@ -516,7 +516,7 @@ caco install-emacs-bridge
 
 Declared in =src/cask-and-cons/mcp.scm= (=mcp-servers=) and written by =caco install-mcp= to the GitHub Copilot JetBrains plugin (=~/.config/github-copilot/intellij/mcp.json=), the Copilot CLI (=~/.copilot/mcp-config.json=) and ECA, which Heks Emacs uses (=~/.config/eca/config.json=). Override the list with =~/.config/cask-and-cons/mcp-settings.scm=.
 
-Each entry is =(name url (header . env-var) ...)=. A header's value is never written to disk; the generated config references the environment variable instead.
+Each entry is =(name url (header . env-var) ...)=. A header's value is never written to disk; the generated config references the environment variable instead. A server whose environment variable is unset or empty is skipped with a warning, so =caco install-mcp= never produces a config with a broken server; export the variable and re-run it to enable the server.
 
 The default server is the Cerebro Grafana MCP (production), see the Confluence page "Cerebro - Grafana MCP server".
 

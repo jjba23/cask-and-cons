@@ -30,6 +30,21 @@
      "https://api.github.com"
      "https://docs.github.com")))
 
+(define (active-mcp-servers)
+  "The servers of @var{mcp-servers} whose header env vars are all set;
+the others are skipped with a warning instead of emitting a broken config."
+  (filter (lambda (s)
+            (let ((missing (filter (lambda (h)
+                                     (let ((v (getenv (cdr h))))
+                                       (or (not v) (string-null? v))))
+                                   (cddr s))))
+              (when (pair? missing)
+                (log-warning "Skipping MCP server ~a: ~a not set (export it and re-run install-mcp)"
+                             (car s)
+                             (string-join (map cdr missing) ", ")))
+              (null? missing)))
+          (mcp-servers)))
+
 (define (home)
   (or (getenv "HOME") "/tmp"))
 
@@ -93,7 +108,7 @@ additional (name . value) pairs merged into each server entry."
                                                                   (cddr s)
                                                                   expand)))
                                                        ,@extra)))
-                                   (mcp-servers)))))
+                                   (active-mcp-servers)))))
          0)
    "\n"))
 
@@ -135,6 +150,6 @@ additional (name . value) pairs merged into each server entry."
                                                                          (cddr s)
                                                                          (lambda (v)
                                                                            (string-append "${env:" v "}"))))))))
-                                          (mcp-servers)))))
+                                          (active-mcp-servers)))))
                      0))
   (log-success "Installed MCP configuration"))
