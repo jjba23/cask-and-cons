@@ -1,0 +1,48 @@
+#+TITLE: Storing the Grafana MCP token in the macOS Keychain
+
+The Grafana MCP server needs an API token. Rather than keeping it in plaintext
+in =~/.config/eca/config.json= or in an environment variable, it lives in the
+macOS Keychain and is read only when the MCP server process starts.
+
+* Store the token (once)
+
+#+begin_src sh
+security add-generic-password -U -a "$USER" -s grafana-mcp-token -w
+#+end_src
+
+=-w= without a value prompts for the token, so it never lands in shell history.
+=-U= updates the entry if it already exists (use this to rotate).
+
+* ECA configuration
+
+In =~/.config/eca/config.json= the remote MCP server is started through a
+small stdio proxy (=mcp-remote=, needs Node/npx). The token is fetched from the
+Keychain inside the launched process only:
+
+#+begin_src json
+{
+  "mcpServers": {
+    "grafana-mcp": {
+      "command": "sh",
+      "args": [
+        "-c",
+        "GRAFANA_TOKEN=$(security find-generic-password -s grafana-mcp-token -w) exec npx -y mcp-remote https://grafana-mcp-technl.cerebro.prd.k8s.ah.technology/mcp --header \"X-Grafana-Api-Key:$GRAFANA_TOKEN\""
+      ]
+    }
+  }
+}
+#+end_src
+
+No token appears in the config file or in your shell environment.
+
+* Rotating or removing
+
+- Rotate: re-run the =add-generic-password -U= command with the new token, then restart ECA.
+- Remove: =security delete-generic-password -s grafana-mcp-token=
+- Check it exists (without printing it): =security find-generic-password -s grafana-mcp-token >/dev/null && echo ok=
+
+* Notes
+
+- The first time, macOS may ask to allow =security= to access the item; choose "Always Allow".
+- The token is still visible to the process itself and briefly in the =mcp-remote= argument list (=ps=) of your own user. Use a Viewer-only service account with an expiry to limit exposure.
+- Never commit the token or a config that contains it.
