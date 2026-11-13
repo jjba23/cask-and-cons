@@ -55,6 +55,7 @@
     "yq"
     "tmux"
     "mongosh"
+    "ollama"
     "mas"
     "gnu-sed"
     "gawk"
