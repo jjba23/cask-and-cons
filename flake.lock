@@ -3,16 +3,16 @@
     "araneola": {
       "flake": false,
       "locked": {
-        "lastModified": 1793287803,
-        "narHash": "sha256-5vk1ZSoVGWGmN+fkr111ORygD+twAKfZW2+RV+PbfkY=",
-        "ref": "refs/tags/v0.2.0",
-        "rev": "f64da51143d0f4ea0de16ba1a0ef92a7b0c2c322",
-        "revCount": 63,
+        "lastModified": 1794340726,
+        "narHash": "sha256-yNfduz4SnvTzNHIPndhrosAcf52/CuLfelrWh35TaTg=",
+        "ref": "refs/tags/v0.2.4",
+        "rev": "f62e3112d7dc19d1cfbdd8c2e9cdc990c6bcb441",
+        "revCount": 69,
         "type": "git",
         "url": "https://github.com/jjba23/araneola"
       },
       "original": {
-        "ref": "refs/tags/v0.2.0",
+        "ref": "refs/tags/v0.2.4",
         "type": "git",
         "url": "https://github.com/jjba23/araneola"
       }
@@ -20,16 +20,16 @@
     "bewaking": {
       "flake": false,
       "locked": {
-        "lastModified": 1793868350,
-        "narHash": "sha256-n8nHbXSTRKC3hMdgfdPcw0V2bbye+N73+2luXepdEew=",
-        "ref": "refs/tags/v0.5.1",
-        "rev": "88e76faf64d2d8654428c75635687ab765cac3ab",
-        "revCount": 108,
+        "lastModified": 1794340758,
+        "narHash": "sha256-2plikxnErlbG/VpV92Ul41f7QwzLhhITsXvGeT2XnG0=",
+        "ref": "refs/tags/v0.5.5",
+        "rev": "24e64079cec96692f804ab9fecc42d80115cdcaa",
+        "revCount": 114,
         "type": "git",
         "url": "https://github.com/jjba23/bewaking"
       },
       "original": {
-        "ref": "refs/tags/v0.5.1",
+        "ref": "refs/tags/v0.5.5",
         "type": "git",
         "url": "https://github.com/jjba23/bewaking"
       }
@@ -61,16 +61,16 @@
     "ggg": {
       "flake": false,
       "locked": {
-        "lastModified": 1792852373,
-        "narHash": "sha256-kp6anuNVk3OY9bIZAr+mOGoMFCEv455iojsZIMxvn90=",
-        "ref": "refs/tags/v0.16.4",
-        "rev": "61b93146125079af97a172908b69adcef3663d17",
-        "revCount": 215,
+        "lastModified": 1794340022,
+        "narHash": "sha256-6MdcP20bNluRCXSc/Mgh1Z/bKB/a+Ywj+kROXtHUMQY=",
+        "ref": "refs/tags/v0.22.2",
+        "rev": "d084d46f23ca207acd6b3b96742c622f77d03ec4",
+        "revCount": 254,
         "type": "git",
         "url": "https://github.com/jjba23/ggg"
       },
       "original": {
-        "ref": "refs/tags/v0.16.4",
+        "ref": "refs/tags/v0.22.2",
         "type": "git",
         "url": "https://github.com/jjba23/ggg"
       }
@@ -187,16 +187,16 @@
     "heks-toon": {
       "flake": false,
       "locked": {
-        "lastModified": 1793657810,
-        "narHash": "sha256-r9zOhpavZAosXVdjOssML6W4M/z9Sf9xxJDKvq/hPlI=",
-        "ref": "refs/tags/v0.3.3",
-        "rev": "8a6040877a579a94e6f5118d5fb210b296d2b530",
-        "revCount": 12,
+        "lastModified": 1794341292,
+        "narHash": "sha256-TDhZF4YxULay1+4hhnevuBKqBvHH3uS36yR/h/pPk1o=",
+        "ref": "refs/tags/v0.3.6",
+        "rev": "8c619782a4ca7a83fbecb9bded3aac5f732a678e",
+        "revCount": 16,
         "type": "git",
         "url": "https://codeberg.org/jjba23/heks-toon"
       },
       "original": {
-        "ref": "refs/tags/v0.3.3",
+        "ref": "refs/tags/v0.3.6",
         "type": "git",
         "url": "https://codeberg.org/jjba23/heks-toon"
       }
@@ -204,16 +204,16 @@
     "hygguile": {
       "flake": false,
       "locked": {
-        "lastModified": 1793832424,
-        "narHash": "sha256-MiaIGdNjzRt+PCZwoKnddB7d9SM4uUctlu2lTv8UOJ0=",
-        "ref": "refs/tags/v2.8.1",
-        "rev": "c24084b599cc1e7c1437ce4d61f1f2844ef20aef",
-        "revCount": 437,
+        "lastModified": 1794340035,
+        "narHash": "sha256-TIed4VNPDiv/RDyfNkxRJpkLeWgJRmRN/DdTb9ZyhOI=",
+        "ref": "refs/tags/v2.8.4",
+        "rev": "c16ff1fc87d2a28ba5d1f04e6c509178fd41eb10",
+        "revCount": 443,
         "type": "git",
         "url": "https://github.com/jjba23/hygguile"
       },
       "original": {
-        "ref": "refs/tags/v2.8.1",
+        "ref": "refs/tags/v2.8.4",
         "type": "git",
         "url": "https://github.com/jjba23/hygguile"
       }
@@ -221,16 +221,16 @@
     "iter-vitae": {
       "flake": false,
       "locked": {
-        "lastModified": 1793659582,
-        "narHash": "sha256-gpoOAEobbbzMAnFcBZ0sLurgtd0bPnPO5LlwhgyPURA=",
-        "ref": "refs/tags/v1.4.0",
-        "rev": "f323b77649a7ab25393a616614fe08b3578caf9f",
-        "revCount": 265,
+        "lastModified": 1794491578,
+        "narHash": "sha256-TQ+2Uo+XEBCVGRHZ0rILRSaSIzc3MEonvMDUk1RIVG4=",
+        "ref": "refs/tags/v1.5.0",
+        "rev": "e1cc24d26b4f98c4015ac542d97f7ad494b97527",
+        "revCount": 273,
         "type": "git",
         "url": "https://github.com/jjba23/iter-vitae"
       },
       "original": {
-        "ref": "refs/tags/v1.4.0",
+        "ref": "refs/tags/v1.5.0",
         "type": "git",
         "url": "https://github.com/jjba23/iter-vitae"
       }
@@ -238,11 +238,11 @@
     "kracht": {
       "flake": false,
       "locked": {
-        "lastModified": 1793874693,
-        "narHash": "sha256-NvCnmeiDUMqHuaK9SCTfeGqpKcVibYON5nDFTVrZ0GY=",
+        "lastModified": 1794341042,
+        "narHash": "sha256-7L1iXZc448aMw7oTuI2kN0NyGaHUbPdiBb2zq6MTRW0=",
         "ref": "refs/heads/trunk",
-        "rev": "d473cde642b0e03078c66c828e6578ae28073d1c",
-        "revCount": 132,
+        "rev": "200c4cbea84b84e87a56f6667d98a5d56c011cac",
+        "revCount": 136,
         "type": "git",
         "url": "https://codeberg.org/jjba23/kracht"
       },
@@ -254,16 +254,16 @@
     "lambdock": {
       "flake": false,
       "locked": {
-        "lastModified": 1793882404,
-        "narHash": "sha256-8A25eNV//RuREN7AUZyXJCgyg+mP/A2jbwJ4mQPRupw=",
-        "ref": "refs/tags/v1.2.1",
-        "rev": "b0e09779104ffef0d054550ccfe8e84961b6ea61",
-        "revCount": 509,
+        "lastModified": 1794432783,
+        "narHash": "sha256-BjvmPTkDres0uOola1NEuPCLpRFwZ9ISYwM3L/LmDh8=",
+        "ref": "refs/tags/v1.2.7",
+        "rev": "16ed47ea8697a965dd3435ce58db0f820b1fa7e7",
+        "revCount": 519,
         "type": "git",
         "url": "https://github.com/jjba23/lambdock"
       },
       "original": {
-        "ref": "refs/tags/v1.2.1",
+        "ref": "refs/tags/v1.2.7",
         "type": "git",
         "url": "https://github.com/jjba23/lambdock"
       }
@@ -271,16 +271,16 @@
     "lenkesamler": {
       "flake": false,
       "locked": {
-        "lastModified": 1792852620,
-        "narHash": "sha256-AhM+DoTkC/B5XoJ7Nkuue1kEY0bRRYZqoCUB4jo3daI=",
-        "ref": "refs/tags/v0.0.5",
-        "rev": "1a0e42f41a01aba0adae94553f51835fc2051f54",
-        "revCount": 85,
+        "lastModified": 1794341080,
+        "narHash": "sha256-bsKM0KslXQJah9MhGaVeVkSrRNP7lOkNlopB/CKVD0U=",
+        "ref": "refs/tags/v0.0.9",
+        "rev": "e8d1a4a15090ac4c18a0daec7eb2c82afdaf0c32",
+        "revCount": 95,
         "type": "git",
         "url": "https://codeberg.org/jjba23/lenkesamler"
       },
       "original": {
-        "ref": "refs/tags/v0.0.5",
+        "ref": "refs/tags/v0.0.9",
         "type": "git",
         "url": "https://codeberg.org/jjba23/lenkesamler"
       }
@@ -321,16 +321,16 @@
     "modusregel": {
       "flake": false,
       "locked": {
-        "lastModified": 1794083600,
-        "narHash": "sha256-qXnQFn+pfp5zAMcSNxab/JCefVREx1/LlrgnqXLJdIQ=",
-        "ref": "refs/tags/v0.9.0",
-        "rev": "ffdb8cb6e79b3d1a062c2f4d49a152af32a83141",
-        "revCount": 99,
+        "lastModified": 1794340784,
+        "narHash": "sha256-6I58/dzBfSBW7Onb05MidZVy0T2nwqOoJGSqGUaazkg=",
+        "ref": "refs/tags/v0.9.3",
+        "rev": "a7c3bae1e501aad53dd63e2388fda2dcc4d92647",
+        "revCount": 104,
         "type": "git",
         "url": "https://github.com/jjba23/modusregel"
       },
       "original": {
-        "ref": "refs/tags/v0.9.0",
+        "ref": "refs/tags/v0.9.3",
         "type": "git",
         "url": "https://github.com/jjba23/modusregel"
       }
@@ -338,16 +338,16 @@
     "mutastructura": {
       "flake": false,
       "locked": {
-        "lastModified": 1794084517,
-        "narHash": "sha256-ZApGhbRGCshgatC6jL8NEoskbxqgwZLN8T+KGq894Z4=",
-        "ref": "refs/tags/v0.9.6",
-        "rev": "7eecaf9218bd9eb36ed612a2482cf438cd9200bb",
-        "revCount": 97,
+        "lastModified": 1794340837,
+        "narHash": "sha256-E4HLBr3SJnTFdwIcwkhRBIae43MPWaq2FAOGS1Tsoq8=",
+        "ref": "refs/tags/v0.9.9",
+        "rev": "7aaf26173e7547cb7ed91a76664a6ac28740741c",
+        "revCount": 102,
         "type": "git",
         "url": "https://github.com/jjba23/mutastructura"
       },
       "original": {
-        "ref": "refs/tags/v0.9.6",
+        "ref": "refs/tags/v0.9.9",
         "type": "git",
         "url": "https://github.com/jjba23/mutastructura"
       }
@@ -375,11 +375,11 @@
         "veritas": "veritas"
       },
       "locked": {
-        "lastModified": 1794176884,
-        "narHash": "sha256-s2zY4lFf/MkHdeRanXfQwXuw6uaNkUHMrXoXx/S9GJk=",
+        "lastModified": 1794494878,
+        "narHash": "sha256-Vvb4uUshLxfh7EuhzMEnmLkuBsXGPf0/4kcnURxiKXw=",
         "ref": "refs/heads/trunk",
-        "rev": "6ec42fd89b3595f04e9af3ef3b469f0827d6ffa3",
-        "revCount": 99,
+        "rev": "ae4204ba61c64a82dd96b089460a58869515cd9b",
+        "revCount": 108,
         "type": "git",
         "url": "https://github.com/jjba23/nix-jointhefreeworld"
       },
@@ -407,16 +407,16 @@
     "olive-css": {
       "flake": false,
       "locked": {
-        "lastModified": 1794067080,
-        "narHash": "sha256-7npMFRUtLaDS3m3USsTTyjwRKWoJpaVib5VspoThqwc=",
-        "ref": "refs/tags/v1.1.0",
-        "rev": "aa15d8c1a3053355cd9721d788f46a10982c8a31",
-        "revCount": 123,
+        "lastModified": 1794340986,
+        "narHash": "sha256-U2KBn/Amt3t9fHFCvxMoS+EukVsyG0OHSQUQgmW1uYw=",
+        "ref": "refs/tags/v1.1.3",
+        "rev": "f593b4a4833f27b6e18867c70bc48c80ecacc794",
+        "revCount": 128,
         "type": "git",
         "url": "https://github.com/jjba23/olive-css"
       },
       "original": {
-        "ref": "refs/tags/v1.1.0",
+        "ref": "refs/tags/v1.1.3",
         "type": "git",
         "url": "https://github.com/jjba23/olive-css"
       }
@@ -424,16 +424,16 @@
     "orgwebalchemy": {
       "flake": false,
       "locked": {
-        "lastModified": 1792852678,
-        "narHash": "sha256-uuRU+eic5+4AjfZf/MFiund1LyTLfDFIJhk2++u1G08=",
-        "ref": "refs/tags/v1.2.4",
-        "rev": "7f2c3c8f25b44cf0eda3e153166c3541bc3bb346",
-        "revCount": 129,
+        "lastModified": 1794341117,
+        "narHash": "sha256-IEqpqXZEe9hQFCgsdFH5zTSf/Dg2FsEhA/CiUpkas0c=",
+        "ref": "refs/tags/v1.2.8",
+        "rev": "452539f31e8f02a712ac84e427807988830cd599",
+        "revCount": 138,
         "type": "git",
         "url": "https://codeberg.org/jjba23/orgwebalchemy"
       },
       "original": {
-        "ref": "refs/tags/v1.2.4",
+        "ref": "refs/tags/v1.2.8",
         "type": "git",
         "url": "https://codeberg.org/jjba23/orgwebalchemy"
       }
@@ -467,16 +467,16 @@
     "sift": {
       "flake": false,
       "locked": {
-        "lastModified": 1794134050,
-        "narHash": "sha256-Fs4/Ywgi03F2sExSHfGQ1m1yinl+VgsIXrBY2XXBxrM=",
-        "ref": "refs/tags/v1.24.3",
-        "rev": "993342a08328e64830ea362871f991f06676d909",
-        "revCount": 126,
+        "lastModified": 1794493873,
+        "narHash": "sha256-vcskGM73tML72Jm0S0Jf3ObUcD5i9cSyz+nvXuk9AVI=",
+        "ref": "refs/tags/v1.27.2",
+        "rev": "9ef9819a086a323e8ac5e33665cd5b662d656387",
+        "revCount": 149,
         "type": "git",
         "url": "https://github.com/jjba23/sift"
       },
       "original": {
-        "ref": "refs/tags/v1.24.3",
+        "ref": "refs/tags/v1.27.2",
         "type": "git",
         "url": "https://github.com/jjba23/sift"
       }
@@ -484,16 +484,16 @@
     "tekengrootte-el": {
       "flake": false,
       "locked": {
-        "lastModified": 1794045580,
-        "narHash": "sha256-kRaWNIM6ruQEUsDZdM31AJSZeBEKYWZUQTGiYBdWKOI=",
-        "ref": "refs/tags/v0.4.0",
-        "rev": "3781e0fbce5b8f62e5c6ca3ea7a57ee94e164d5b",
-        "revCount": 32,
+        "lastModified": 1794340942,
+        "narHash": "sha256-Ki0fDqNXVERipoKwj1U2IsqfMeHsoBKzItAWnBWY5W4=",
+        "ref": "refs/tags/v0.4.4",
+        "rev": "817fde8167b994b9d38c83a79d1b1953f072542a",
+        "revCount": 37,
         "type": "git",
         "url": "https://github.com/jjba23/tekengrootte.el"
       },
       "original": {
-        "ref": "refs/tags/v0.4.0",
+        "ref": "refs/tags/v0.4.4",
         "type": "git",
         "url": "https://github.com/jjba23/tekengrootte.el"
       }
@@ -501,16 +501,16 @@
     "veritas": {
       "flake": false,
       "locked": {
-        "lastModified": 1793887632,
-        "narHash": "sha256-67IEvbp0uQW9mvOM28nuvwmYA01CjpHFfkwr+St85Ho=",
-        "ref": "refs/tags/v1.4.0",
-        "rev": "78cc0cc1865c95c181477a1564005e3dce9c8fd0",
-        "revCount": 295,
+        "lastModified": 1794340563,
+        "narHash": "sha256-t5enTczT/lsTycLthucyRtHq7rkxefHe62GO19hZiGY=",
+        "ref": "refs/tags/v1.4.3",
+        "rev": "49f43113632fa80188b3897b3f3d755d8dbf6879",
+        "revCount": 300,
         "type": "git",
         "url": "https://github.com/jjba23/veritas"
       },
       "original": {
-        "ref": "refs/tags/v1.4.0",
+        "ref": "refs/tags/v1.4.3",
         "type": "git",
         "url": "https://github.com/jjba23/veritas"
       }
