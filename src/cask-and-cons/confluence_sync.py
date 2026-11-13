@@ -5,7 +5,7 @@
 # ///
 """Mirror Confluence Cloud spaces to local Markdown files.
 
-Driven by environment variables set by `caco' (see confluence.scm):
+Driven by environment variables set by `maak' (see confluence.scm):
   CONFLUENCE_BASE_URL   https://acme.atlassian.net
   CONFLUENCE_AUTH       "browser" (reuse a logged-in Chrome profile) or "token"
   CONFLUENCE_PROFILE    Chrome profile directory        (browser mode)
@@ -603,5 +603,5 @@ if __name__ == "__main__":
     try:
         login() if cmd == "login" else sync()
     except AuthError as e:
-        notify("Session expired - run: caco login-confluence")
-        sys.exit(f"Not authenticated ({e}). Run `caco login-confluence`.")
+        notify("Session expired - run: maak login-confluence")
+        sys.exit(f"Not authenticated ({e}). Run `maak login-confluence`.")

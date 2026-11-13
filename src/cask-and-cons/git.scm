@@ -40,7 +40,7 @@
   `((core (editor . "emacsclient")
           (excludesfile . "~/.gitignore-global")
           ;; Every diff - `git diff', `git log -p', `git show' - is paged
-          ;; through delta, which `caco install-brew' installs as the
+          ;; through delta, which `maak install-brew' installs as the
           ;; `git-delta' formula (see brew.scm).  Same setting as on heks-linux.
           (pager . "delta"))
     (interactive

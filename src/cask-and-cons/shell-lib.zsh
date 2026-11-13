@@ -499,10 +499,10 @@ glog () {
 }
 
 
-# caco: available everywhere; navigates to the repo, then runs the task.
+# caco: run a maak task of the cask-and-cons repo from anywhere, without
+# leaving the current directory.
 caco () {
-    cd ~/Hacking/cask-and-cons || return
-    ./caco "$@"
+    maak --no-print-directory -C ~/Hacking/cask-and-cons "$@"
 }
 
 

@@ -34,7 +34,7 @@
 
 (define (skhd-config)
   (string-append
-   "# auto-generated file! Regenerate with `./caco install-skhd`.\n"
+   "# auto-generated file! Regenerate with `maak install-skhd`.\n"
    "# Source of truth: src/cask-and-cons/skhd.scm\n\n"
    (string-join (map (lambda (b)
                        (format #f "~a : ~a" (first b) (second b)))

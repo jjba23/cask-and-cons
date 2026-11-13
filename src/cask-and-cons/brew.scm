@@ -19,7 +19,8 @@
 (define brew-taps
   '("koekeishiya/formulae"
     "d12frosted/emacs-plus"
-    "hashicorp/tap"))
+    "hashicorp/tap"
+    "mongodb/brew"))
 
 (define brew-formulae
   '("jq" "fzf" "pandoc" "rsync"
@@ -55,6 +56,7 @@
     "yq"
     "tmux"
     "mongosh"
+    "mongodb/brew/mongodb-database-tools"
     "ollama"
     "mas"
     "gnu-sed"

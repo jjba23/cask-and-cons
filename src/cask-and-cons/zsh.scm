@@ -312,7 +312,7 @@ else @file{~/.config}."
 (define zshrc-config
   (string-append
    "# cask-and-cons --- ZSH configuration\n"
-   "# auto-generated file! Regenerate with `./caco install-zsh`.\n"
+   "# auto-generated file! Regenerate with `maak install-zsh`.\n"
    "# Sources of truth: src/cask-and-cons/zsh.scm (machine data) and\n"
    "# src/cask-and-cons/shell-lib.zsh (shared prompt + helpers).\n"
    "\n"

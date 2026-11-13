@@ -6,7 +6,7 @@
 
 ;;; Declarative local Markdown mirror of Confluence Cloud, refreshed weekly.
 ;;;
-;;; `./caco sync-confluence' does one sync; `./caco install-confluence' writes
+;;; `maak sync-confluence' does one sync; `maak install-confluence' writes
 ;;; a launchd agent that runs it every week (Monday 09:00 by default; launchd
 ;;; also runs missed jobs after wake).  The work is done by confluence_sync.py
 ;;; (run through `uv', which fetches playwright on first use).
@@ -14,7 +14,7 @@
 ;;; Two ways to authenticate, picked by `confluence-auth':
 ;;;
 ;;; 'browser (default) -- for organisations that block API tokens.  Run
-;;; `./caco login-confluence' once: it opens Chrome on a dedicated profile,
+;;; `maak login-confluence' once: it opens Chrome on a dedicated profile,
 ;;; you log in through SSO/MFA, and the session stays in that profile.  Syncs
 ;;; then run headless in the same profile and reuse its cookies.  When the
 ;;; session expires the sync fails with a macOS notification; log in again.
@@ -73,7 +73,7 @@
 
 (define label "org.jointhefreeworld.caco.confluence-sync")
 
-;;; The `caco' launcher exports CACO_DIR (the repo root).
+;;; The `maak.scm' file exports CACO_DIR (the repo root).
 (define (project-dir)
   (or (getenv "CACO_DIR") (getcwd)))
 
@@ -138,13 +138,15 @@
         (sched (confluence-schedule)))
     (string-append
      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-     "<!-- auto-generated file! Regenerate with `./caco install-confluence`. -->\n"
+     "<!-- auto-generated file! Regenerate with `maak install-confluence`. -->\n"
      "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" "
      "\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
      "<plist version=\"1.0\"><dict>\n"
      "  <key>Label</key><string>" label "</string>\n"
      "  <key>ProgramArguments</key><array>\n"
-     "    <string>" (project-dir) "/caco</string>\n"
+     "    <string>" (home) "/.nix-profile/bin/maak</string>\n"
+     "    <string>-C</string>\n"
+     "    <string>" (project-dir) "</string>\n"
      "    <string>sync-confluence</string>\n"
      "  </array>\n"
      "  <key>EnvironmentVariables</key><dict>\n"

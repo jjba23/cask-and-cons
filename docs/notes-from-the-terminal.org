@@ -46,7 +46,7 @@ Run ~n help~ any time for the list.  Tab completes the subcommands and topic nam
 ~n~ is part of the ZSH configuration that cask-and-cons generates:
 
 #+begin_src sh
-./caco install-zsh      # writes ~/.zshrc (and the pager keymap)
+maak install-zsh      # writes ~/.zshrc (and the pager keymap)
 exec zsh                # or open a new terminal
 n help
 #+end_src
@@ -55,7 +55,7 @@ How it gets there, so you can change it:
 
 - The helpers are plain zsh in =src/cask-and-cons/notes.zsh=.
 - =src/cask-and-cons/zsh.scm= reads that file and splices it into =~/.zshrc= right after the shared shell library (=shell-lib.zsh=), under the heading =# ---- notes (the `n' command) ----=, together with =export NOTES_DIR=…=.
-- The notes directory is defined *once*, as =notes-directory= in =src/cask-and-cons/user-settings.scm=.  The Emacs bridge (=./caco install-emacs-bridge=) takes ~heks/notes-dir~ from the same value, so the two halves cannot point at different places.  =$HOME= in it is understood by both.
+- The notes directory is defined *once*, as =notes-directory= in =src/cask-and-cons/user-settings.scm=.  The Emacs bridge (=maak install-emacs-bridge=) takes ~heks/notes-dir~ from the same value, so the two halves cannot point at different places.  =$HOME= in it is understood by both.
 
 You do not need cask-and-cons to use ~n~.  Copy =notes.zsh= anywhere, ~source~ it from your own =~/.zshrc= after defining =__cc_has= (a one-line "is this command available" helper: =__cc_has () { command -v "$1" >/dev/null 2>&1; }=) and set ~NOTES_DIR~.
 
@@ -283,7 +283,7 @@ A git pre-commit hook that runs ~n index~ and adds =**/index.org= keeps a reposi
 | ~VISUAL~ / ~EDITOR~ | your own | Used when there is no Emacs server and ~NOTES_EDITOR~ is unset. |
 | ~CC_NOTES_ACRONYMS~ | AH, HTTP, APIs, … | An associative array in =notes.zsh=: folder word → how it is written in index titles. |
 
-To change where the notes live, edit =notes-directory= in =user-settings.scm= and reinstall both halves in one go (tasks chain with a comma): =./caco install-zsh,install-emacs-bridge=.
+To change where the notes live, edit =notes-directory= in =user-settings.scm= and reinstall both halves in one go (tasks chain with a comma): =maak install-zsh,install-emacs-bridge=.
 
 * Recipes
 :PROPERTIES:
@@ -384,7 +384,7 @@ Honest list of what the shell does /not/ do, so that you know when to reach for 
 :CUSTOM_ID: trouble
 :END:
 
-*~n: no notes directory (NOTES_DIR=…)~.*  The directory does not exist.  Check ~echo $NOTES_DIR~; =user-settings.scm= has the source of truth; rerun ~./caco install-zsh~.
+*~n: no notes directory (NOTES_DIR=…)~.*  The directory does not exist.  Check ~echo $NOTES_DIR~; =user-settings.scm= has the source of truth; rerun ~maak install-zsh~.
 
 *~n: command not found~ after installing.*  Open a new shell (or ~exec zsh~); the function is defined by =~/.zshrc=.
 

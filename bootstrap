@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# cask-and-cons bootstrap: get `maak' on a fresh machine.
+#
+# Every task of this repo runs through maak (see maak.scm), and maak itself
+# comes from the Nix profile this repo's flake.nix describes.  This script
+# installs that profile, which is the one step maak cannot do for itself.
+# It is safe to run again; it replaces the profile entry.
+#
+# Needs: Nix (https://nixos.org/download).
+set -euo pipefail
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+for nix in "$(command -v nix || true)" /nix/var/nix/profiles/default/bin/nix; do
+    [ -x "$nix" ] && break
+    nix=""
+done
+if [ -z "$nix" ]; then
+    echo "bootstrap: Nix not found; install it from https://nixos.org/download" >&2
+    exit 1
+fi
+
+flags=(--extra-experimental-features "nix-command flakes")
+"$nix" "${flags[@]}" profile remove caco-tools 2>/dev/null || true
+"$nix" "${flags[@]}" profile install "path:$DIR#caco-tools"
+
+echo
+echo "maak is installed: $("$HOME/.nix-profile/bin/maak" --version | head -1)"
+echo "Open a new shell (or add ~/.nix-profile/bin to PATH), then run: maak"
