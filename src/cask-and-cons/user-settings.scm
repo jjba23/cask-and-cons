@@ -31,7 +31,7 @@
 
 ;;; The one place that picks the colour scheme: a name from `theme-names'.
 ;;; Emacs and WezTerm both follow it.  Change it here to retheme every consumer.
-(define global-theme 'modus-operandi-tinted)
+(define global-theme 'modus-vivendi-tinted)
 
 ;;; The palettes come from heks-linux (codeberg.org/jjba23/heks-linux), so a
 ;;; theme looks the same on both systems.  Each row is
