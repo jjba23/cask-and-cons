@@ -13,7 +13,7 @@
 
 (define kotlin-lsp-release
   ;; JetBrains Kotlin Language Server release; bump this to update.
-  "263.7084.0")
+  "271.2085.0")
 
 (define (home-path . parts)
   "Return an absolute path made of the user's home directory and @var{parts}."
