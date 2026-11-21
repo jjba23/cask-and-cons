@@ -34,7 +34,7 @@
   guile-3.0
   ;; `texi2any' renders the Texinfo dokgen writes into the HTML page; dokgen
   ;; writes the Texinfo, not the page.
-  texinfo
+  (specification->package "texinfo")
   ;; guile-config and guile-lib are propagated by guile-dokgen already; naming
   ;; guile-lib is harmless and keeps the environment honest about what the
   ;; modules are read with.
