@@ -16,6 +16,12 @@
 ;;
 ;; The exports are the task list.  Each task is one thin procedure over a
 ;; module in src/cask-and-cons/, which is where the work is done.
+;;
+;; `docs' and `diagrams' are the exception to "the work is in src/": they are
+;; about the modules rather than done by them.  Both shell out to tools the
+;; machine's own Guix may not have (dokgen, texi2any, mmdc), so they run in the
+;; environment manifest.scm describes, at the revision channels.scm pins.  The
+;; install tasks keep using the Nix profile `./bootstrap' puts in place.
 
 ;; The modules live in ./src, which maak does not put on the load path by
 ;; itself.  This has to run before the module below is defined.
@@ -23,6 +29,10 @@
   (add-to-load-path
    (string-append (dirname (or (current-filename) "./maak.scm")) "/src")))
 
+;; `scandir' finds the mermaid sources `maak diagrams' renders, and
+;; `string-drop-right' names each image after its source.  (`scandir' comes
+;; from (ice-9 ftw); `string-drop-right' and `string-suffix?' are core Guile
+;; 3.0 procedures, so (srfi srfi-13) would be an unused import here.)
 (define-module (maak)
   #:declarative? #f
   #:use-module ((maak maak) #:hide (log-info log-error))
@@ -45,6 +55,8 @@
   #:use-module (cask-and-cons confluence)
   #:export (default
             compile-sources
+            docs
+            diagrams
             install-brew
             install-nix
             install-git
@@ -69,6 +81,17 @@
 ;; The Confluence module finds the repository through this, and writes it into
 ;; the launchd agent.  Maak runs from the directory of this file.
 (setenv "CACO_DIR" (getcwd))
+
+;; ====== Constants ======
+
+;; The stylesheet the generated API page is read with, shared with the other
+;; jointhefreeworld projects' references.
+(define api-docs-css-url
+  "https://jointhefreeworld.org/static/css/jointhefreeworld.css")
+
+;; The name of the project, and so the directory under ./src that holds it.
+(define project-name
+  'cask-and-cons)
 
 (define (default)
   "List the available tasks."
@@ -95,6 +118,76 @@
                 (exit 1)))
             (find-scm-files "src"))
   (log-success "Compiled project sources"))
+
+;; ====== Documentation ======
+;;
+;; The reference is generated, never written: dokgen loads each module in
+;; src/cask-and-cons/ and writes the Texinfo its docstrings amount to, texi2any
+;; renders that into one HTML page, and the page is put beside the stylesheet,
+;; the script and the diagrams it points at.
+;;
+;; Both tasks run in the environment manifest.scm describes, at the revision
+;; channels.scm pins, so `maak docs' means the same thing on a machine that has
+;; never pulled the jointhefreeworld channel - which is where dokgen lives.
+
+(define (docs)
+  "Generate cask-and-cons's API reference and render it as HTML.
+
+The page is doc/api-dist/index.html.  dokgen reads the modules rather than
+their text, so every exported procedure that has a docstring is in the
+reference; beside the Texinfo it writes the stylesheet, the script and a
+directory of diagrams for the docstrings that carry one, and Texinfo copies
+neither, so they are put beside the page that points at them."
+  (log-info "Generating the API reference")
+  (delete-file-recursively "doc")
+  (time-machine-manifest-shell
+   (list "dokgen" "api"
+         "--destination" "doc/api"
+         (~ "./src/~a" project-name))
+   #:verbose? #t)
+  (mkdir-p "doc/api-dist")
+  (time-machine-manifest-shell
+   (list "texi2any" "-v" "--html" "--no-split"
+         (~ "--css-ref=~a" api-docs-css-url)
+         "-I" "doc/api"
+         "-c" (shell-quote
+               (string-append
+                "EXTRA_HEAD="
+                "<link rel=\"stylesheet\" href=\"dokgen.css\">"
+                "<script src=\"dokgen.js\" defer></script>"))
+         "-o" "doc/api-dist/index.html"
+         "./doc/api/index.texi")
+   #:verbose? #t)
+  (for-each (lambda (asset)
+              (when (file-exists? (~ "doc/api/~a" asset))
+                (cp (~ "doc/api/~a" asset) "doc/api-dist"
+                    #:force? #t #:verbose? #t)))
+            '("dokgen.css" "dokgen.js"))
+  (when (file-exists? "doc/api/diagrams")
+    (cp "doc/api/diagrams" "doc/api-dist" #:force? #t #:verbose? #t))
+  (log-success "Wrote doc/api-dist/index.html"))
+
+(define (diagrams)
+  "Render every mermaid source under resources/diagrams to the SVG beside it.
+
+A diagram is drawn once and committed, both halves of it: the mermaid source and
+the SVG rendered beside it, so reading the README needs no renderer.  Rendering
+is a task of its own because the renderer is a JavaScript tool, found on $PATH,
+which is where `npm install --global @mermaid-js/mermaid-cli' puts it."
+  (log-info "Rendering the diagrams")
+  (for-each
+   (lambda (name)
+     (let* ((source (in-vicinity "resources/diagrams" name))
+            (image (string-append (string-drop-right source 4) ".svg")))
+       ((@ (maak maak) run)
+        (list "mmdc" "-i" source "-o" image
+              "--backgroundColor" "transparent")
+        #:verbose? #t)))
+   (scandir "resources/diagrams"
+            (lambda (name)
+              (and (not (member name '("." "..")))
+                   (string-suffix? ".mmd" name)))))
+  (log-success "Rendered the diagrams"))
 
 ;; ====== Install targets ======
 

@@ -212,6 +212,8 @@ Available tasks:
 - =login-confluence= — log in to Confluence once in a browser (browser auth mode)
 - =install-confluence= — install the launchd agent that runs =sync-confluence= weekly
 - =install-mcp= — write the MCP server config for Copilot (JetBrains, CLI) and ECA (see [[*MCP servers]])
+- =docs= — generate the API reference from the modules into =doc/api-dist/index.html= (see [[*The API reference]])
+- =diagrams= — render every =resources/diagrams/*.mmd= into the SVG beside it
 
 Install targets are just plain tasks named =install-<target>=; there is no separate =install= sub-command or target argument to parse.
 
@@ -253,6 +255,63 @@ To wire up a new module (e.g. a =waybar= module):
   in =maak.scm=, add =install-waybar= to =#:export= and to =install-tasks= (which =hr= runs).
 
 If the module's own function is already named =install-waybar=, list it under =#:re-export= instead of wrapping it.
+
+----------
+
+* macOS system preferences
+
+=maak install-macos= converges the macOS =defaults= database on what
+=src/cask-and-cons/macos.scm= declares. The declaration is plain data — an alist
+of =DOMAIN -> (KEY . VALUE)= — covering Dock and Finder behaviour, the clock,
+Stage Manager and the trackpad. Nothing is written wholesale: each declared key
+is read back with =defaults read=, and only the keys whose live value differs are
+written, with the type flag the value itself picks (=bool=, =int=, =float= or
+=string=). A process is restarted only when a domain it belongs to actually
+changed, so a run that finds everything in place kills nothing.
+
+#+attr_html: :width 720 :alt The macOS defaults declaration, read back key by key, written only where the live value differs, then the affected processes restarted
+[[file:resources/diagrams/macos-defaults.svg]]
+
+Only values that were explicitly set on the scanned machine are declared;
+everything else is left at the macOS default. A machine-specific change is an
+override in =$XDG_CONFIG_HOME/cask-and-cons/macos-settings.scm=, which is loaded
+before any key is read:
+
+#+begin_src scheme
+(macos-settings (append (macos-settings) '(("com.apple.dock" (tilesize . 36)))))
+#+end_src
+
+Not covered, on purpose: Dock tiles (=persistent-apps= holds binary bookmarks)
+and the Caps Lock → Control modifier mapping, which macOS sets per keyboard in
+System Settings.
+
+----------
+
+* The API reference
+
+The reference is generated from the modules rather than written beside them:
+every exported procedure, macro, record and parameter in =src/cask-and-cons/=
+that carries a docstring is in it, because the task loads the modules instead of
+parsing their text.
+
+#+begin_src shell
+maak docs          # doc/api-dist/index.html
+maak diagrams      # re-render resources/diagrams/*.mmd into the SVGs
+#+end_src
+
+=maak docs= writes the Texinfo with [[https://github.com/jjba23/guile-dokgen][dokgen]] and renders it with =texi2any=, then
+puts the page beside the stylesheet, the script and the diagram directory it
+references. =maak diagrams= is separate because the renderer (=mmdc=) is a
+JavaScript tool, found on =$PATH=. Both halves of every diagram are committed —
+the =resources/diagrams/*.mmd= source and the =.svg= rendered beside it — so
+reading this file needs no renderer.
+
+These are the only tasks that need Guix: they run in
+=guix time-machine --channels=channels.scm -- shell -m manifest.scm=, the pinned
+environment in =channels.scm= and =manifest.scm=, because dokgen lives in the
+=jointhefreeworld= channel rather than in Guix itself. The install tasks keep
+running from the Nix profile =./bootstrap= puts in place. The generated =doc/=
+directory is not committed.
 
 ----------
 

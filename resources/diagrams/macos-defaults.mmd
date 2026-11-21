@@ -1,0 +1,17 @@
+flowchart TD
+  declared["(macos-settings):<br/>domain -> (key . value) alist"] --> override{"machine-local override at<br/>$XDG_CONFIG_HOME/cask-and-cons/<br/>macos-settings.scm?"}
+  override -- "yes" --> inForce["load-local-overrides makes it the<br/>declaration, before any key is read"]
+  override -- "no" --> inForce
+  inForce --> domain["for each declared domain"]
+  domain --> key["for each declared key"]
+  key --> read["defaults read DOMAIN KEY"]
+  read --> compare{"equal to value->canonical?"}
+  compare -- "yes" --> untouched["nothing written"]
+  compare -- "no" --> write["defaults write DOMAIN KEY<br/>with value->flag's type flag"]
+  write --> changed["the domain counts as changed"]
+  untouched --> next["the next key"]
+  changed --> next
+  next --> domains["the domains that changed"]
+  domains --> mapping["macos-domain-processes:<br/>domain -> process"]
+  mapping --> restart["killall PROCESS, once per process"]
+  domains --> report["log: already up to date,<br/>or N domain(s) changed"]

@@ -13,8 +13,7 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 format)
   #:use-module (srfi srfi-19)
-  #:export (G_ setup-i18n
-               syscall
+  #:export (syscall
                flatten-list
                spaced-conf-pair
                mk-lines
