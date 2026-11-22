@@ -6,6 +6,8 @@
 #+attr_html: :width 160 :alt Cask & Cons logo
 [[file:logo.svg]]
 
+- 📖 *API reference:* [[https://jointhefreeworld.org/api-docs/cask-and-cons/index.html][Cask & Cons API reference]]
+
 *My work macOS dotfiles.*
 
 ~cask-and-cons~ is driven by [[https://codeberg.org/jjba23/maak][maak]], via the tasks in =maak.scm= (see [[*Get maak]]). Naming stems from a pun on Homebrew casks of macOS and the cons cells of Lisp.
