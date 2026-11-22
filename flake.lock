@@ -34,6 +34,23 @@
         "url": "https://github.com/jjba23/bewaking"
       }
     },
+    "dokgen": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1795344901,
+        "narHash": "sha256-29Zw3rlW1f5vFCuAlCL98kRyUr/4k8UIQPy+d/Fr5YU=",
+        "ref": "refs/tags/v0.11.0",
+        "rev": "c44d5dc19b1a7111eacd1fea134854d006d47d58",
+        "revCount": 118,
+        "type": "git",
+        "url": "https://github.com/jjba23/guile-dokgen"
+      },
+      "original": {
+        "ref": "refs/tags/v0.11.0",
+        "type": "git",
+        "url": "https://github.com/jjba23/guile-dokgen"
+      }
+    },
     "emacs": {
       "inputs": {
         "maak-el": "maak-el",
@@ -254,16 +271,16 @@
     "lambdock": {
       "flake": false,
       "locked": {
-        "lastModified": 1794909452,
-        "narHash": "sha256-u10xg+lSwWxN+UoIn4a/wwnG7mbPQxEnBHsg/dAnIqw=",
-        "ref": "refs/tags/v2.1.7",
-        "rev": "3cd1ed01103b262f6e1dc8450f56203a3c67d097",
-        "revCount": 638,
+        "lastModified": 1795212067,
+        "narHash": "sha256-wKYkeSkAzJhvuHOlD6K8C7PFhjPKMl1AC+DIjuhWDKs=",
+        "ref": "refs/tags/v2.2.3",
+        "rev": "9b8045ab07670d11ffbde6cd85424c984e499d1f",
+        "revCount": 670,
         "type": "git",
         "url": "https://github.com/jjba23/lambdock"
       },
       "original": {
-        "ref": "refs/tags/v2.1.7",
+        "ref": "refs/tags/v2.2.3",
         "type": "git",
         "url": "https://github.com/jjba23/lambdock"
       }
@@ -288,16 +305,16 @@
     "maak": {
       "flake": false,
       "locked": {
-        "lastModified": 1794897743,
-        "narHash": "sha256-EI8UkOsoEpceTHLQtekqI42+nkoVdSiMxzyLMvHYfdU=",
-        "ref": "refs/tags/v0.25.0",
-        "rev": "90eb3b4de5743381d9bab808e4135483cd8d4bd8",
-        "revCount": 298,
+        "lastModified": 1795272286,
+        "narHash": "sha256-zolaVBG7wbdFugJdIJlRAHzFkhrJR9exjwm46EbrUzM=",
+        "ref": "refs/tags/v1.1.2",
+        "rev": "e6f4593fe5b8abbbce560f8693b7e9b6bc44754c",
+        "revCount": 320,
         "type": "git",
         "url": "https://github.com/jjba23/maak"
       },
       "original": {
-        "ref": "refs/tags/v0.25.0",
+        "ref": "refs/tags/v1.1.2",
         "type": "git",
         "url": "https://github.com/jjba23/maak"
       }
@@ -356,6 +373,7 @@
       "inputs": {
         "araneola": "araneola",
         "bewaking": "bewaking",
+        "dokgen": "dokgen",
         "emacs": "emacs",
         "ggg": "ggg",
         "guile-deps": "guile-deps",
@@ -376,11 +394,11 @@
         "whelk": "whelk"
       },
       "locked": {
-        "lastModified": 1794909696,
-        "narHash": "sha256-fhmbqtB3UsyFhfEeMJ/KUSSElNktq1RzQTxTJhNfRwc=",
+        "lastModified": 1795344979,
+        "narHash": "sha256-pxoa3+DT6wSKAkxCa4aPweAEB4r6cT418JoMKBcJX2w=",
         "ref": "refs/heads/trunk",
-        "rev": "3266ad6ba10ab3fe9a9968b1e15048d5a2997a96",
-        "revCount": 154,
+        "rev": "692f8abefd385ca77fbbdad9f22896cf9d1aa584",
+        "revCount": 197,
         "type": "git",
         "url": "https://github.com/jjba23/nix-jointhefreeworld"
       },
@@ -391,11 +409,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1792773339,
-        "narHash": "sha256-rZLrzrC6i+jnTAlvPZHogKDulY7WWDEv9hJeHieO7Zw=",
+        "lastModified": 1794537146,
+        "narHash": "sha256-Wpz/7x/YWnDIBu7yj6ixe8j6fIMsidd9Y+o1PqPF3iM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "3ec636362e1816bc2f0888fa0fa2c69f1bc9e504",
+        "rev": "d5cc6833999746cffdfe0598f7bc801a57b887a9",
         "type": "github"
       },
       "original": {
@@ -425,18 +443,18 @@
     "orgwebalchemy": {
       "flake": false,
       "locked": {
-        "lastModified": 1794497622,
-        "narHash": "sha256-OGHIUN4YxutVGNsGlLwTuXZFsihPauqiS+ZCVylEsQI=",
-        "ref": "refs/tags/v1.2.9",
-        "rev": "d087afdd5a6a5bb4bfd667720d6444ac0781521c",
-        "revCount": 139,
+        "lastModified": 1795212916,
+        "narHash": "sha256-DFOjr/0Z3j01U/XW+TXDNApeesBwPutfDJaRFJTA7sA=",
+        "ref": "refs/tags/v1.3.0",
+        "rev": "cd60a6668221ab37c383c7f40dc76675ffa6db8a",
+        "revCount": 147,
         "type": "git",
-        "url": "https://codeberg.org/jjba23/orgwebalchemy"
+        "url": "https://github.com/jjba23/orgwebalchemy"
       },
       "original": {
-        "ref": "refs/tags/v1.2.9",
+        "ref": "refs/tags/v1.3.0",
         "type": "git",
-        "url": "https://codeberg.org/jjba23/orgwebalchemy"
+        "url": "https://github.com/jjba23/orgwebalchemy"
       }
     },
     "root": {
@@ -468,16 +486,16 @@
     "sift": {
       "flake": false,
       "locked": {
-        "lastModified": 1794746185,
-        "narHash": "sha256-wmclwKtnE8wKimNh3qMccCU0Fs3F7La0EnKJ3daUkm8=",
-        "ref": "refs/tags/v1.37.0",
-        "rev": "1b5d673171f31bf42d7b3fd2b4382cd1561df4b7",
-        "revCount": 193,
+        "lastModified": 1795283770,
+        "narHash": "sha256-vLUHHoV+lGojBnJ31A3BjuYIcwaKB/yzZ7rVcMoaEC8=",
+        "ref": "refs/tags/v1.39.2",
+        "rev": "2614ec73bf5a4ebfddbf77392de9aaa9200e93ef",
+        "revCount": 205,
         "type": "git",
         "url": "https://github.com/jjba23/sift"
       },
       "original": {
-        "ref": "refs/tags/v1.37.0",
+        "ref": "refs/tags/v1.39.2",
         "type": "git",
         "url": "https://github.com/jjba23/sift"
       }
@@ -552,16 +570,16 @@
     "whelk": {
       "flake": false,
       "locked": {
-        "lastModified": 1794905208,
-        "narHash": "sha256-Elalhi0UYbznEaQB9lskR+npmsj6nx2tbNl69ugE3JY=",
-        "ref": "refs/tags/v0.38.0",
-        "rev": "9565efe329f05ba9771558812f49be48914f2eb5",
-        "revCount": 133,
+        "lastModified": 1795217742,
+        "narHash": "sha256-4mgpz12uQI6MOkjJXKTB3rMhj2CHPYbbywSRiJFNzao=",
+        "ref": "refs/tags/v0.49.0",
+        "rev": "91a32ffa8ed63e5f8155f3dad5a45a788fcbbc13",
+        "revCount": 185,
         "type": "git",
         "url": "https://github.com/jjba23/whelk"
       },
       "original": {
-        "ref": "refs/tags/v0.38.0",
+        "ref": "refs/tags/v0.49.0",
         "type": "git",
         "url": "https://github.com/jjba23/whelk"
       }
