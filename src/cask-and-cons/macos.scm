@@ -4,6 +4,8 @@
 
 ;;; SPDX-License-Identifier: MIT
 
+;;; Commentary:
+;;;
 ;;; Declarative macOS system preferences (the `defaults' database).
 ;;;
 ;;; `macos-default-settings' is plain data: an alist of
@@ -13,10 +15,32 @@
 ;;; key with the live value, writes only what differs, and restarts only the
 ;;; processes (Dock, Finder, ...) whose domain actually changed.
 ;;;
+;;; ```mermaid
+;;; flowchart TD
+;;;   declared["(macos-settings):<br/>domain -> (key . value) alist"] --> override{"machine-local override at<br/>$XDG_CONFIG_HOME/cask-and-cons/<br/>macos-settings.scm?"}
+;;;   override -- "yes" --> inForce["load-local-overrides makes it the<br/>declaration, before any key is read"]
+;;;   override -- "no" --> inForce
+;;;   inForce --> domain["for each declared domain"]
+;;;   domain --> key["for each declared key"]
+;;;   key --> read["defaults read DOMAIN KEY"]
+;;;   read --> compare{"equal to value->canonical?"}
+;;;   compare -- "yes" --> untouched["nothing written"]
+;;;   compare -- "no" --> write["defaults write DOMAIN KEY<br/>with value->flag's type flag"]
+;;;   write --> changed["the domain counts as changed"]
+;;;   untouched --> next["the next key"]
+;;;   changed --> next
+;;;   next --> domains["the domains that changed"]
+;;;   domains --> mapping["macos-domain-processes:<br/>domain -> process"]
+;;;   mapping --> restart["killall PROCESS, once per process"]
+;;;   domains --> report["log: already up to date,<br/>or N domain(s) changed"]
+;;; ```
+;;;
 ;;; Only values that were explicitly set on the scanned machine are declared
 ;;; here; everything else is left at the macOS default.  Not covered, on
 ;;; purpose: Dock tiles (`persistent-apps' holds binary bookmarks) and the
 ;;; Caps Lock -> Control modifier mapping (set per keyboard in System Settings).
+;;;
+;;; Code:
 
 (define-module (cask-and-cons macos)
   #:declarative? #t

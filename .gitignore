@@ -1,1 +1,3 @@
 __pycache__
+# The API reference `maak docs' writes, and the page it is rendered to.
+doc/
