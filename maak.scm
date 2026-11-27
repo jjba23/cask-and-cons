@@ -80,7 +80,7 @@
     (ftw dir
          (lambda (filename statinfo flag)
            (when (and (eq? flag 'regular)
-                      (string-suffix? ".scm" filename))
+                   (string-suffix? ".scm" filename))
              (set! acc (cons filename acc)))
            #t))
     acc))
@@ -149,7 +149,10 @@
   (list install-brew install-nix install-git install-gpg install-omniwm
         install-emacs-bridge install-zsh install-wezterm install-fontconfig
         install-jetbrains-fonts install-macos install-skhd install-mcp
-        install-kotlin-lsp install-ollama install-confluence))
+        ;; install-kotlin-lsp
+        ;; install-ollama
+        ;; install-confluence
+        ))
 
 (define (hr)
   "Run every install-* task, in dependency order."
