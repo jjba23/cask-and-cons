@@ -16,7 +16,7 @@
                             font-mono-postscript-name))
 
 ;;; The one place that picks the typefaces: sans, serif and monospace.  Emacs and
-;;; WezTerm follow these, and `font-casks' (installed by the Homebrew module)
+;;; iTerm2 follow these, and `font-casks' (installed by the Homebrew module)
 ;;; guarantees they are present.
 (define font-sans "Work Sans")
 (define font-serif "Source Serif 4")
@@ -30,7 +30,7 @@
 (define font-casks '("font-work-sans" "font-source-serif-4" "font-juliamono"))
 
 ;;; The one place that picks the colour scheme: a name from `theme-names'.
-;;; Emacs and WezTerm both follow it.  Change it here to retheme every consumer.
+;;; Emacs and iTerm2 both follow it.  Change it here to retheme every consumer.
 (define global-theme 'modus-operandi-tinted)
 
 ;;; The palettes come from heks-linux (codeberg.org/jjba23/heks-linux), so a
@@ -81,7 +81,7 @@
     (golden-gate-dark modus-vivendi #t "#f5f5f7" "#1e1e1e" "#0a84ff" "#2c2c2e")))
 
 ;;; Optional hand-tuned ANSI colours, for themes where the terminal should not
-;;; fall back on WezTerm's defaults.
+;;; fall back on the defaults.
 (define theme-ansi-overrides
   '((modus-operandi ("ansi" "#000000" "#a60000" "#006800" "#6f5500"
                      "#0031a9" "#721045" "#005e8b" "#a6a6a6")
@@ -105,7 +105,7 @@
   (cadr (theme-definition name)))
 
 (define (theme-palette name)
-  "Return the WezTerm colours of theme @var{name} as an association list."
+  "Return the terminal colours of theme @var{name} as an association list."
   (let* ((d (cddr (theme-definition name)))
          (text (list-ref d 0))
          (bg (list-ref d 1))

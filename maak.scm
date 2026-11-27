@@ -34,13 +34,12 @@
   #:use-module (cask-and-cons omniwm)
   #:use-module (cask-and-cons emacs)
   #:use-module (cask-and-cons zsh)
-  #:use-module (cask-and-cons wezterm)
+  #:use-module (cask-and-cons iterm)
   #:use-module (cask-and-cons fonts)
   #:use-module (cask-and-cons macos)
   #:use-module (cask-and-cons skhd)
   #:use-module (cask-and-cons mcp)
   #:use-module (cask-and-cons kotlin-lsp)
-  #:use-module (cask-and-cons ollama)
   #:use-module (cask-and-cons nix)
   #:use-module (cask-and-cons confluence)
   #:export (default
@@ -51,7 +50,7 @@
             install-gpg
             install-omniwm
             install-zsh
-            install-wezterm
+            install-iterm
             install-macos
             install-skhd
             install-mcp
@@ -62,7 +61,6 @@
                install-fontconfig
                install-jetbrains-fonts
                install-kotlin-lsp
-               install-ollama
                sync-confluence
                login-confluence))
 
@@ -122,9 +120,9 @@
   "Install the ZSH configuration (~/.zshrc and the pager keymap)."
   (install-zsh-config))
 
-(define (install-wezterm)
-  "Install the WezTerm configuration."
-  (install-wezterm-config))
+(define (install-iterm)
+  "Install the iTerm2 profile (colours, font, Meta key, scrollback)."
+  (install-iterm-config))
 
 (define (install-macos)
   "Converge the macOS system preferences declared in macos.scm."
@@ -147,10 +145,9 @@
 (define install-tasks
   ;; Order matters: brew provides what the later tasks call.
   (list install-brew install-nix install-git install-gpg install-omniwm
-        install-emacs-bridge install-zsh install-wezterm install-fontconfig
+        install-emacs-bridge install-zsh install-iterm install-fontconfig
         install-jetbrains-fonts install-macos install-skhd install-mcp
         ;; install-kotlin-lsp
-        ;; install-ollama
         ;; install-confluence
         ))
 

@@ -57,7 +57,6 @@
     "tmux"
     "mongosh"
     "mongodb/brew/mongodb-database-tools"
-    "ollama"
     "mas"
     "gnu-sed"
     "gawk"
@@ -96,8 +95,7 @@
     "rectangle"
     "stats"
     "keepassxc"
-    "raycast"
-    "wezterm"))
+    "raycast"))
 
 (define (brew-output . args)
   "Run brew with @var{args}; return its stdout lines as a list."

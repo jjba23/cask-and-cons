@@ -67,109 +67,27 @@ Go to https://brew.sh and install it
 
 --------
 
-* Install iTerm2
+* iTerm2
 
 #+begin_src shell
 brew install --cask iterm2
+maak install-iterm
 #+end_src
 
-I like to use Emacs Bindings for navigating the terminal. The iTerm2 default for the Control key works just fine, but the Meta key puts junk in the terminal. To fix this, iTerm2 needs to know that “Left Option” needs to be treated as a Meta key.
+=maak install-iterm= writes an iTerm2 Dynamic Profile to
+=~/Library/Application Support/iTerm2/DynamicProfiles/cask-and-cons.json=
+(generated from =src/cask-and-cons/iterm.scm=) and makes it the default profile.
+It follows =global-theme= and =font-mono= from =user-settings.scm=, so the colours
+(foreground, background, cursor, selection, ANSI) and the font match Heks Emacs.
+It also sets Left/Right Option to Esc+ (Meta), 100k lines of scrollback, and the
+window transparency and blur. Restart iTerm2 after the first run.
 
-Open Settings
-Click on Profile
-Click on Keys
-In the bottom right corner, You’ll see Left Option. Change that to Esc+
+A machine-specific override can be dropped at
+=~/.config/cask-and-cons/iterm-settings.scm= to tweak the parameters
+(=iterm-window-opacity=, =iterm-window-blur=, =iterm-font-size=, ...).
 
-I set it to 100k lines scrollback
-
-Then I set the window to have some transparency and blur.
-
-I also add some basic Emacs motions and bindings to iTerm profile, e.g. ~C-v~ for page down, etc.
-
---------
-
-* WezTerm
-
-WezTerm is declared in =src/cask-and-cons/brew.scm= (=maak install-brew= installs
-it), and unlike iTerm2 it is configured from Lisp rather than by hand:
-
-#+begin_src shell
-maak install-wezterm
-#+end_src
-
-writes =~/.config/wezterm/wezterm.lua=, generated from
-=src/cask-and-cons/wezterm.scm=. Everything the iTerm2 setup above asks you to
-click through - the Meta key, 100k lines of scrollback, the transparency and the
-blur - is a value in that module (=wezterm-font-family=, =wezterm-scrollback-lines=,
-=wezterm-window-opacity=, =wezterm-window-blur=), and the font and the colours are
-the ones the Emacs bridge gives Heks Emacs (=Intel One Mono=, =ayu-dark=).
-
-Two keyboard settings replace the iTerm2 clicking outright. Option is not Meta on
-macOS by default - it composes characters, so =M-v= types a mathematical symbol
-instead of paging - so the generated file turns
-off =send_composed_key_when_left_alt_is_pressed= and
-=send_composed_key_when_right_alt_is_pressed=, and Option reaches the application
-as ESC. =enable_kitty_keyboard= lets a program that asks for the kitty keyboard
-protocol (Emacs does) tell chords apart that the legacy encoding cannot, such as
-=C-i= against =TAB=.
-
-The window keeps its title bar and its resize border: the generated file asks for
-=window_decorations = 'TITLE | RESIZE'=, so macOS draws the native title bar with
-its traffic lights and moving, closing and resizing all work the way they always
-did. Tabs still exist, but the tab bar stays hidden while there is only one tab.
-
-The value is shared with the Linux twin, and it is also the default value of
-=WindowDecorations=, which is what makes it the right one on Wayland: the default
-asks the compositor to follow the server's decorations, while any non-default
-value (=RESIZE=, =TITLE= alone, anything with =INTEGRATED_BUTTONS=) makes WezTerm
-paint a client-side frame of its own -- on the Linux side of this pair that frame
-is a 33 pixel band of flat dark with no title and no buttons in it.
-
-The key bindings are the Emacs ones, and they are *guarded*: WezTerm asks each
-pane which process is in front of it, and while the answer is one of
-=wezterm-yield-apps= - Emacs above all, but also =less=, the editors, the
-full-screen TUIs, the multiplexers and the REPLs - the chord is handed straight
-back to that application. Inside Emacs =C-x= is Emacs's =C-x=; at a shell prompt it
-is the prefix of the terminal's window commands. =C-c= is never bound, because it
-is the interrupt signal.
-
-The guard is what lets the terminal claim the page keys at all: =C-v= pages the
-scrollback forward and =M-v= pages it back, and inside Emacs or the pager those
-same chords are handed over untouched, so the pager keeps its =forw-screen= and
-=back-screen= (see [[*The pager][The pager]]) and Emacs keeps its =scroll-up-command=.
-WezTerm's own bare-modifier defaults are re-registered through the same guard -
-=C-Tab=, =C-S-Tab=, =C-PageUp=, =C-PageDown=, =M-Enter= and =C-Insert= - so a
-full-screen program receives them instead of the terminal.
-
-| Chord                     | WezTerm does                       | Emacs equivalent                |
-|---------------------------+------------------------------------+---------------------------------|
-| =C-x 2=                   | split the pane below               | =C-x 2= split-window-below      |
-| =C-x 3=                   | split the pane to the right        | =C-x 3= split-window-right      |
-| =C-x 1=                   | zoom the pane in place             | =C-x 1= delete-other-windows    |
-| =C-x 0=                   | close the pane                     | =C-x 0= delete-window           |
-| =C-x o=                   | move to the next pane              | =C-x o= other-window            |
-| =C-x b=                   | pick a pane by name                | =C-x b= switch-to-buffer        |
-| =C-x <left> / <right>=    | previous / next tab                | =C-x <left>= previous-buffer    |
-| =C-x g=                   | leave the prefix                   | =C-g= keyboard-quit             |
-| =S-<arrow>=               | move to the pane in that direction | =S-<arrow>= windmove            |
-| =C-y= / =M-w=             | paste / copy                       | =C-y= yank, =M-w= kill-ring-save |
-| =C-=, =C--, =C-0=        | grow / shrink / reset the font     | =C-=, =C--= text-scale          |
-| =M-s=                     | search the scrollback              | =M-s= search prefix             |
-| =C-v= / =M-v=             | page the scrollback down / up      | =C-v= / =M-v= scroll-up-command |
-| =S-PageUp= / =S-PageDown= | page the scrollback                | =S-PageUp= scroll-other-window  |
-| =S-Home= / =S-End=        | top / bottom of the scrollback     |                                 |
-
-That list is what the terminal does when no application owns the keyboard; while
-Emacs, =less= or any other entry of =wezterm-yield-apps= is in front, every one of
-these chords goes to it instead. The guard needs
-=pane:get_foreground_process_name()=, which only answers for local panes, so over
-=ssh= or inside the WezTerm multiplexer the terminal keeps its own binding - and
-that is why the scrollback also stays on =S-PageUp= and =S-PageDown=.
-
-As with the other install targets, a machine-specific override can be dropped at
-=$XDG_CONFIG_HOME/cask-and-cons/wezterm-settings.scm= (defaulting to
-=~/.config/cask-and-cons/wezterm-settings.scm=) to tweak the parameters before the
-file is rendered. WezTerm reloads the generated file on its own.
+Emacs-style key mappings (e.g. ~C-v~ for page down) are not generated; add them
+in the iTerm2 profile's Keys tab.
 
 --------
 
@@ -206,7 +124,7 @@ Available tasks:
 - =install-omniwm= — install the OmniWM configuration
 - =install-emacs-bridge= — install the settings Heks Emacs reads (=~/.emacs.d/cask-and-cons-bridge.el=)
 - =install-zsh= — install the ZSH configuration (=~/.zshrc= and the pager keymap)
-- =install-wezterm= — install the WezTerm configuration (=~/.config/wezterm/wezterm.lua=)
+- =install-iterm= — install the iTerm2 Dynamic Profile (colours, font, Meta key, scrollback)
 - =install-macos= — converge macOS system preferences (Dock, Finder, trackpad, clock, ...) declared in =src/cask-and-cons/macos.scm=; only changed keys are written and only affected processes (Dock, Finder) restart. Override with =~/.config/cask-and-cons/macos-settings.scm=, e.g. =(macos-settings (append (macos-settings) '(("com.apple.dock" (tilesize . 36)))))=
 - =sync-confluence= — one-off sync of Confluence Cloud to local Markdown (see [[*Confluence mirror]])
 - =login-confluence= — log in to Confluence once in a browser (browser auth mode)
@@ -405,7 +323,7 @@ Control + Command + O	Toggle Overview
 Control + Command + 1-9	Focus column 1-9
 Control + Command + - / =	Narrow / widen the column
 Control + Command + , / .	Consume / expel window into / from a column
-Command + Return, Command + /	Open WezTerm, Raycast (skhd)
+Command + Return, Command + /	Open iTerm2, Raycast (skhd)
 Focus and move use Command instead of Option (set in =src/cask-and-cons/omniwm-settings.toml=, installed with =maak install-omniwm=). OmniWM rejects incomplete settings files, so that file is a full OmniWM-generated snapshot with my tweaks; regenerate it if OmniWM bumps =schemaVersion=.
 Every shortcut is customizable in Settings > Hotkeys; the complete list lives in Keyboard Shortcuts.
 

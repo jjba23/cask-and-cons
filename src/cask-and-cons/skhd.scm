@@ -19,9 +19,9 @@
   (make-parameter
    ;; Command plays the part of niri's Mod key (heks-linux).  Chords that
    ;; macOS needs for editing (C, V, X, A, S, Q, M, L, P, I) are left alone.
-   '(("cmd - return" "open -a WezTerm")
+   '(("cmd - return" "open -a iTerm")
      ("cmd - 0x2C" "open -a Raycast")   ; cmd - /  (niri: Mod+/ launcher)
-     ("cmd - t" "open -a WezTerm")
+     ("cmd - t" "open -a iTerm")
      ("cmd - e" "/opt/homebrew/bin/emacsclient -c -n -a ''")
      ("cmd - b" "open -a Finder ~"))))
 
